@@ -2,10 +2,11 @@ import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, tap } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private api = 'http://localhost:3000/api/auth';
+  private api = `${environment.apiUrl}/auth`;
 
   // On garde le subject pour les composants qui s'y abonnent (ex: sidebar)
   private userSubject = new BehaviorSubject<any>(null);
