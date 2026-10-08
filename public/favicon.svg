@@ -1,13 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <defs>
-    <clipPath id="circle">
+    <clipPath id="c">
       <circle cx="50" cy="50" r="50"/>
     </clipPath>
   </defs>
   <image
-    href="/nou.jpeg"
-    x="0" y="0"
-    width="100" height="100"
+    href="data:image/jpeg;base64,COLLE_ICI_LA_CHAINE_BASE64"
+    x="0" y="0" width="100" height="100"
     preserveAspectRatio="xMidYMid slice"
-    clip-path="url(#circle)"/>
+    clip-path="url(#c)"/>
 </svg>
