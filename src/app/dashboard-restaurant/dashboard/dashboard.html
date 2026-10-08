@@ -1,0 +1,177 @@
+<section class="dashboard-resto">
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Chargement du tableau de bord…</p>
+  </div>
+
+  <ng-container *ngIf="!isLoading && stats">
+
+    <!-- =========================================================
+         HERO
+         ========================================================= -->
+    <div class="hero">
+      <div class="hero-left">
+        <span class="hero-greeting">{{ getGreeting() }} 👋</span>
+        <h1>{{ stats.restaurant.name }}</h1>
+
+        <div class="hero-rating">
+          <i class="bi bi-star-fill"></i>
+          {{ stats.restaurant.rating > 0 ? stats.restaurant.rating.toFixed(1) : 'Nouveau' }}
+          <span class="muted">({{ stats.restaurant.totalReviews }} avis)</span>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <button
+          class="btn-toggle-open"
+          [class.open]="stats.restaurant.isOpen"
+          [disabled]="isTogglingOpen"
+          (click)="toggleOpen()">
+
+          <span class="dot"></span>
+          {{ stats.restaurant.isOpen ? 'Ouvert' : 'Fermé' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         STATS CARDS
+         ========================================================= -->
+    <div class="stats-grid">
+
+      <div class="stat-card">
+        <div class="stat-icon red">
+          <i class="bi bi-bag-check"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Commandes aujourd'hui</span>
+          <span class="stat-value">{{ stats.today.orders }}</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon green">
+          <i class="bi bi-cash-stack"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">CA aujourd'hui</span>
+          <span class="stat-value">{{ stats.today.revenue | number }} Ar</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon blue">
+          <i class="bi bi-graph-up-arrow"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">CA ce mois</span>
+          <span class="stat-value">{{ stats.month.revenue | number }} Ar</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon orange">
+          <i class="bi bi-clock-history"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">En attente</span>
+          <span class="stat-value">{{ stats.status.pending }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =========================================================
+         STATUTS COMMANDES
+         ========================================================= -->
+    <div class="section-card">
+      <h2><i class="bi bi-kanban"></i> État des commandes</h2>
+
+      <div class="status-row">
+        <a routerLink="/restaurant/commandes" class="status-box pending">
+          <span class="status-count">{{ stats.status.pending }}</span>
+          <span class="status-label">En attente</span>
+          <i class="bi bi-hourglass-split"></i>
+        </a>
+
+        <a routerLink="/restaurant/commandes" class="status-box preparing">
+          <span class="status-count">{{ stats.status.preparing }}</span>
+          <span class="status-label">En préparation</span>
+          <i class="bi bi-fire"></i>
+        </a>
+
+        <a routerLink="/restaurant/commandes" class="status-box delivering">
+          <span class="status-count">{{ stats.status.delivering }}</span>
+          <span class="status-label">En livraison</span>
+          <i class="bi bi-truck"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         GRAPHIQUE 7 JOURS
+         ========================================================= -->
+    <div class="section-card">
+      <h2><i class="bi bi-bar-chart-line"></i> Ventes des 7 derniers jours</h2>
+
+      <div class="chart">
+        <div class="chart-bars">
+          <div class="bar-wrap" *ngFor="let d of chartData">
+            <div class="bar-tooltip">
+              {{ d.revenue | number }} Ar
+            </div>
+            <div class="bar"
+                 [style.height.%]="getBarHeight(d.revenue)"
+                 [style.background]="d.revenue > 0 ? 'linear-gradient(180deg, #ff6b6b, #ee5a24)' : 'rgba(255,255,255,0.04)'">
+            </div>
+            <span class="bar-day">{{ d.day }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         TOP PRODUITS
+         ========================================================= -->
+    <div class="section-card" *ngIf="topProducts.length > 0">
+      <h2><i class="bi bi-trophy"></i> Top 5 produits</h2>
+
+      <div class="top-products">
+        <div class="top-product" *ngFor="let p of topProducts; let i = index">
+          <span class="rank">#{{ i + 1 }}</span>
+          <div class="product-info">
+            <h3>{{ p.name }}</h3>
+            <p>{{ p.quantity }} vendus</p>
+          </div>
+          <span class="product-revenue">{{ p.revenue | number }} Ar</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         LIENS RAPIDES
+         ========================================================= -->
+    <div class="quick-actions">
+      <a routerLink="/restaurant/commandes" class="quick-action">
+        <i class="bi bi-box-seam"></i>
+        <span>Voir les commandes</span>
+      </a>
+      <a routerLink="/restaurant/produits" class="quick-action">
+        <i class="bi bi-menu-app"></i>
+        <span>Gérer les produits</span>
+      </a>
+      <a routerLink="/restaurant/promotions" class="quick-action">
+        <i class="bi bi-megaphone"></i>
+        <span>Mes promotions</span>
+      </a>
+      <a routerLink="/restaurant/statistiques" class="quick-action">
+        <i class="bi bi-graph-up"></i>
+        <span>Statistiques</span>
+      </a>
+    </div>
+
+  </ng-container>
+
+</section>

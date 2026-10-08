@@ -1,0 +1,183 @@
+<!-- =========================================================
+     CLIENT SIDEBAR
+     ========================================================= -->
+<aside class="client-sidebar" [class.collapsed]="isCollapsed">
+
+  <!-- =========================================================
+       EN-TÊTE
+       ========================================================= -->
+  <div class="sidebar-header">
+
+    <a class="sidebar-brand" routerLink="/client/dashboard" aria-label="Retour à l'accueil">
+      <span class="brand-icon">🍽️</span>
+      <span class="brand-text">Komandy</span>
+      <span class="brand-dot"></span>
+    </a>
+
+    <button
+      type="button"
+      class="btn-toggle"
+      (click)="toggleSidebar()"
+      [attr.aria-label]="isCollapsed ? 'Ouvrir la sidebar' : 'Réduire la sidebar'"
+      [attr.aria-expanded]="!isCollapsed"
+      [attr.title]="isCollapsed ? 'Ouvrir' : 'Réduire'">
+      <i class="bi"
+         [class.bi-chevron-right]="isCollapsed"
+         [class.bi-chevron-left]="!isCollapsed"></i>
+    </button>
+
+  </div>
+
+  <!-- =========================================================
+       PROFIL UTILISATEUR (dynamique)
+       ========================================================= -->
+  <div class="sidebar-profile">
+    <div class="profile-avatar">
+
+      <!-- Photo uploadée -->
+      <img
+        *ngIf="hasAvatar()"
+        [src]="getAvatarUrl()"
+        [alt]="'Photo de ' + userName">
+
+      <!-- Initiales colorées par défaut -->
+      <div
+        *ngIf="!hasAvatar()"
+        class="avatar-initials"
+        [style.background]="getUserGradient()">
+        {{ getUserInitials() }}
+      </div>
+
+      <span class="online-status" aria-label="En ligne"></span>
+    </div>
+
+    <div class="profile-info">
+      <h6 class="profile-name">{{ userName || 'Client' }}</h6>
+      <span class="profile-role">Client</span>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       NAVIGATION PRINCIPALE
+       ========================================================= -->
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+
+      <!-- Tableau de bord -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/client/dashboard"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          [attr.title]="isCollapsed ? 'Tableau de bord' : null">
+          <i class="bi bi-grid-1x2-fill"></i>
+          <span class="nav-text">Tableau de bord</span>
+        </a>
+      </li>
+
+      <!-- Restaurants -->
+      <li class="nav-item">
+        <a
+  class="nav-link"
+  routerLink="/client/restaurants"
+  routerLinkActive="active"
+  [attr.title]="isCollapsed ? 'Restaurants' : null">
+  <i class="bi bi-shop"></i>
+  <span class="nav-text">Restaurants</span>
+  <span class="nav-badge" *ngIf="restaurantsCount > 0">{{ restaurantsCount }}</span>
+</a>
+      </li>
+
+      <!-- Commandes (badge dynamique) -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/client/commandes"
+          routerLinkActive="active"
+          [attr.title]="isCollapsed ? 'Mes commandes' : null">
+          <i class="bi bi-box-seam"></i>
+          <span class="nav-text">Mes commandes</span>
+          <span class="nav-badge" *ngIf="ordersCount > 0">{{ ordersCount }}</span>
+        </a>
+      </li>
+
+      <!-- Favoris (badge dynamique) -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/client/favoris"
+          routerLinkActive="active"
+          [attr.title]="isCollapsed ? 'Favoris' : null">
+          <i class="bi bi-heart"></i>
+          <span class="nav-text">Favoris</span>
+          <span class="nav-badge" *ngIf="favoritesCount > 0">{{ favoritesCount }}</span>
+        </a>
+      </li>
+
+      <!-- Promotions -->
+      <li class="nav-item">
+        <a
+  class="nav-link"
+  routerLink="/client/promotions"
+  routerLinkActive="active"
+  [attr.title]="isCollapsed ? 'Promotions' : null">
+  <i class="bi bi-tags"></i>
+  <span class="nav-text">Promotions</span>
+  <span class="nav-badge promo" *ngIf="promotionsCount > 0">{{ promotionsCount }}</span>
+</a>
+      </li>
+
+    </ul>
+  </nav>
+
+  <!-- =========================================================
+       SÉPARATEUR
+       ========================================================= -->
+  <div class="sidebar-divider"></div>
+
+  <!-- =========================================================
+       NAVIGATION BASSE
+       ========================================================= -->
+  <nav class="sidebar-nav bottom-nav">
+    <ul class="nav-list">
+
+      <!-- Mon profil -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/client/profil"
+          routerLinkActive="active"
+          [attr.title]="isCollapsed ? 'Mon profil' : null">
+          <i class="bi bi-person"></i>
+          <span class="nav-text">Mon profil</span>
+        </a>
+      </li>
+
+      <!-- Paramètres -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/client/parametres"
+          routerLinkActive="active"
+          [attr.title]="isCollapsed ? 'Paramètres' : null">
+          <i class="bi bi-gear"></i>
+          <span class="nav-text">Paramètres</span>
+        </a>
+      </li>
+
+      <!-- Déconnexion -->
+      <li class="nav-item">
+        <a
+          class="nav-link logout"
+          (click)="onLogout()"
+          [attr.title]="isCollapsed ? 'Déconnexion' : null">
+          <i class="bi bi-box-arrow-right"></i>
+          <span class="nav-text">Déconnexion</span>
+        </a>
+      </li>
+
+    </ul>
+  </nav>
+
+</aside>

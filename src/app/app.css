@@ -1,0 +1,35 @@
+
+:host {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #0a0e1a;
+}
+
+
+.main-content {
+    flex: 1;
+    background: #0a0e1a;
+    position: relative;
+    z-index: 1;
+  
+    & > * {
+        background: transparent;
+    }
+}
+
+main {
+    margin: 0;
+    padding: 0;
+    background: #0a0e1a;
+}
+
+
+router-outlet {
+    display: none;
+}
+
+
+router-outlet + * {
+    background: #0a0e1a;
+}

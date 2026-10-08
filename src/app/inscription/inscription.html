@@ -1,0 +1,219 @@
+<!-- register.component.html -->
+<section class="register-section">
+  <div class="container">
+    <div class="register-wrapper">
+      
+      <!-- Colonne Gauche - Présentation -->
+      <div class="register-presentation">
+        <div class="presentation-content">
+          
+          <!-- Badge -->
+          <div class="presentation-badge">
+            <span class="badge-icon"></span>
+            Rejoignez la communauté
+          </div>
+
+          <!-- Titre -->
+          <h1 class="presentation-title">
+            Créez votre compte <br>
+            <span class="brand-gradient">en un clic</span>
+          </h1>
+
+          <!-- Description -->
+          <p class="presentation-description">
+            Que vous soyez un client passionné de bonne cuisine 
+            ou un restaurateur ambitieux, Komandy vous offre 
+            la plateforme idéale pour développer votre activité.
+          </p>
+
+          <!-- Avantages -->
+          <div class="presentation-benefits">
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <i class="bi bi-check-circle-fill"></i>
+              </div>
+              <div class="benefit-text">
+                <span>Inscription gratuite et rapide</span>
+              </div>
+            </div>
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <i class="bi bi-check-circle-fill"></i>
+              </div>
+              <div class="benefit-text">
+                <span>Accès à toutes les fonctionnalités</span>
+              </div>
+            </div>
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <i class="bi bi-check-circle-fill"></i>
+              </div>
+              <div class="benefit-text">
+                <span>Support client disponible 7j/7</span>
+              </div>
+            </div>
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <i class="bi bi-check-circle-fill"></i>
+              </div>
+              <div class="benefit-text">
+                <span>Pas de frais cachés</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Statistiques -->
+          <div class="presentation-stats">
+            <div class="stat">
+              <span class="stat-number">500+</span>
+              <span class="stat-label">Restaurants</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+              <span class="stat-number">10k+</span>
+              <span class="stat-label">Clients</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+              <span class="stat-number">4.8★</span>
+              <span class="stat-label">Satisfaction</span>
+            </div>
+          </div>
+
+          <!-- Témoignage -->
+          <div class="presentation-testimonial">
+            <div class="testimonial-avatar">
+              <span class="avatar-emoji">👨‍🍳</span>
+            </div>
+            <div class="testimonial-text">
+              <p>"Komandy a boosté mes commandes de 40% en seulement 2 mois !"</p>
+              <span class="testimonial-author">- Jean, Restaurant Le Gourmet</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Colonne Droite - Choix du type de compte -->
+      <div class="register-form-col">
+        <div class="register-card">
+          
+          <!-- En-tête -->
+          <div class="register-header">
+            <div class="register-icon-wrapper">
+              <span class="register-icon"></span>
+            </div>
+            <h2 class="register-title">Choisissez votre profil</h2>
+            <p class="register-subtitle">
+              Sélectionnez le type de compte qui vous correspond
+            </p>
+          </div>
+
+          <!-- Options d'inscription -->
+          <div class="register-options">
+            
+            <!-- Option Client -->
+            <div class="register-option client-option">
+              <div class="option-badge">Populaire</div>
+              <div class="option-icon">👤</div>
+              <h3 class="option-title">Client</h3>
+              <p class="option-description">
+                Découvrez les restaurants, commandez vos plats préférés 
+                et suivez vos commandes en temps réel.
+              </p>
+              <ul class="option-features">
+                <li>
+                  <i class="bi bi-check-circle-fill"></i>
+                  Accès à tous les restaurants
+                </li>
+                <li>
+                  <i class="bi bi-check-circle-fill"></i>
+                  Commandes en 1 clic
+                </li>
+                <li>
+                  <i class="bi bi-check-circle-fill"></i>
+                  Suivi en temps réel
+                </li>
+                <li>
+                  <i class="bi bi-check-circle-fill"></i>
+                  Promotions exclusives
+                </li>
+              </ul>
+              <a
+                routerLink="/inscription/client"
+                class="btn btn-client">
+                <i class="bi bi-person-plus me-2"></i>
+                Créer un compte client
+                <span class="btn-arrow">→</span>
+              </a>
+            </div>
+
+            <!-- Séparateur -->
+            <div class="register-divider">
+              <span class="divider-text">ou</span>
+            </div>
+
+            <!-- Option Restaurant -->
+            <div class="register-option restaurant-option">
+              <div class="option-badge pro">Professionnel</div>
+              <div class="option-icon">🍽️</div>
+              <h3 class="option-title">Restaurant</h3>
+              <p class="option-description">
+                Créez votre espace professionnel, gérez vos menus 
+                et vos commandes depuis une interface intuitive.
+              </p>
+              <ul class="option-features">
+                <li>
+                  <i class="bi bi-check-circle-fill"></i>
+                  Gestion des menus
+                </li>
+                <li>
+                  <i class="bi bi-check-circle-fill"></i>
+                  Tableau de bord pro
+                </li>
+                <li>
+                  <i class="bi bi-check-circle-fill"></i>
+                  Statistiques avancées
+                </li>
+                <li>
+                  <i class="bi bi-check-circle-fill"></i>
+                  Support prioritaire
+                </li>
+              </ul>
+              <a
+                routerLink="/inscription/restaurant"
+                class="btn btn-restaurant">
+                <i class="bi bi-rocket-takeoff me-2"></i>
+                Créer mon restaurant
+                <span class="btn-arrow">→</span>
+              </a>
+            </div>
+
+          </div>
+
+          <!-- Lien vers connexion -->
+          <div class="register-login">
+            <p class="login-text">
+              Vous avez déjà un compte ?
+              <a routerLink="/connexion" class="login-link">
+                Connectez-vous
+                <i class="bi bi-arrow-right"></i>
+              </a>
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Éléments décoratifs -->
+  <div class="register-bg-decoration">
+    <div class="bg-circle c1"></div>
+    <div class="bg-circle c2"></div>
+    <div class="bg-circle c3"></div>
+    <div class="bg-blob b1"></div>
+    <div class="bg-blob b2"></div>
+  </div>
+</section>

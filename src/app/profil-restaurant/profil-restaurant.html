@@ -1,0 +1,690 @@
+<!-- =========================================================
+     PROFIL RESTAURANT - Paramètres
+     ========================================================= -->
+<section class="profil-page">
+  <div class="container">
+
+    <!-- =========================================================
+         EN-TÊTE
+         ========================================================= -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">
+          <i class="bi bi-shop"></i>
+          Profil du restaurant
+        </h1>
+        <p class="page-subtitle">
+          Gérez vos informations, horaires et préférences
+        </p>
+      </div>
+
+      <div class="page-actions">
+        <button class="btn-secondary" (click)="resetProfile()">
+          <i class="bi bi-arrow-counterclockwise"></i>
+          Annuler
+        </button>
+        <button class="btn-primary" (click)="saveProfile()" [disabled]="isSaving">
+          <i class="bi" [class.bi-check-lg]="!isSaving" [class.bi-hourglass-split]="isSaving"></i>
+          {{ isSaving ? 'Enregistrement...' : 'Enregistrer' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         BANNIÈRE (Cover + Logo)
+         ========================================================= -->
+    <div class="profile-banner" [hidden]="isLoading">
+
+      <!-- COVER -->
+      <div class="cover-wrapper" (click)="openCoverPicker()">
+
+        <img *ngIf="hasCover()"
+             [src]="getCoverUrl()"
+             [alt]="profile.name"
+             class="cover-image">
+
+        <div *ngIf="!hasCover()" class="cover-placeholder">
+          <i class="bi bi-image"></i>
+          <span>Aucune bannière</span>
+        </div>
+
+        <div class="cover-overlay"></div>
+
+        <div *ngIf="isUploadingCover" class="upload-overlay">
+          <div class="spinner"></div>
+          <span>Upload…</span>
+        </div>
+
+        <button type="button"
+                class="btn-upload-cover"
+                (click)="openCoverPicker(); $event.stopPropagation()"
+                [disabled]="isUploadingCover">
+          <i class="bi bi-camera"></i>
+          <span>Changer la bannière</span>
+        </button>
+
+        <input #coverInput
+               type="file"
+               accept="image/*"
+               hidden
+               (change)="onCoverChange($event)">
+      </div>
+
+      <!-- AVATAR + RÉSUMÉ -->
+      <div class="profile-avatar-section">
+        <div class="avatar-wrapper">
+
+          <div class="avatar-image" *ngIf="hasLogo(); else initialsAvatar">
+            <img [src]="getLogoUrl()" alt="Logo">
+          </div>
+
+          <ng-template #initialsAvatar>
+            <div class="avatar-image avatar-initials"
+                 [style.background]="getGradient()">
+              {{ getInitials() }}
+            </div>
+          </ng-template>
+
+          <div *ngIf="isUploadingLogo" class="upload-overlay small">
+            <div class="spinner small"></div>
+          </div>
+
+          <button type="button"
+                  class="btn-upload-avatar"
+                  (click)="openLogoPicker()"
+                  [disabled]="isUploadingLogo"
+                  aria-label="Changer le logo">
+            <i class="bi"
+               [class.bi-camera]="!isUploadingLogo"
+               [class.bi-hourglass-split]="isUploadingLogo"></i>
+          </button>
+
+          <input #logoInput
+                 type="file"
+                 accept="image/*"
+                 hidden
+                 (change)="onLogoChange($event)">
+        </div>
+
+        <div class="profile-summary">
+          <h2>{{ profile.name || 'Mon restaurant' }}</h2>
+          <p class="profile-type">
+            <i class="bi bi-tag"></i>
+            {{ profile.type || 'Restaurant' }}
+          </p>
+          <span class="status-badge active">
+            <span class="status-dot"></span>
+            En ligne
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loader global -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Chargement du profil…</p>
+    </div>
+
+    <!-- =========================================================
+         ONGLETS
+         ========================================================= -->
+    <div class="tabs">
+      <button class="tab"
+              [class.active]="activeTab === 'infos'"
+              (click)="setTab('infos')">
+        <i class="bi bi-info-circle"></i>
+        Informations
+      </button>
+      <button class="tab"
+              [class.active]="activeTab === 'horaires'"
+              (click)="setTab('horaires')">
+        <i class="bi bi-clock"></i>
+        Horaires
+      </button>
+      <button class="tab"
+              [class.active]="activeTab === 'livraison'"
+              (click)="setTab('livraison')">
+        <i class="bi bi-truck"></i>
+        Livraison
+      </button>
+      <button class="tab"
+              [class.active]="activeTab === 'notifications'"
+              (click)="setTab('notifications')">
+        <i class="bi bi-bell"></i>
+        Notifications
+      </button>
+    </div>
+
+    <!-- =========================================================
+         TAB 1 : INFORMATIONS
+         ========================================================= -->
+    <div class="tab-content" *ngIf="activeTab === 'infos'">
+
+      <div class="form-card">
+        <h3 class="card-title">
+          <i class="bi bi-shop"></i>
+          Informations générales
+        </h3>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nom du restaurant</label>
+            <input type="text" [(ngModel)]="profile.name" class="form-input"
+                   placeholder="Ex: Mon Restaurant">
+          </div>
+
+          <div class="form-group">
+            <label>Type de cuisine</label>
+            <input type="text" [(ngModel)]="profile.type" class="form-input"
+                   placeholder="Ex: Fast Food • Burgers">
+          </div>
+
+          <div class="form-group full">
+            <label>Description</label>
+            <textarea [(ngModel)]="profile.description" class="form-input" rows="4"
+                      placeholder="Décrivez votre restaurant..."></textarea>
+            <span class="form-hint">
+              {{ profile.description.length }} / 500 caractères
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3 class="card-title">
+          <i class="bi bi-telephone"></i>
+          Coordonnées
+        </h3>
+
+        <div class="form-grid">
+          <!-- EMAIL avec bouton crayon -->
+          <div class="form-group">
+            <label>Email</label>
+            <div class="email-display">
+              <input type="email"
+                     [value]="profile.email"
+                     class="form-input"
+                     readonly
+                     disabled>
+              <button type="button"
+                      class="btn-change-email"
+                      (click)="openEmailModal()"
+                      title="Modifier l'email">
+                <i class="bi bi-pencil"></i>
+              </button>
+            </div>
+            <span class="form-hint">
+              <i class="bi bi-lock-fill"></i>
+              Cliquez sur le crayon pour changer votre email
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label>Téléphone</label>
+            <input type="tel" [(ngModel)]="profile.phone" class="form-input"
+                   placeholder="+261 34 12 345 67">
+          </div>
+
+          <div class="form-group full">
+            <label>Site web (optionnel)</label>
+            <input type="url" [(ngModel)]="profile.website" class="form-input"
+                   placeholder="https://monrestaurant.mg">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3 class="card-title">
+          <i class="bi bi-geo-alt"></i>
+          Adresse
+        </h3>
+
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Adresse</label>
+            <input type="text" [(ngModel)]="profile.address" class="form-input"
+                   placeholder="123 Rue de la Paix">
+          </div>
+
+          <div class="form-group">
+            <label>Ville</label>
+            <input type="text" [(ngModel)]="profile.city" class="form-input"
+                   placeholder="Antananarivo">
+          </div>
+
+          <div class="form-group">
+            <label>Code postal</label>
+            <input type="text" [(ngModel)]="profile.postalCode" class="form-input"
+                   placeholder="101">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3 class="card-title">
+          <i class="bi bi-tags"></i>
+          Types de cuisine
+        </h3>
+        <p class="card-subtitle">Sélectionnez les types qui correspondent à votre restaurant</p>
+
+        <div class="chips-grid">
+          <button type="button"
+                  class="chip"
+                  *ngFor="let c of cuisineOptions"
+                  [class.selected]="isCuisineSelected(c.value)"
+                  (click)="toggleCuisine(c.value)">
+            <i class="bi"
+               [class.bi-check-circle-fill]="isCuisineSelected(c.value)"
+               [class.bi-circle]="!isCuisineSelected(c.value)"></i>
+            {{ c.label }}
+          </button>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3 class="card-title">
+          <i class="bi bi-credit-card"></i>
+          Moyens de paiement acceptés
+        </h3>
+
+        <div class="chips-grid">
+          <button type="button"
+                  class="chip"
+                  *ngFor="let p of paymentOptions"
+                  [class.selected]="isPaymentSelected(p.value)"
+                  (click)="togglePayment(p.value)">
+            <i class="bi"
+               [class.bi-check-circle-fill]="isPaymentSelected(p.value)"
+               [class.bi-circle]="!isPaymentSelected(p.value)"></i>
+            {{ p.label }}
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =========================================================
+         TAB 2 : HORAIRES
+         ========================================================= -->
+    <div class="tab-content" *ngIf="activeTab === 'horaires'">
+
+      <div class="form-card">
+        <div class="card-header-row">
+          <div>
+            <h3 class="card-title">
+              <i class="bi bi-clock-history"></i>
+              Horaires d'ouverture
+            </h3>
+            <p class="card-subtitle">
+              {{ getOpenDaysCount() }} jour{{ getOpenDaysCount() > 1 ? 's' : '' }} ouvert{{ getOpenDaysCount() > 1 ? 's' : '' }} par semaine
+            </p>
+          </div>
+        </div>
+
+        <div class="hours-list">
+          <div class="hour-row" *ngFor="let h of profile.openingHours"
+               [class.closed]="!h.isOpen">
+
+            <div class="hour-day">
+              <span class="day-name">{{ h.label }}</span>
+            </div>
+
+            <div class="hour-inputs" *ngIf="h.isOpen">
+              <input type="time" [(ngModel)]="h.open" class="form-input time-input">
+              <span class="time-separator">à</span>
+              <input type="time" [(ngModel)]="h.close" class="form-input time-input">
+            </div>
+
+            <div class="hour-closed-label" *ngIf="!h.isOpen">
+              <i class="bi bi-door-closed"></i>
+              Fermé
+            </div>
+
+            <div class="hour-toggle">
+              <label class="switch">
+                <input type="checkbox"
+                       [checked]="h.isOpen"
+                       (change)="toggleOpeningDay(h)">
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =========================================================
+         TAB 3 : LIVRAISON
+         ========================================================= -->
+    <div class="tab-content" *ngIf="activeTab === 'livraison'">
+
+      <div class="form-card">
+        <h3 class="card-title">
+          <i class="bi bi-truck"></i>
+          Paramètres de livraison
+        </h3>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Frais de livraison (Ar)</label>
+            <input type="number" [(ngModel)]="profile.deliveryFee" class="form-input"
+                   placeholder="1500">
+            <span class="form-hint">0 = livraison gratuite</span>
+          </div>
+
+          <div class="form-group">
+            <label>Commande minimum (Ar)</label>
+            <input type="number" [(ngModel)]="profile.minOrder" class="form-input"
+                   placeholder="5000">
+          </div>
+
+          <div class="form-group">
+            <label>Rayon de livraison (km)</label>
+            <input type="number" [(ngModel)]="profile.deliveryRadius" class="form-input"
+                   placeholder="5">
+          </div>
+
+          <div class="form-group">
+            <label>Temps de préparation moyen (min)</label>
+            <input type="number" [(ngModel)]="profile.avgPrepTime" class="form-input"
+                   placeholder="20">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3 class="card-title">
+          <i class="bi bi-gear"></i>
+          Options de commande
+        </h3>
+
+        <div class="toggle-list">
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Accepter les commandes en ligne</span>
+              <span class="toggle-desc">
+                Les clients peuvent passer commande via Komandy
+              </span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="profile.acceptOnlineOrders">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Accepter automatiquement</span>
+              <span class="toggle-desc">
+                Les commandes sont confirmées sans validation manuelle
+              </span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="profile.autoAcceptOrders">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Autoriser les réservations</span>
+              <span class="toggle-desc">
+                Les clients peuvent réserver une table
+              </span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="profile.allowReservations">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =========================================================
+         TAB 4 : NOTIFICATIONS
+         ========================================================= -->
+    <div class="tab-content" *ngIf="activeTab === 'notifications'">
+
+      <div class="form-card">
+        <h3 class="card-title">
+          <i class="bi bi-bell"></i>
+          Préférences de notifications
+        </h3>
+        <p class="card-subtitle">
+          Choisissez comment et quand vous souhaitez être notifié
+        </p>
+
+        <div class="toggle-list">
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Nouvelles commandes</span>
+              <span class="toggle-desc">
+                Recevoir une notification à chaque nouvelle commande
+              </span>
+            </div>
+            <label class="switch">
+              <input type="checkbox"
+                     [checked]="notifications.newOrders"
+                     (change)="toggleNotification('newOrders')">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Nouveaux avis</span>
+              <span class="toggle-desc">
+                Être alerté quand un client laisse un avis
+              </span>
+            </div>
+            <label class="switch">
+              <input type="checkbox"
+                     [checked]="notifications.newReviews"
+                     (change)="toggleNotification('newReviews')">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Promotions Komandy</span>
+              <span class="toggle-desc">
+                Recevoir les offres et actualités de Komandy
+              </span>
+            </div>
+            <label class="switch">
+              <input type="checkbox"
+                     [checked]="notifications.promotions"
+                     (change)="toggleNotification('promotions')">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Newsletter mensuelle</span>
+              <span class="toggle-desc">
+                Conseils, statistiques et tendances
+              </span>
+            </div>
+            <label class="switch">
+              <input type="checkbox"
+                     [checked]="notifications.newsletter"
+                     (change)="toggleNotification('newsletter')">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3 class="card-title">
+          <i class="bi bi-send"></i>
+          Canaux de communication
+        </h3>
+
+        <div class="toggle-list">
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">
+                <i class="bi bi-envelope"></i> Alertes par email
+              </span>
+              <span class="toggle-desc">
+                Envoyées à {{ profile.email }}
+              </span>
+            </div>
+            <label class="switch">
+              <input type="checkbox"
+                     [checked]="notifications.emailAlerts"
+                     (change)="toggleNotification('emailAlerts')">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">
+                <i class="bi bi-phone"></i> Alertes SMS
+              </span>
+              <span class="toggle-desc">
+                Envoyées au {{ profile.phone }}
+              </span>
+            </div>
+            <label class="switch">
+              <input type="checkbox"
+                     [checked]="notifications.smsAlerts"
+                     (change)="toggleNotification('smsAlerts')">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =========================================================
+         BOUTON STICKY EN BAS (mobile)
+         ========================================================= -->
+    <div class="sticky-footer">
+      <button class="btn-secondary" (click)="resetProfile()">
+        <i class="bi bi-arrow-counterclockwise"></i>
+        Annuler
+      </button>
+      <button class="btn-primary" (click)="saveProfile()" [disabled]="isSaving">
+        <i class="bi" [class.bi-check-lg]="!isSaving" [class.bi-hourglass-split]="isSaving"></i>
+        {{ isSaving ? 'Enregistrement...' : 'Enregistrer' }}
+      </button>
+    </div>
+
+  </div>
+
+  <!-- =========================================================
+       MODAL CHANGEMENT D'EMAIL
+       ========================================================= -->
+  <div class="modal-overlay"
+       *ngIf="showEmailModal"
+       (click)="closeEmailModal()">
+
+    <div class="email-modal" (click)="$event.stopPropagation()">
+
+      <!-- En-tête -->
+      <div class="email-modal-header">
+        <div class="email-modal-icon">
+          <i class="bi bi-envelope-at-fill"></i>
+        </div>
+        <div>
+          <h3>Changer mon email</h3>
+          <p>Confirmez avec votre mot de passe</p>
+        </div>
+        <button type="button"
+                class="email-modal-close"
+                (click)="closeEmailModal()"
+                aria-label="Fermer">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <!-- Corps -->
+      <div class="email-modal-body">
+
+        <!-- Email actuel -->
+        <div class="form-group">
+          <label>Email actuel</label>
+          <input type="email"
+                 [value]="profile.email"
+                 class="form-input"
+                 disabled
+                 readonly>
+        </div>
+
+        <!-- Nouvel email -->
+        <div class="form-group">
+          <label>Nouvel email</label>
+          <input type="email"
+                 [(ngModel)]="emailNew"
+                 class="form-input"
+                 placeholder="nouveau@email.com"
+                 [disabled]="isChangingEmail">
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="form-group">
+          <label>Mot de passe (pour confirmer)</label>
+          <input type="password"
+                 [(ngModel)]="emailPassword"
+                 class="form-input"
+                 placeholder="••••••••"
+                 (keydown.enter)="submitEmailChange()"
+                 [disabled]="isChangingEmail">
+        </div>
+
+        <!-- Erreur -->
+        <div class="email-error" *ngIf="emailError">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          {{ emailError }}
+        </div>
+
+      </div>
+
+      <!-- Pied -->
+      <div class="email-modal-footer">
+        <button type="button"
+                class="btn-secondary"
+                (click)="closeEmailModal()"
+                [disabled]="isChangingEmail">
+          Annuler
+        </button>
+
+        <button type="button"
+                class="btn-primary"
+                [disabled]="isChangingEmail"
+                (click)="submitEmailChange()">
+          <i class="bi"
+             [class.bi-check-lg]="!isChangingEmail"
+             [class.bi-hourglass-split]="isChangingEmail"></i>
+          {{ isChangingEmail ? 'Enregistrement…' : 'Confirmer' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       TOAST DE SUCCÈS
+       ========================================================= -->
+  <div class="toast" [class.show]="showSuccessToast">
+    <i class="bi bi-check-circle-fill"></i>
+    <span>{{ successMessage }}</span>
+  </div>
+
+</section>

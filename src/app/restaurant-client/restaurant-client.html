@@ -1,0 +1,158 @@
+<section class="clients-page">
+
+  <div class="page-header">
+    <div>
+      <h1><i class="bi bi-people"></i> Mes clients</h1>
+      <p>Historique et statistiques de vos clients</p>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       STATS GLOBALES
+       ========================================================= -->
+  <div class="stats-row" *ngIf="!isLoading">
+    <div class="stat-box">
+      <i class="bi bi-people-fill"></i>
+      <div>
+        <span class="val">{{ totalClients }}</span>
+        <span class="lbl">Clients uniques</span>
+      </div>
+    </div>
+
+    <div class="stat-box">
+      <i class="bi bi-cash-stack"></i>
+      <div>
+        <span class="val">{{ totalRevenue | number }} Ar</span>
+        <span class="lbl">CA total</span>
+      </div>
+    </div>
+
+    <div class="stat-box">
+      <i class="bi bi-graph-up"></i>
+      <div>
+        <span class="val">{{ avgOrderValue | number }} Ar</span>
+        <span class="lbl">Panier moyen</span>
+      </div>
+    </div>
+
+    <!-- Économies accordées -->
+    <div class="stat-box promo" *ngIf="totalSaved > 0">
+      <i class="bi bi-tag-fill"></i>
+      <div>
+        <span class="val">-{{ totalSaved | number }} Ar</span>
+        <span class="lbl">Économies accordées</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       FILTRES
+       ========================================================= -->
+  <div class="filters-bar" *ngIf="!isLoading && clients.length > 0">
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input type="text" placeholder="Rechercher un client…"
+             [(ngModel)]="searchQuery" (input)="onSearch()">
+    </div>
+
+    <div class="sort-chips">
+      <button [class.active]="sortBy === 'spent'"  (click)="setSort('spent')">Plus dépensé</button>
+      <button [class.active]="sortBy === 'orders'" (click)="setSort('orders')">Plus commandé</button>
+      <button [class.active]="sortBy === 'recent'" (click)="setSort('recent')">Plus récent</button>
+      <button [class.active]="sortBy === 'saved'"  (click)="setSort('saved')">
+        <i class="bi bi-tag-fill"></i> Plus économisé
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       LOADING
+       ========================================================= -->
+  <div class="loading-list" *ngIf="isLoading">
+    <div class="skeleton-row" *ngFor="let i of [1,2,3,4,5]"></div>
+  </div>
+
+  <!-- =========================================================
+       LISTE
+       ========================================================= -->
+  <div class="clients-list" *ngIf="!isLoading && filteredClients.length > 0">
+    <div class="client-row"
+         *ngFor="let c of filteredClients"
+         [class.has-promo]="hasUsedPromo(c)">
+
+      <!-- Avatar -->
+      <div class="client-avatar">
+        <img *ngIf="hasAvatar(c)" [src]="getAvatarUrl(c)" [alt]="c.name">
+
+        <span *ngIf="!hasAvatar(c)"
+              [style.background]="getGradient(c.name)">
+          {{ getInitials(c.name) }}
+        </span>
+
+        <!-- Petite pastille promo sur l'avatar -->
+        <span class="avatar-promo-dot" *ngIf="hasUsedPromo(c)" title="A utilisé une promotion">
+          <i class="bi bi-tag-fill"></i>
+        </span>
+      </div>
+
+      <!-- Infos -->
+      <div class="client-info">
+        <div class="client-name-row">
+          <h3>{{ c.name }}</h3>
+
+          <!-- Badge promo -->
+          <span class="promo-badge" *ngIf="hasUsedPromo(c)">
+            <i class="bi bi-tag-fill"></i>
+            {{ getPromoOrders(c) }} promo{{ getPromoOrders(c) > 1 ? 's' : '' }}
+          </span>
+        </div>
+
+        <p><i class="bi bi-envelope"></i> {{ c.email }}</p>
+        <p><i class="bi bi-telephone"></i> {{ c.phone }}</p>
+      </div>
+
+      <!-- Métriques -->
+      <div class="client-metrics">
+        <div class="metric">
+          <span class="val">{{ c.totalOrders }}</span>
+          <span class="lbl">commandes</span>
+        </div>
+
+        <div class="metric">
+          <span class="val spent">{{ c.totalSpent | number }} Ar</span>
+          <span class="lbl">dépensé</span>
+        </div>
+
+        <!-- Économies du client -->
+        <div class="metric" *ngIf="hasUsedPromo(c)">
+          <span class="val saved">-{{ getSavedAmount(c) | number }} Ar</span>
+          <span class="lbl">économisé</span>
+        </div>
+
+        <div class="metric">
+          <span class="val date">{{ getDaysSince(c.lastOrder) }}</span>
+          <span class="lbl">dernière commande</span>
+        </div>
+      </div>
+
+      <!-- Appel -->
+      <a [href]="'tel:' + c.phone" class="btn-call">
+        <i class="bi bi-telephone-fill"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       VIDE
+       ========================================================= -->
+  <div class="empty-state" *ngIf="!isLoading && filteredClients.length === 0">
+    <i class="bi bi-people"></i>
+    <h3>{{ clients.length === 0 ? 'Aucun client' : 'Aucun résultat' }}</h3>
+    <p>
+      {{ clients.length === 0
+         ? 'Vos clients apparaîtront ici après leur première commande'
+         : 'Essayez un autre mot-clé' }}
+    </p>
+  </div>
+
+</section>

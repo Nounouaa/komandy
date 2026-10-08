@@ -1,0 +1,167 @@
+<section class="restaurants-page">
+
+  <!-- =========================================================
+       HEADER
+       ========================================================= -->
+  <div class="page-header">
+    <div>
+      <h1><i class="bi bi-shop"></i> Restaurants</h1>
+      <p>
+        {{ filtered.length }} restaurant{{ filtered.length > 1 ? 's' : '' }}
+        disponible{{ filtered.length > 1 ? 's' : '' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       FILTRES
+       ========================================================= -->
+  <div class="filters-bar">
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input
+        type="text"
+        placeholder="Rechercher un restaurant, une cuisine…"
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()">
+    </div>
+
+    <div class="filter-chips">
+      <button [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
+        <i class="bi bi-grid"></i> Tous
+      </button>
+      <button [class.active]="activeFilter === 'open'" (click)="setFilter('open')">
+        <i class="bi bi-circle-fill"></i> Ouverts
+      </button>
+      <button [class.active]="activeFilter === 'rating'" (click)="setFilter('rating')">
+        <i class="bi bi-star"></i> Bien notés
+      </button>
+      <button [class.active]="activeFilter === 'fast'" (click)="setFilter('fast')">
+        <i class="bi bi-lightning"></i> Rapides
+      </button>
+      <button [class.active]="activeFilter === 'promo'" (click)="setFilter('promo')">
+        <i class="bi bi-tag-fill"></i> En promo
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       CHARGEMENT
+       ========================================================= -->
+  <div class="loading-grid" *ngIf="isLoading">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line short"></div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       GRILLE
+       ========================================================= -->
+  <div class="restaurants-grid" *ngIf="!isLoading && filtered.length > 0">
+    <a class="restaurant-card"
+       *ngFor="let r of filtered"
+       [class.has-promo]="hasPromos(r._id)"
+       [routerLink]="['/client/restaurants', r._id]">
+
+      <!-- =========================================================
+           COVER + LOGO
+           ========================================================= -->
+      <div class="restaurant-cover">
+        <img
+          *ngIf="uploadService.hasImage(r.coverImage)"
+          [src]="uploadService.getImageUrl(r.coverImage)"
+          [alt]="r.name">
+
+        <div *ngIf="!uploadService.hasImage(r.coverImage)" class="cover-placeholder">
+          <i class="bi bi-shop-window"></i>
+        </div>
+
+        <!-- Badge ouvert/fermé -->
+        <span class="badge-status" [class.open]="r.isOpen">
+          {{ r.isOpen ? 'Ouvert' : 'Fermé' }}
+        </span>
+
+        <!-- =========================================================
+             BADGE PROMO (au-dessus de la cover)
+             ========================================================= -->
+        <span class="promo-badge"
+              *ngIf="hasPromos(r._id)"
+              [style.background]="getPromoColor(r._id)">
+          <i class="bi bi-tag-fill"></i>
+          <ng-container *ngIf="getBestDiscount(r._id) > 0">
+            Jusqu'à -{{ getBestDiscount(r._id) }}%
+          </ng-container>
+          <ng-container *ngIf="getBestDiscount(r._id) === 0">
+            {{ countPromosForRestaurant(r._id) }} promo{{ countPromosForRestaurant(r._id) > 1 ? 's' : '' }}
+          </ng-container>
+        </span>
+
+        <!-- Logo par-dessus la cover -->
+        <div class="restaurant-logo">
+          <img
+            *ngIf="uploadService.hasImage(r.logo)"
+            [src]="uploadService.getImageUrl(r.logo)"
+            [alt]="r.name">
+
+          <span
+            *ngIf="!uploadService.hasImage(r.logo)"
+            class="logo-initials"
+            [style.background]="avatarService.getGradient(r.name)">
+            {{ avatarService.getInitials(r.name) }}
+          </span>
+        </div>
+      </div>
+
+      <!-- =========================================================
+           BODY
+           ========================================================= -->
+      <div class="restaurant-body">
+        <div class="restaurant-title">
+          <h3>{{ r.name }}</h3>
+          <span class="rating" *ngIf="r.rating > 0">
+            <i class="bi bi-star-fill"></i>
+            {{ r.rating.toFixed(1) }}
+          </span>
+        </div>
+
+        <p class="restaurant-type">
+          <i class="bi bi-tag"></i>
+          {{ r.type || 'Restaurant' }}
+          <span *ngIf="r.city"> • {{ r.city }}</span>
+        </p>
+
+        <!-- Bandeau promo compact -->
+        <div class="promo-info" *ngIf="hasPromos(r._id)">
+          <i class="bi bi-megaphone-fill"></i>
+          <span>
+            {{ countPromosForRestaurant(r._id) }}
+            offre{{ countPromosForRestaurant(r._id) > 1 ? 's' : '' }} en cours
+          </span>
+        </div>
+
+        <div class="restaurant-meta">
+          <span>
+            <i class="bi bi-clock"></i>
+            {{ r.avgPrepTime || 20 }} min
+          </span>
+          <span>
+            <i class="bi bi-truck"></i>
+            {{ r.deliveryFee > 0 ? r.deliveryFee + ' Ar' : 'Gratuit' }}
+          </span>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- =========================================================
+       VIDE
+       ========================================================= -->
+  <div class="empty-state" *ngIf="!isLoading && filtered.length === 0">
+    <i class="bi bi-shop"></i>
+    <h3>Aucun restaurant trouvé</h3>
+    <p>Essayez un autre filtre ou une autre recherche</p>
+  </div>
+
+</section>

@@ -1,0 +1,404 @@
+<section class="orders-page">
+
+  <!-- =========================================================
+       EN-TÊTE
+       ========================================================= -->
+  <div class="page-header">
+    <div>
+      <h1><i class="bi bi-box-seam"></i> Mes commandes</h1>
+      <p>Suivez vos commandes en temps réel</p>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       FILTRES
+       ========================================================= -->
+  <div class="filter-chips">
+    <button [class.active]="filter === 'all'" (click)="setFilter('all')">
+      <i class="bi bi-grid"></i>
+      Toutes
+      <span class="chip-count" *ngIf="orders.length > 0">{{ orders.length }}</span>
+    </button>
+
+    <button [class.active]="filter === 'ongoing'" (click)="setFilter('ongoing')">
+      <span class="live-dot"></span>
+      En cours
+      <span class="chip-count" *ngIf="ongoingCount > 0">{{ ongoingCount }}</span>
+    </button>
+
+    <button [class.active]="filter === 'delivered'" (click)="setFilter('delivered')">
+      <i class="bi bi-exclamation-circle"></i>
+      À confirmer
+      <span class="chip-count alert" *ngIf="deliveredCount > 0">{{ deliveredCount }}</span>
+    </button>
+
+    <button [class.active]="filter === 'received'" (click)="setFilter('received')">
+      <i class="bi bi-check2-all"></i>
+      Reçues
+    </button>
+
+    <button [class.active]="filter === 'cancelled'" (click)="setFilter('cancelled')">
+      <i class="bi bi-x-circle"></i>
+      Annulées
+    </button>
+  </div>
+
+  <!-- =========================================================
+       CHARGEMENT
+       ========================================================= -->
+  <div class="loading-list" *ngIf="isLoading">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3]"></div>
+  </div>
+
+  <!-- =========================================================
+       LISTE
+       ========================================================= -->
+  <div class="orders-list" *ngIf="!isLoading && filteredOrders.length > 0">
+    <div class="order-card"
+         *ngFor="let o of filteredOrders"
+         [class.has-dispute]="hasDispute(o)"
+         [class.delivered-waiting]="o.status === 'delivered'">
+
+      <!-- =========================================================
+           HEADER
+           ========================================================= -->
+      <div class="order-header">
+        <div class="restaurant-block">
+          <div class="restaurant-icon">
+            <i class="bi bi-shop"></i>
+          </div>
+          <div>
+            <h3>{{ getRestaurantName(o) }}</h3>
+            <p>#{{ o._id.slice(-6).toUpperCase() }} • {{ o.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+        </div>
+
+        <span class="status-pill" [ngClass]="o.status">
+          <i class="bi" [ngClass]="getStatusIcon(o.status)"></i>
+          {{ getStatusLabel(o.status) }}
+        </span>
+      </div>
+
+      <!-- =========================================================
+           BARRE DE PROGRESSION (commandes en cours)
+           ========================================================= -->
+      <div class="progress-wrapper"
+           *ngIf="['pending','accepted','preparing','ready','delivering'].includes(o.status)">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width]="getProgressWidth(o.status)"></div>
+        </div>
+        <div class="progress-steps">
+          <span [class.done]="['pending','accepted','preparing','ready','delivering'].includes(o.status)">Reçue</span>
+          <span [class.done]="['accepted','preparing','ready','delivering'].includes(o.status)">Acceptée</span>
+          <span [class.done]="['preparing','ready','delivering'].includes(o.status)">Préparation</span>
+          <span [class.done]="['ready','delivering'].includes(o.status)">Prête</span>
+          <span [class.done]="['delivering'].includes(o.status)">Livraison</span>
+        </div>
+      </div>
+
+      <!-- =========================================================
+           LIVREUR (en route)
+           ========================================================= -->
+      <div class="deliverer-box" *ngIf="o.status === 'delivering' && o.delivererName">
+        <i class="bi bi-truck"></i>
+        <div>
+          <strong>{{ o.delivererName }}</strong>
+          <span>{{ o.delivererPhone }}</span>
+        </div>
+        <a [href]="'tel:' + o.delivererPhone" class="btn-call">
+          <i class="bi bi-telephone"></i> Appeler
+        </a>
+      </div>
+
+      <!-- =========================================================
+           ARTICLES
+           ========================================================= -->
+      <div class="order-items">
+        <div class="item" *ngFor="let i of o.items">
+          <span class="item-name">{{ i.quantity }}× {{ i.name }}</span>
+          <span class="item-price">{{ i.price * i.quantity }} Ar</span>
+        </div>
+      </div>
+
+      <!-- =========================================================
+           FOOTER (adresse + total)
+           ========================================================= -->
+      <div class="order-footer">
+        <div class="delivery-address">
+          <i class="bi bi-geo-alt"></i>
+          {{ o.deliveryAddress?.address }} — {{ o.deliveryAddress?.city }}
+        </div>
+        <div class="order-total">
+          Total : <strong>{{ o.total | number }} Ar</strong>
+        </div>
+      </div>
+
+      <!-- =========================================================
+           ✅ CONFIRMATION CLIENT (statut "delivered" + pas de litige)
+           ========================================================= -->
+     <!-- =========================================================
+     ACTIONS CLIENT
+     ========================================================= -->
+<!-- =========================================================
+     ACTIONS CLIENT
+     ========================================================= -->
+<!-- =========================================================
+     ACTIONS CLIENT
+     ========================================================= -->
+<!-- =========================================================
+     ACTIONS CLIENT
+     ========================================================= -->
+<div class="order-client-actions">
+
+  <!-- Contacter le restaurant -->
+  <button
+    type="button"
+    class="btn-contact"
+    (click)="contactRestaurant(o)">
+    <i class="bi bi-chat-dots-fill"></i>
+    Contacter le restaurant
+  </button>
+
+  <!-- 🚚 LIVREUR EN ROUTE : bouton "Il est arrivé, j'ai payé" -->
+  <ng-container *ngIf="o.status === 'delivering'">
+    <button class="btn-received"
+            (click)="confirmDeliveredAndPaid(o)">
+      <i class="bi bi-truck"></i>
+      <span>Il est arrivé — J'ai payé</span>
+    </button>
+  </ng-container>
+
+  <!-- ✅ LIVRÉE : confirmation finale -->
+  <ng-container *ngIf="o.status === 'delivered' && !o.dispute?.reported">
+    <button class="btn-received" (click)="confirmDeliveredAndPaid(o)">
+      <i class="bi bi-check-circle-fill"></i>
+      <span>J'ai reçu et payé</span>
+    </button>
+    <button class="btn-report" (click)="reportNotReceived(o)">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      Je n'ai pas reçu
+    </button>
+  </ng-container>
+
+</div>
+      <!-- =========================================================
+           ⚠️ LITIGE EN COURS
+           ========================================================= -->
+      <div class="dispute-box" *ngIf="hasDispute(o)">
+        <i class="bi bi-hourglass-split"></i>
+        <div>
+          <strong>Litige en cours de traitement</strong>
+          <p>{{ o.dispute?.reason }}</p>
+          <span class="dispute-time">{{ getTimeAgo(o.dispute?.reportedAt) }}</span>
+        </div>
+      </div>
+
+      <!-- =========================================================
+           ✅ LITIGE RÉSOLU
+           ========================================================= -->
+      <div class="dispute-resolved-box" *ngIf="isDisputeResolved(o)">
+        <i class="bi bi-info-circle-fill"></i>
+        <div>
+          <strong>Litige résolu</strong>
+          <p>{{ o.dispute?.resolution || 'Le restaurant a traité votre signalement' }}</p>
+        </div>
+      </div>
+
+      <!-- =========================================================
+           ✅ COMMANDE CONFIRMÉE (reçue + payée)
+           ========================================================= -->
+      <div class="received-box" *ngIf="o.status === 'received'">
+        <i class="bi bi-check-circle-fill"></i>
+        <div>
+          <strong>Commande confirmée</strong>
+          <p>Merci ! La transaction a été finalisée.</p>
+        </div>
+      </div>
+
+      <!-- =========================================================
+           NOTE / AVIS
+           ========================================================= -->
+      <div class="order-rating" *ngIf="o.rating">
+        <span>Votre note :</span>
+        <span class="stars">
+          <i class="bi bi-star-fill"
+             *ngFor="let s of [1,2,3,4,5]"
+             [class.active]="s <= o.rating"></i>
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       VIDE
+       ========================================================= -->
+  <div class="empty-state" *ngIf="!isLoading && filteredOrders.length === 0">
+    <i class="bi bi-bag-x"></i>
+    <h3>{{ orders.length === 0 ? 'Aucune commande' : 'Aucune commande dans ce filtre' }}</h3>
+    <p>
+      {{ orders.length === 0
+        ? 'Passez votre première commande depuis un restaurant'
+        : 'Essayez un autre filtre' }}
+    </p>
+    <a routerLink="/client/restaurants" class="btn-primary" *ngIf="orders.length === 0">
+      <i class="bi bi-shop"></i>
+      Voir les restaurants
+    </a>
+    <button class="btn-secondary" *ngIf="orders.length > 0" (click)="setFilter('all')">
+      <i class="bi bi-arrow-counterclockwise"></i>
+      Voir toutes les commandes
+    </button>
+  </div>
+
+
+  <!-- =========================================================
+     MODAL CONTACT RESTAURANT
+     ========================================================= -->
+<div class="modal-overlay"
+     *ngIf="showContactModal"
+     (click)="closeContactModal()">
+
+  <div class="contact-modal" (click)="$event.stopPropagation()">
+
+    <!-- En-tête -->
+    <div class="contact-modal-header">
+      <div class="contact-modal-icon">
+        <i class="bi bi-chat-dots-fill"></i>
+      </div>
+      <div>
+        <h3>Contacter le restaurant</h3>
+        <p>{{ contactRestaurantName }}</p>
+      </div>
+      <button type="button"
+              class="contact-modal-close"
+              (click)="closeContactModal()"
+              aria-label="Fermer">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Corps -->
+    <div class="contact-modal-body">
+
+      <!-- Info commande -->
+      <div class="contact-order-info" *ngIf="contactOrder">
+        <i class="bi bi-box-seam"></i>
+        <span>
+          Commande #{{ contactOrder._id.slice(-6).toUpperCase() }}
+          • {{ contactOrder.total | number }} Ar
+        </span>
+      </div>
+
+      <!-- Textarea -->
+      <div class="contact-input-wrapper">
+        <label>Votre message</label>
+        <textarea
+          class="contact-textarea"
+          [(ngModel)]="contactMessage"
+          placeholder="Écrivez votre message au restaurant…"
+          rows="5"
+          maxlength="500"
+          (input)="onContactInput($event)"
+          [disabled]="isSendingContact"></textarea>
+
+        <span class="contact-char-count">
+          {{ contactMessage.length }} / 500
+        </span>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="contact-modal-footer">
+      <button type="button"
+              class="btn-cancel"
+              (click)="closeContactModal()"
+              [disabled]="isSendingContact">
+        Annuler
+      </button>
+
+      <button type="button"
+              class="btn-send-contact"
+              [disabled]="!contactMessage.trim() || isSendingContact"
+              (click)="sendContactMessage()">
+        <i class="bi"
+           [class.bi-send-fill]="!isSendingContact"
+           [class.bi-hourglass-split]="isSendingContact"></i>
+        {{ isSendingContact ? 'Envoi…' : 'Envoyer' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+
+<!-- =========================================================
+     TOAST DE CONFIRMATION
+     ========================================================= -->
+<div class="toast-notification"
+     [class.show]="showToast"
+     [class.success]="toastType === 'success'"
+     [class.error]="toastType === 'error'">
+
+  <div class="toast-icon">
+    <i class="bi"
+       [class.bi-check-circle-fill]="toastType === 'success'"
+       [class.bi-exclamation-circle-fill]="toastType === 'error'"></i>
+  </div>
+
+  <div class="toast-content">
+    <span class="toast-message">{{ toastMessage }}</span>
+  </div>
+
+  <button type="button"
+          class="toast-close"
+          (click)="showToast = false"
+          aria-label="Fermer">
+    <i class="bi bi-x"></i>
+  </button>
+</div>
+
+
+<!-- =========================================================
+     MODAL DE CONFIRMATION
+     ========================================================= -->
+<div class="modal-overlay"
+     *ngIf="showConfirmModal"
+     (click)="closeConfirmModal()">
+
+  <div class="confirm-dialog" (click)="$event.stopPropagation()">
+
+    <!-- Icône + animation -->
+    <div class="confirm-dialog-icon"
+         [style.background]="confirmColor + '22'"
+         [style.color]="confirmColor">
+      <i class="bi" [ngClass]="confirmIcon"></i>
+    </div>
+
+    <!-- Contenu -->
+    <h3 class="confirm-dialog-title">{{ confirmTitle }}</h3>
+    <p class="confirm-dialog-message">{{ confirmMessage }}</p>
+
+    <!-- Actions -->
+    <div class="confirm-dialog-actions">
+      <button type="button"
+              class="btn-dialog-cancel"
+              (click)="closeConfirmModal()">
+        {{ confirmCancelText }}
+      </button>
+
+      <button type="button"
+              class="btn-dialog-confirm"
+              [style.background]="'linear-gradient(135deg, ' + confirmColor + ', ' + confirmColor + 'cc)'"
+              (click)="acceptConfirmModal()">
+        <i class="bi bi-check-lg"></i>
+        {{ confirmConfirmText }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+</section>

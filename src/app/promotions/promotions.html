@@ -1,0 +1,237 @@
+<section class="promotions-page">
+
+  <!-- =========================================================
+       HERO
+       ========================================================= -->
+  <div class="promo-hero">
+    <div class="hero-content">
+      <div class="hero-icon">
+        <i class="bi bi-gift-fill"></i>
+      </div>
+      <div>
+        <h1>Promotions & Offres</h1>
+        <p>Économisez sur vos commandes avec nos offres du moment</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       FILTRES (affichés seulement s'il y a des promos)
+       ========================================================= -->
+  <div class="filter-chips" *ngIf="!isLoading && hasAnyPromotion()">
+    <button [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
+      <i class="bi bi-grid"></i> Toutes
+    </button>
+    <button [class.active]="activeFilter === 'percent'" (click)="setFilter('percent')">
+      <i class="bi bi-percent"></i> Réductions %
+    </button>
+    <button [class.active]="activeFilter === 'fixed'" (click)="setFilter('fixed')">
+      <i class="bi bi-cash-coin"></i> Montant fixe
+    </button>
+    <button [class.active]="activeFilter === 'free-delivery'" (click)="setFilter('free-delivery')">
+      <i class="bi bi-truck"></i> Livraison offerte
+    </button>
+  </div>
+
+  <!-- =========================================================
+       CHARGEMENT
+       ========================================================= -->
+  <div class="promo-grid" *ngIf="isLoading">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3]"></div>
+  </div>
+
+  <!-- =========================================================
+       LISTE DES PROMOTIONS
+       ========================================================= -->
+  <div class="promo-grid" *ngIf="!isLoading && hasAnyPromotion() && filteredPromotions.length > 0">
+
+    <div class="promo-card"
+         *ngFor="let promo of filteredPromotions"
+         [style.--promo-color]="promo.color"
+         (click)="usePromotion(promo)">
+
+      <div class="promo-strip"></div>
+
+      <!-- Restaurant -->
+      <div class="promo-resto" *ngIf="promo.restaurantId">
+        <div class="resto-cover">
+          <img *ngIf="promo.restaurantCover"
+               [src]="promo.restaurantCover"
+               [alt]="promo.restaurantName">
+          <div *ngIf="!promo.restaurantCover" class="resto-placeholder">
+            <i class="bi bi-shop"></i>
+          </div>
+        </div>
+
+        <div class="resto-info">
+          <span class="resto-name">{{ promo.restaurantName }}</span>
+          <span class="resto-type" *ngIf="promo.restaurantType">{{ promo.restaurantType }}</span>
+        </div>
+
+        <i class="bi bi-arrow-right resto-arrow"></i>
+      </div>
+
+      <!-- Contenu promo -->
+      <div class="promo-main">
+
+        <div class="promo-icon-wrap">
+          <div class="promo-icon"
+               [style.background]="promo.color + '22'"
+               [style.color]="promo.color">
+            <i class="bi" [ngClass]="promo.icon"></i>
+          </div>
+        </div>
+
+        <div class="promo-body">
+
+          <div class="promo-top">
+            <span class="discount-badge"
+                  [style.background]="promo.color"
+                  [style.color]="'#0a0e1a'">
+              {{ getDiscountLabel(promo) }}
+            </span>
+
+            <span class="promo-days">
+              <i class="bi bi-clock"></i>
+              {{ getDaysLeft(promo.expiresAt) }} jour{{ getDaysLeft(promo.expiresAt) > 1 ? 's' : '' }}
+            </span>
+          </div>
+
+          <h3>{{ promo.title }}</h3>
+          <p>{{ promo.description }}</p>
+
+          <div class="promo-min" *ngIf="promo.minOrder > 0">
+            <i class="bi bi-info-circle"></i>
+            Minimum {{ promo.minOrder }} Ar
+          </div>
+
+          <!-- Code promo -->
+          <div class="promo-code-row" (click)="$event.stopPropagation()">
+            <div class="code-box">
+              <i class="bi bi-ticket-perforated"></i>
+              <span class="code-text">{{ promo.code }}</span>
+            </div>
+
+            <button class="btn-copy"
+                    [class.copied]="copiedCode === promo.code"
+                    (click)="copyCode(promo.code, $event)">
+              <i class="bi"
+                 [class.bi-clipboard]="copiedCode !== promo.code"
+                 [class.bi-check-lg]="copiedCode === promo.code"></i>
+              <span>{{ copiedCode === promo.code ? 'Copié !' : 'Copier' }}</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- =========================================================
+       VIDE — AUCUNE PROMOTION DU TOUT
+       ========================================================= -->
+  <div class="empty-hero" *ngIf="!isLoading && !hasAnyPromotion()">
+    <div class="empty-hero-inner">
+
+      <div class="empty-icon-large">
+        <i class="bi bi-tag"></i>
+      </div>
+
+      <h2>Aucune promotion en ce moment</h2>
+
+      <p>
+        Nos restaurants partenaires préparent de nouvelles offres.
+        Revenez bientôt pour profiter des réductions !
+      </p>
+
+      <div class="empty-actions">
+        <a routerLink="/client/restaurants" class="btn-primary">
+          <i class="bi bi-shop"></i>
+          Explorer les restaurants
+        </a>
+      </div>
+
+      <!-- Suggestions -->
+      <div class="empty-tips">
+        <div class="tip">
+          <i class="bi bi-bell"></i>
+          <span>Activez les notifications pour être alerté des nouvelles promos</span>
+        </div>
+        <div class="tip">
+          <i class="bi bi-heart"></i>
+          <span>Ajoutez vos restaurants préférés aux favoris</span>
+        </div>
+        <div class="tip">
+          <i class="bi bi-percent"></i>
+          <span>Les promos apparaissent dès qu'un restaurant en publie une</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       VIDE — FILTRE SANS RÉSULTAT
+       ========================================================= -->
+  <div class="empty-filter"
+       *ngIf="!isLoading && hasAnyPromotion() && filteredPromotions.length === 0">
+
+    <div class="empty-icon-small">
+      <i class="bi bi-funnel"></i>
+    </div>
+
+    <h3>Aucune offre dans cette catégorie</h3>
+    <p>Essayez un autre filtre ou voyez toutes les promotions</p>
+
+    <button class="btn-secondary" (click)="setFilter('all')">
+      <i class="bi bi-grid"></i>
+      Voir toutes les promotions
+    </button>
+  </div>
+
+  <!-- =========================================================
+       RESTAURANTS SUGGÉRÉS (toujours visibles)
+       ========================================================= -->
+  <div class="section" *ngIf="restaurants.length > 0">
+    <div class="section-header">
+      <h2>
+        <i class="bi bi-shop"></i>
+        Restaurants à découvrir
+      </h2>
+      <a routerLink="/client/restaurants" class="link-see-all">
+        Voir tout <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="restaurants-row">
+      <div class="mini-card"
+           *ngFor="let r of restaurants"
+           (click)="goToRestaurant(r)">
+
+        <div class="mini-cover">
+          <img *ngIf="r.coverImage" [src]="r.coverImage" [alt]="r.name">
+          <div *ngIf="!r.coverImage" class="mini-placeholder">
+            <i class="bi bi-shop-window"></i>
+          </div>
+
+          <button class="btn-heart-mini"
+                  [class.active]="isFavorite(r._id)"
+                  (click)="toggleFavorite(r, $event)">
+            <i class="bi"
+               [class.bi-heart]="!isFavorite(r._id)"
+               [class.bi-heart-fill]="isFavorite(r._id)"></i>
+          </button>
+        </div>
+
+        <div class="mini-body">
+          <h4>{{ r.name }}</h4>
+          <p>{{ r.type || 'Restaurant' }}</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</section>

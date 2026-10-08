@@ -1,0 +1,149 @@
+<div style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: sans-serif;">
+
+  <h1>🧪 Test Komandy — Temps réel</h1>
+
+  <!-- ============ LOGIN ============ -->
+  <div *ngIf="!currentUser" style="padding: 20px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 20px;">
+    <h2>Connexion</h2>
+
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <input
+        type="email"
+        [(ngModel)]="email"
+        placeholder="Email"
+        style="padding: 10px; flex: 1; min-width: 200px;">
+
+      <input
+        type="password"
+        [(ngModel)]="password"
+        placeholder="Mot de passe"
+        style="padding: 10px; flex: 1; min-width: 200px;">
+
+      <button
+        (click)="onLogin()"
+        style="padding: 10px 24px; background: #ff6b6b; color: white; border: none; border-radius: 8px; cursor: pointer;">
+        Se connecter
+      </button>
+    </div>
+
+    <p style="margin-top: 12px; color: #666; font-size: 0.9em;">
+      💡 Testez avec <code>client@test.mg</code> / <code>test123</code>
+      ou <code>resto2@test.mg</code> / <code>test123</code>
+    </p>
+  </div>
+
+  <!-- ============ UTILISATEUR CONNECTÉ ============ -->
+  <div *ngIf="currentUser" style="padding: 15px; background: #e8f5e9; border-radius: 8px; margin-bottom: 20px;">
+    <strong>✅ Connecté :</strong> {{ currentUser.name }} ({{ currentUser.role }})
+    <button
+      (click)="onLogout()"
+      style="float: right; padding: 6px 16px; background: #f44336; color: white; border: none; border-radius: 6px; cursor: pointer;">
+      Déconnexion
+    </button>
+  </div>
+
+  <!-- ============ ACTIONS CLIENT ============ -->
+  <div *ngIf="currentUser?.role === 'client'" style="padding: 20px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px;">
+    <h2>🛒 Client — Passer une commande</h2>
+
+    <label>ID du restaurant :</label><br>
+    <input
+      [(ngModel)]="restaurantId"
+      style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px;">
+
+    <label>Produit :</label><br>
+    <input
+      [(ngModel)]="items[0].name"
+      style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px;">
+
+    <div style="display: flex; gap: 10px;">
+      <div style="flex: 1;">
+        <label>Prix :</label>
+        <input
+          type="number"
+          [(ngModel)]="items[0].price"
+          style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+      </div>
+      <div style="flex: 1;">
+        <label>Quantité :</label>
+        <input
+          type="number"
+          [(ngModel)]="items[0].quantity"
+          style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+      </div>
+    </div>
+
+    <button
+      (click)="onCreateOrder()"
+      style="margin-top: 12px; padding: 12px 24px; background: #4caf50; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%;">
+      📤 Commander
+    </button>
+  </div>
+
+  <!-- ============ LISTE DES COMMANDES ============ -->
+  <div *ngIf="currentUser" style="padding: 20px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px;">
+    <h2>📦 Commandes ({{ orders.length }})</h2>
+
+    <div *ngFor="let o of orders"
+         style="padding: 15px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 10px; background: #f9f9f9;">
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <strong>#{{ o._id.slice(-6).toUpperCase() }}</strong>
+        <span style="padding: 4px 12px; border-radius: 12px; font-size: 0.85em; background: #fff3cd; color: #856404;">
+          {{ getStatusLabel(o.status) }}
+        </span>
+      </div>
+
+      <div style="margin-top: 8px; font-size: 0.9em;">
+        <div *ngFor="let i of o.items">
+          {{ i.quantity }}× {{ i.name }} — {{ i.price * i.quantity }} Ar
+        </div>
+        <div style="margin-top: 6px; font-weight: bold;">Total : {{ o.total }} Ar</div>
+      </div>
+
+      <!-- Actions RESTAURANT -->
+      <div *ngIf="currentUser.role === 'restaurant'" style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+        <button *ngIf="o.status === 'pending'"
+                (click)="onUpdateStatus(o, 'accepted')"
+                style="padding: 6px 14px; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer;">
+          ✅ Accepter
+        </button>
+        <button *ngIf="o.status === 'accepted'"
+                (click)="onUpdateStatus(o, 'preparing')"
+                style="padding: 6px 14px; background: #ff9800; color: white; border: none; border-radius: 6px; cursor: pointer;">
+          🔥 Préparer
+        </button>
+        <button *ngIf="o.status === 'preparing'"
+                (click)="onUpdateStatus(o, 'ready')"
+                style="padding: 6px 14px; background: #2196f3; color: white; border: none; border-radius: 6px; cursor: pointer;">
+          ✅ Prête
+        </button>
+        <button *ngIf="o.status === 'ready'"
+                (click)="onUpdateStatus(o, 'delivering')"
+                style="padding: 6px 14px; background: #9c27b0; color: white; border: none; border-radius: 6px; cursor: pointer;">
+          🚚 Livrer
+        </button>
+        <button *ngIf="o.status === 'delivering'"
+                (click)="onUpdateStatus(o, 'delivered')"
+                style="padding: 6px 14px; background: #2e7d32; color: white; border: none; border-radius: 6px; cursor: pointer;">
+          ✅ Livrée
+        </button>
+      </div>
+    </div>
+
+    <p *ngIf="orders.length === 0" style="color: #999;">Aucune commande.</p>
+  </div>
+
+  <!-- ============ LOGS ============ -->
+  <div *ngIf="currentUser" style="padding: 15px; background: #1a1a1a; color: #0f0; border-radius: 8px; font-family: monospace; font-size: 0.85em;">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+      <strong>📋 Logs</strong>
+      <button (click)="clearLogs()" style="background: none; border: 1px solid #0f0; color: #0f0; padding: 2px 10px; border-radius: 4px; cursor: pointer;">
+        Effacer
+      </button>
+    </div>
+    <div *ngFor="let l of logs">{{ l }}</div>
+    <div *ngIf="logs.length === 0" style="color: #666;">Aucun log</div>
+  </div>
+
+</div>

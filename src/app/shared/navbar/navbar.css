@@ -1,0 +1,357 @@
+/* CSS - Navbar avec Active State Amélioré */
+.navbar-premium {
+  background: rgba(10, 14, 26, 0.85) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 12px 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Effet au scroll */
+.navbar-premium.scrolled {
+  padding: 8px 0;
+  background: rgba(10, 14, 26, 0.95) !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* ==================== LOGO ==================== */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  position: relative;
+  text-decoration: none;
+}
+
+.brand-icon {
+  font-size: 1.8rem;
+  display: inline-block;
+  animation: icon-float 3s ease-in-out infinite;
+}
+
+.brand-text {
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff 0%, #ff6b6b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+  transition: font-size 0.3s;
+}
+
+.brand-dot {
+  width: 6px;
+  height: 6px;
+  background: #6bcb77;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+  margin-left: -2px;
+  box-shadow: 0 0 12px rgba(107, 203, 119, 0.3);
+}
+
+/* ==================== TOGGLE BUTTON ==================== */
+.premium-toggler {
+  border: none;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.premium-toggler:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.premium-toggler:focus {
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.3);
+  outline: none;
+}
+
+.toggler-line {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: white;
+  margin: 5px 0;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.premium-toggler[aria-expanded="true"] .toggler-line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.premium-toggler[aria-expanded="true"] .toggler-line:nth-child(2) {
+  opacity: 0;
+}
+
+.premium-toggler[aria-expanded="true"] .toggler-line:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* ==================== NAVIGATION LINKS ==================== */
+.premium-link {
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-weight: 500;
+  padding: 8px 18px !important;
+  border-radius: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.premium-link i {
+  font-size: 0.9rem;
+  opacity: 0.5;
+  transition: all 0.3s;
+}
+
+.premium-link span {
+  position: relative;
+}
+
+/* Indicateur de page active - animé */
+.nav-indicator {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ff6b6b, #ffd93d);
+  border-radius: 2px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==================== ÉTAT ACTIF ==================== */
+.premium-link.active {
+  color: #ffffff !important;
+  background: rgba(255, 107, 107, 0.08);
+}
+
+.premium-link.active i {
+  opacity: 1;
+  color: #ff6b6b;
+}
+
+.premium-link.active .nav-indicator {
+  width: 24px;
+}
+
+/* Cercle lumineux autour du lien actif */
+.premium-link.active::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  border-radius: 12px;
+  background: radial-gradient(circle, rgba(255, 107, 107, 0.04), transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  animation: active-glow 2s ease-in-out infinite;
+}
+
+@keyframes active-glow {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+/* ==================== HOVER ==================== */
+.premium-link:hover {
+  color: rgba(255, 255, 255, 0.9) !important;
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-1px);
+}
+
+.premium-link:hover i {
+  opacity: 1;
+  color: #ff6b6b;
+}
+
+.premium-link:hover .nav-indicator {
+  width: 16px;
+  background: linear-gradient(90deg, rgba(255, 107, 107, 0.4), rgba(255, 217, 61, 0.4));
+}
+
+/* ==================== BOUTONS ==================== */
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-outline-premium-nav {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-outline-premium-nav:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.btn-gradient-nav {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  border: none;
+  color: white;
+  padding: 8px 24px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-gradient-nav::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.5s;
+}
+
+.btn-gradient-nav:hover::before {
+  left: 100%;
+}
+
+.btn-gradient-nav:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 30px rgba(238, 90, 36, 0.4);
+  color: white;
+}
+
+/* ==================== STATUS INDICATOR ==================== */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 20px;
+  padding-left: 20px;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background: #6bcb77;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(107, 203, 119, 0.3);
+}
+
+.status-text {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes icon-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(-5deg); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 991.98px) {
+  .navbar-premium {
+    background: rgba(10, 14, 26, 0.95) !important;
+    padding: 10px 0;
+  }
+  
+  .navbar-collapse {
+    padding: 20px 0 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin-top: 12px;
+  }
+  
+  .premium-link {
+    padding: 10px 16px !important;
+    border-radius: 8px;
+    justify-content: center;
+  }
+  
+  .premium-link.active .nav-indicator {
+    width: 20px;
+  }
+  
+  .nav-buttons {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .nav-buttons .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .status-indicator {
+    display: none !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .brand-text {
+    font-size: 1.2rem;
+  }
+  
+  .brand-icon {
+    font-size: 1.4rem;
+  }
+  
+  .btn-gradient-nav,
+  .btn-outline-premium-nav {
+    font-size: 0.85rem;
+    padding: 10px 16px;
+  }
+}
+
+/* ==================== SCROLL EFFECT ==================== */
+.navbar-premium.scrolled .brand-text {
+  font-size: 1.3rem;
+}
+
+.navbar-premium.scrolled .brand-icon {
+  font-size: 1.5rem;
+}

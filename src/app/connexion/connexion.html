@@ -1,0 +1,97 @@
+<section class="auth-page">
+  <div class="auth-card">
+
+    <!-- EN-TÊTE -->
+    <div class="auth-header">
+      <div class="auth-logo">
+        <i class="bi bi-shop-window"></i>
+      </div>
+      <h1>Bienvenue sur Komandy</h1>
+      <p>Connectez-vous pour continuer</p>
+    </div>
+
+    <!-- ERREUR -->
+    <div class="alert-error" *ngIf="errorMessage">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- FORMULAIRE -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email</label>
+        <div class="input-wrapper">
+          <i class="bi bi-envelope"></i>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="votre@email.com"
+            autocomplete="email">
+        </div>
+        <span class="form-error" *ngIf="f['email'].touched && f['email'].errors">
+          <span *ngIf="f['email'].errors['required']">Email obligatoire</span>
+          <span *ngIf="f['email'].errors['email']">Format d'email invalide</span>
+        </span>
+      </div>
+
+      <!-- Mot de passe -->
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <div class="input-wrapper">
+          <i class="bi bi-lock"></i>
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="••••••••"
+            autocomplete="current-password">
+          <button
+            type="button"
+            class="btn-toggle-password"
+            (click)="togglePassword()"
+            [attr.aria-label]="showPassword ? 'Cacher' : 'Afficher'">
+            <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+          </button>
+        </div>
+        <span class="form-error" *ngIf="f['password'].touched && f['password'].errors">
+          <span *ngIf="f['password'].errors['required']">Mot de passe obligatoire</span>
+          <span *ngIf="f['password'].errors['minlength']">Minimum 6 caractères</span>
+        </span>
+      </div>
+
+      <!-- Bouton -->
+      <button type="submit" class="btn-primary" [disabled]="isLoading">
+        <i class="bi" [class.bi-box-arrow-in-right]="!isLoading" [class.bi-hourglass-split]="isLoading"></i>
+        {{ isLoading ? 'Connexion...' : 'Se connecter' }}
+      </button>
+
+    </form>
+
+    <!-- SÉPARATEUR -->
+    <div class="auth-divider">
+      <span>Pas encore de compte ?</span>
+    </div>
+
+    <!-- LIENS INSCRIPTION -->
+    <div class="auth-links">
+      <a routerLink="/inscription/client" class="auth-link client">
+        <i class="bi bi-person-plus"></i>
+        <div>
+          <strong>Je suis client</strong>
+          <span>Commander des plats</span>
+        </div>
+      </a>
+      <a routerLink="/inscription/restaurant" class="auth-link restaurant">
+        <i class="bi bi-shop"></i>
+        <div>
+          <strong>Je suis restaurant</strong>
+          <span>Vendre mes plats</span>
+        </div>
+      </a>
+    </div>
+
+  </div>
+</section>

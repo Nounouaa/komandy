@@ -1,0 +1,746 @@
+<!-- =========================================================
+     PROFIL CLIENT — Paramètres
+     ========================================================= -->
+<section class="profil-page">
+  <div class="container">
+
+    <!-- EN-TÊTE -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">
+          <i class="bi bi-person-circle"></i>
+          Mon profil
+        </h1>
+        <p class="page-subtitle">
+          Gérez vos informations, adresses et préférences
+        </p>
+      </div>
+
+      <div class="page-actions">
+        <button class="btn-secondary" (click)="resetProfile()">
+          <i class="bi bi-arrow-counterclockwise"></i>
+          Annuler
+        </button>
+        <button class="btn-primary" (click)="saveProfile()" [disabled]="isSaving">
+          <i class="bi" [class.bi-check-lg]="!isSaving" [class.bi-hourglass-split]="isSaving"></i>
+          {{ isSaving ? 'Enregistrement...' : 'Enregistrer' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         BANNIÈRE (Cover + Avatar)
+         ========================================================= -->
+   <!-- =========================================================
+     BANNIÈRE (Cover + Avatar) — DYNAMIQUE
+     ========================================================= -->
+<div class="profile-banner" [hidden]="isLoading">
+
+  <!-- Cover -->
+  <div class="cover-wrapper" (click)="openCoverPicker()">
+    <img
+      *ngIf="hasCover()"
+      [src]="getCoverUrl()"
+      [alt]="getFullName()"
+      class="cover-image">
+
+    <div *ngIf="!hasCover()" class="cover-placeholder">
+      <i class="bi bi-image"></i>
+      <span>Aucune bannière</span>
+    </div>
+
+    <div class="cover-overlay"></div>
+
+    <div *ngIf="isUploadingCover" class="upload-overlay">
+      <div class="spinner"></div>
+      <span>Upload…</span>
+    </div>
+
+    <button type="button"
+            class="btn-upload-cover"
+            (click)="openCoverPicker(); $event.stopPropagation()"
+            [disabled]="isUploadingCover">
+      <i class="bi bi-camera"></i>
+      <span>Changer la bannière</span>
+    </button>
+
+    <input
+      #coverInput
+      type="file"
+      accept="image/*"
+      hidden
+      (change)="onCoverChange($event)">
+  </div>
+
+  <!-- Avatar + Résumé -->
+  <div class="profile-avatar-section">
+    <div class="avatar-wrapper">
+
+      <div class="avatar-image" *ngIf="hasAvatar(); else initialsAvatar">
+        <img [src]="getAvatarUrl()" alt="Avatar">
+      </div>
+
+      <ng-template #initialsAvatar>
+        <div class="avatar-image avatar-initials"
+             [style.background]="getGradient()">
+          {{ getInitials() }}
+        </div>
+      </ng-template>
+
+      <div *ngIf="isUploadingAvatar" class="upload-overlay small">
+        <div class="spinner small"></div>
+      </div>
+
+      <button type="button"
+              class="btn-upload-avatar"
+              (click)="openAvatarPicker()"
+              [disabled]="isUploadingAvatar"
+              aria-label="Changer la photo">
+        <i class="bi"
+           [class.bi-camera]="!isUploadingAvatar"
+           [class.bi-hourglass-split]="isUploadingAvatar"></i>
+      </button>
+
+      <input
+        #avatarInput
+        type="file"
+        accept="image/*"
+        hidden
+        (change)="onAvatarChange($event)">
+    </div>
+
+    <div class="profile-summary">
+      <h2>{{ getFullName() }}</h2>
+      <p class="profile-type">
+        <i class="bi bi-envelope"></i>
+        {{ profile.email }}
+      </p>
+      <span class="status-badge active">
+        <span class="status-dot"></span>
+        Client
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- Loader global -->
+<div class="loading-state" *ngIf="isLoading">
+  <div class="spinner"></div>
+  <p>Chargement du profil…</p>
+</div>
+    <!-- =========================================================
+         ONGLETS
+         ========================================================= -->
+    <div class="tabs">
+      <button class="tab"
+              [class.active]="activeTab === 'infos'"
+              (click)="setTab('infos')">
+        <i class="bi bi-info-circle"></i>
+        <span>Informations</span>
+      </button>
+      <button class="tab"
+              [class.active]="activeTab === 'adresses'"
+              (click)="setTab('adresses')">
+        <i class="bi bi-geo-alt"></i>
+        <span>Adresses</span>
+      </button>
+      <button class="tab"
+              [class.active]="activeTab === 'paiement'"
+              (click)="setTab('paiement')">
+        <i class="bi bi-credit-card"></i>
+        <span>Paiement</span>
+      </button>
+      <button class="tab"
+              [class.active]="activeTab === 'notifications'"
+              (click)="setTab('notifications')">
+        <i class="bi bi-bell"></i>
+        <span>Notifications</span>
+      </button>
+    </div>
+
+    <!-- =========================================================
+         TAB 1 : INFORMATIONS
+         ========================================================= -->
+    <div class="tab-content" *ngIf="activeTab === 'infos'">
+
+      <div class="form-card">
+        <h3 class="card-title">
+          <i class="bi bi-person"></i>
+          Informations personnelles
+        </h3>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Prénom</label>
+            <input type="text" [(ngModel)]="profile.firstName" class="form-input"
+                   placeholder="Marie">
+          </div>
+
+          <div class="form-group">
+            <label>Nom</label>
+            <input type="text" [(ngModel)]="profile.lastName" class="form-input"
+                   placeholder="Rakoto">
+          </div>
+
+          <div class="form-group">
+            <label>Date de naissance</label>
+            <input type="date" [(ngModel)]="profile.birthDate" class="form-input">
+          </div>
+
+          <div class="form-group">
+            <label>Genre</label>
+            <select [(ngModel)]="profile.gender" class="form-input">
+              <option value="">Non précisé</option>
+              <option value="homme">Homme</option>
+              <option value="femme">Femme</option>
+              <option value="autre">Autre</option>
+            </select>
+          </div>
+
+          <div class="form-group full">
+            <label>Bio</label>
+            <textarea [(ngModel)]="profile.bio" class="form-input" rows="3"
+                      placeholder="Parlez-nous un peu de vous..."></textarea>
+            <span class="form-hint">
+              {{ profile.bio.length }} / 300 caractères
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3 class="card-title">
+          <i class="bi bi-telephone"></i>
+          Coordonnées
+        </h3>
+
+        <div class="form-grid">
+          <div class="form-group">
+  <label>Email</label>
+  <div class="email-display">
+    <input type="email"
+           [value]="profile.email"
+           class="form-input"
+           readonly
+           disabled>
+    <button type="button"
+            class="btn-change-email"
+            (click)="openEmailModal()"
+            title="Modifier l'email">
+      <i class="bi bi-pencil"></i>
+    </button>
+  </div>
+  <span class="form-hint">
+    <i class="bi bi-lock-fill"></i>
+    Cliquez sur le crayon pour changer votre email
+  </span>
+</div>
+
+          <div class="form-group">
+            <label>Téléphone</label>
+            <input type="tel" [(ngModel)]="profile.phone" class="form-input"
+                   placeholder="+261 34 12 345 67">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3 class="card-title">
+          <i class="bi bi-tags"></i>
+          Cuisines préférées
+        </h3>
+        <p class="card-subtitle">
+          Sélectionnez les types de cuisine que vous aimez
+        </p>
+
+        <div class="chips-grid">
+          <button type="button"
+                  class="chip"
+                  *ngFor="let c of cuisineOptions"
+                  [class.selected]="isCuisineSelected(c.value)"
+                  (click)="toggleCuisine(c.value)">
+            <i class="bi"
+               [class.bi-check-circle-fill]="isCuisineSelected(c.value)"
+               [class.bi-circle]="!isCuisineSelected(c.value)"></i>
+            {{ c.label }}
+          </button>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3 class="card-title">
+          <i class="bi bi-heart-pulse"></i>
+          Restrictions alimentaires
+        </h3>
+        <p class="card-subtitle">
+          Nous vous montrerons en priorité les plats compatibles
+        </p>
+
+        <div class="chips-grid">
+          <button type="button"
+                  class="chip"
+                  *ngFor="let d of dietaryOptions"
+                  [class.selected]="isDietarySelected(d.value)"
+                  (click)="toggleDietary(d.value)">
+            <i class="bi"
+               [class.bi-check-circle-fill]="isDietarySelected(d.value)"
+               [class.bi-circle]="!isDietarySelected(d.value)"></i>
+            {{ d.label }}
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =========================================================
+         TAB 2 : ADRESSES
+         ========================================================= -->
+    <div class="tab-content" *ngIf="activeTab === 'adresses'">
+
+      <div class="form-card">
+        <div class="card-header-row">
+          <div>
+            <h3 class="card-title">
+              <i class="bi bi-geo-alt"></i>
+              Mes adresses de livraison
+            </h3>
+            <p class="card-subtitle">
+              {{ profile.addresses.length }} adresse{{ profile.addresses.length > 1 ? 's' : '' }} enregistrée{{ profile.addresses.length > 1 ? 's' : '' }}
+            </p>
+          </div>
+
+          <button class="btn-primary btn-sm" (click)="openAddressForm()">
+            <i class="bi bi-plus-lg"></i>
+            Ajouter
+          </button>
+        </div>
+
+        <div class="address-list">
+          <div class="address-card"
+               *ngFor="let addr of profile.addresses"
+               [class.is-default]="addr.isDefault">
+
+            <div class="address-icon">
+              <i class="bi"
+                 [class.bi-house-door]="addr.label === 'Maison'"
+                 [class.bi-building]="addr.label === 'Bureau'"
+                 [class.bi-geo]="addr.label !== 'Maison' && addr.label !== 'Bureau'"></i>
+            </div>
+
+            <div class="address-info">
+              <div class="address-header">
+                <span class="address-label">{{ addr.label }}</span>
+                <span class="default-badge" *ngIf="addr.isDefault">
+                  <i class="bi bi-check-circle-fill"></i>
+                  Par défaut
+                </span>
+              </div>
+              <p class="address-line">{{ addr.address }}</p>
+              <p class="address-line muted">
+                {{ addr.postalCode }} {{ addr.city }}
+              </p>
+            </div>
+
+            <div class="address-actions">
+              <button type="button" class="icon-btn" title="Modifier"
+                      (click)="editAddress(addr)">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button type="button" class="icon-btn danger" title="Supprimer"
+                      (click)="deleteAddress(addr.id)">
+                <i class="bi bi-trash"></i>
+              </button>
+              <button type="button" class="icon-btn" title="Définir par défaut"
+                      *ngIf="!addr.isDefault"
+                      (click)="setDefaultAddress(addr.id)">
+                <i class="bi bi-star"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="empty-state" *ngIf="profile.addresses.length === 0">
+            <i class="bi bi-geo-alt"></i>
+            <p>Aucune adresse enregistrée</p>
+            <button class="btn-secondary btn-sm" (click)="openAddressForm()">
+              <i class="bi bi-plus-lg"></i>
+              Ajouter une adresse
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORMULAIRE ADRESSE -->
+      <div class="form-card address-form" *ngIf="showAddressForm">
+        <h3 class="card-title">
+          <i class="bi" [class.bi-plus-circle]="!editingAddressId" [class.bi-pencil-square]="editingAddressId"></i>
+          {{ editingAddressId ? 'Modifier l\'adresse' : 'Nouvelle adresse' }}
+        </h3>
+
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Libellé</label>
+            <div class="label-chips">
+              <button type="button"
+                      class="chip small"
+                      [class.selected]="newAddress.label === 'Maison'"
+                      (click)="newAddress.label = 'Maison'">
+                <i class="bi bi-house-door"></i> Maison
+              </button>
+              <button type="button"
+                      class="chip small"
+                      [class.selected]="newAddress.label === 'Bureau'"
+                      (click)="newAddress.label = 'Bureau'">
+                <i class="bi bi-building"></i> Bureau
+              </button>
+              <button type="button"
+                      class="chip small"
+                      [class.selected]="newAddress.label === 'Autre'"
+                      (click)="newAddress.label = 'Autre'">
+                <i class="bi bi-geo"></i> Autre
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label>Adresse</label>
+            <input type="text" [(ngModel)]="newAddress.address" class="form-input"
+                   placeholder="123 Rue de la Paix">
+          </div>
+
+          <div class="form-group">
+            <label>Ville</label>
+            <input type="text" [(ngModel)]="newAddress.city" class="form-input"
+                   placeholder="Antananarivo">
+          </div>
+
+          <div class="form-group">
+            <label>Code postal</label>
+            <input type="text" [(ngModel)]="newAddress.postalCode" class="form-input"
+                   placeholder="101">
+          </div>
+
+          <div class="form-group full">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="newAddress.isDefault">
+              <span>Définir comme adresse par défaut</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-secondary" (click)="cancelAddressForm()">
+            Annuler
+          </button>
+          <button class="btn-primary" (click)="saveAddress()">
+            <i class="bi bi-check-lg"></i>
+            {{ editingAddressId ? 'Modifier' : 'Ajouter' }}
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =========================================================
+         TAB 3 : PAIEMENT
+         ========================================================= -->
+    <div class="tab-content" *ngIf="activeTab === 'paiement'">
+
+      <div class="form-card">
+        <h3 class="card-title">
+          <i class="bi bi-credit-card"></i>
+          Moyens de paiement
+        </h3>
+        <p class="card-subtitle">
+          Gérez vos cartes et modes de paiement enregistrés
+        </p>
+
+        <div class="payment-list">
+          <div class="payment-card"
+               *ngFor="let p of profile.paymentMethods"
+               [class.is-default]="p.isDefault">
+
+            <div class="payment-icon" [ngClass]="p.type">
+              <i class="bi" [ngClass]="getPaymentIcon(p.type)"></i>
+            </div>
+
+            <div class="payment-info">
+              <div class="payment-header">
+                <span class="payment-label">{{ p.label }}</span>
+                <span class="default-badge" *ngIf="p.isDefault">
+                  <i class="bi bi-check-circle-fill"></i>
+                  Par défaut
+                </span>
+              </div>
+              <p class="payment-details">{{ p.details }}</p>
+            </div>
+
+            <div class="payment-actions">
+              <button type="button" class="icon-btn" title="Définir par défaut"
+                      *ngIf="!p.isDefault"
+                      (click)="setDefaultPayment(p.id)">
+                <i class="bi bi-star"></i>
+              </button>
+              <button type="button" class="icon-btn danger" title="Supprimer"
+                      (click)="deletePayment(p.id)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="empty-state" *ngIf="profile.paymentMethods.length === 0">
+            <i class="bi bi-credit-card"></i>
+            <p>Aucun moyen de paiement enregistré</p>
+          </div>
+        </div>
+
+        <button class="btn-secondary add-payment-btn">
+          <i class="bi bi-plus-lg"></i>
+          Ajouter un moyen de paiement
+        </button>
+      </div>
+
+    </div>
+
+    <!-- =========================================================
+         TAB 4 : NOTIFICATIONS
+         ========================================================= -->
+    <div class="tab-content" *ngIf="activeTab === 'notifications'">
+
+      <div class="form-card">
+        <h3 class="card-title">
+          <i class="bi bi-bell"></i>
+          Préférences de notifications
+        </h3>
+        <p class="card-subtitle">
+          Choisissez comment et quand vous souhaitez être notifié
+        </p>
+
+        <div class="toggle-list">
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Suivi des commandes</span>
+              <span class="toggle-desc">
+                Recevoir une notification à chaque étape de votre commande
+              </span>
+            </div>
+            <label class="switch">
+              <input type="checkbox"
+                     [checked]="notifications.orderUpdates"
+                     (change)="toggleNotification('orderUpdates')">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Promotions & offres</span>
+              <span class="toggle-desc">
+                Recevoir les réductions et bons plans de vos restaurants préférés
+              </span>
+            </div>
+            <label class="switch">
+              <input type="checkbox"
+                     [checked]="notifications.promotions"
+                     (change)="toggleNotification('promotions')">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Nouveaux restaurants</span>
+              <span class="toggle-desc">
+                Être alerté quand un nouveau restaurant s'inscrit près de chez vous
+              </span>
+            </div>
+            <label class="switch">
+              <input type="checkbox"
+                     [checked]="notifications.newRestaurants"
+                     (change)="toggleNotification('newRestaurants')">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Newsletter Komandy</span>
+              <span class="toggle-desc">
+                Conseils, actualités et tendances culinaires
+              </span>
+            </div>
+            <label class="switch">
+              <input type="checkbox"
+                     [checked]="notifications.newsletter"
+                     (change)="toggleNotification('newsletter')">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3 class="card-title">
+          <i class="bi bi-send"></i>
+          Canaux de communication
+        </h3>
+
+        <div class="toggle-list">
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">
+                <i class="bi bi-envelope"></i> Alertes par email
+              </span>
+              <span class="toggle-desc">
+                Envoyées à {{ profile.email }}
+              </span>
+            </div>
+            <label class="switch">
+              <input type="checkbox"
+                     [checked]="notifications.emailAlerts"
+                     (change)="toggleNotification('emailAlerts')">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">
+                <i class="bi bi-phone"></i> Alertes SMS
+              </span>
+              <span class="toggle-desc">
+                Envoyées au {{ profile.phone }}
+              </span>
+            </div>
+            <label class="switch">
+              <input type="checkbox"
+                     [checked]="notifications.smsAlerts"
+                     (change)="toggleNotification('smsAlerts')">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =========================================================
+         BOUTON STICKY EN BAS (mobile)
+         ========================================================= -->
+    <div class="sticky-footer">
+      <button class="btn-secondary" (click)="resetProfile()">
+        <i class="bi bi-arrow-counterclockwise"></i>
+        Annuler
+      </button>
+      <button class="btn-primary" (click)="saveProfile()" [disabled]="isSaving">
+        <i class="bi" [class.bi-check-lg]="!isSaving" [class.bi-hourglass-split]="isSaving"></i>
+        {{ isSaving ? 'Enregistrement...' : 'Enregistrer' }}
+      </button>
+    </div>
+
+  </div>
+
+  <!-- =========================================================
+       TOAST DE SUCCÈS
+       ========================================================= -->
+  <div class="toast" [class.show]="showSuccessToast">
+    <i class="bi bi-check-circle-fill"></i>
+    <span>{{ successMessage }}</span>
+  </div>
+
+
+  <!-- =========================================================
+     MODAL CHANGEMENT D'EMAIL
+     ========================================================= -->
+<div class="modal-overlay"
+     *ngIf="showEmailModal"
+     (click)="closeEmailModal()">
+
+  <div class="email-modal" (click)="$event.stopPropagation()">
+
+    <!-- En-tête -->
+    <div class="email-modal-header">
+      <div class="email-modal-icon">
+        <i class="bi bi-envelope-at-fill"></i>
+      </div>
+      <div>
+        <h3>Changer mon email</h3>
+        <p>Confirmez avec votre mot de passe</p>
+      </div>
+      <button type="button"
+              class="email-modal-close"
+              (click)="closeEmailModal()"
+              aria-label="Fermer">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Corps -->
+    <div class="email-modal-body">
+
+      <!-- Email actuel -->
+      <div class="form-group">
+        <label>Email actuel</label>
+        <input type="email"
+               [value]="profile.email"
+               class="form-input"
+               disabled
+               readonly>
+      </div>
+
+      <!-- Nouvel email -->
+      <div class="form-group">
+        <label>Nouvel email</label>
+        <input type="email"
+               [(ngModel)]="emailNew"
+               class="form-input"
+               placeholder="nouveau@email.com"
+               [disabled]="isChangingEmail">
+      </div>
+
+      <!-- Mot de passe -->
+      <div class="form-group">
+        <label>Mot de passe (pour confirmer)</label>
+        <input type="password"
+               [(ngModel)]="emailPassword"
+               class="form-input"
+               placeholder="••••••••"
+               (keydown.enter)="submitEmailChange()"
+               [disabled]="isChangingEmail">
+      </div>
+
+      <!-- Erreur -->
+      <div class="email-error" *ngIf="emailError">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        {{ emailError }}
+      </div>
+
+    </div>
+
+    <!-- Pied -->
+    <div class="email-modal-footer">
+      <button type="button"
+              class="btn-secondary"
+              (click)="closeEmailModal()"
+              [disabled]="isChangingEmail">
+        Annuler
+      </button>
+
+      <button type="button"
+              class="btn-primary"
+              [disabled]="isChangingEmail"
+              (click)="submitEmailChange()">
+        <i class="bi"
+           [class.bi-check-lg]="!isChangingEmail"
+           [class.bi-hourglass-split]="isChangingEmail"></i>
+        {{ isChangingEmail ? 'Enregistrement…' : 'Confirmer' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+</section>

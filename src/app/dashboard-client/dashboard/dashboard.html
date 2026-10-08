@@ -1,0 +1,266 @@
+<section class="dashboard">
+
+  <!-- =========================================================
+       HERO — BIENVENUE
+       ========================================================= -->
+  <div class="hero">
+    <div class="hero-content">
+
+      <div class="hero-avatar-wrapper">
+        <!-- Photo uploadée -->
+        <img
+          *ngIf="hasUserAvatar()"
+          [src]="getUserAvatarUrl()"
+          [alt]="user?.name || 'Client'"
+          class="hero-avatar-img">
+
+        <!-- Initiales colorées -->
+        <div
+          *ngIf="!hasUserAvatar()"
+          class="hero-avatar"
+          [style.background]="getUserGradient()">
+          {{ getUserInitials() }}
+        </div>
+      </div>
+
+      <div class="hero-text">
+        <span class="hero-greeting">{{ getGreeting() }} 👋</span>
+        <h1>{{ user?.name || 'Cher client' }}</h1>
+        <p>Que voulez-vous manger aujourd'hui ?</p>
+      </div>
+    </div>
+
+    <!-- Recherche -->
+    <div class="hero-search">
+      <i class="bi bi-search"></i>
+      <input
+        type="text"
+        placeholder="Rechercher un restaurant, une cuisine, une ville…"
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()">
+    </div>
+  </div>
+
+  <!-- =========================================================
+       COMMANDES EN COURS
+       ========================================================= -->
+  <div class="section" *ngIf="ongoingOrders.length > 0">
+    <div class="section-header">
+      <h2>
+        <i class="bi bi-clock-history"></i>
+        Commandes en cours
+        <span class="badge-live">
+          <span class="live-dot"></span>
+          Live
+        </span>
+      </h2>
+      <a routerLink="/client/commandes" class="link-see-all">
+        Voir tout <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="ongoing-grid">
+      <div class="ongoing-card" *ngFor="let order of ongoingOrders">
+
+        <div class="ongoing-header">
+          <div class="restaurant-info">
+            <div class="restaurant-logo">
+              <!-- Logo du restaurant -->
+              <img
+                *ngIf="hasLogo(order.restaurantId)"
+                [src]="getLogoUrl(order.restaurantId)"
+                [alt]="getRestaurantName(order)">
+
+              <!-- Initiales fallback -->
+              <span
+                *ngIf="!hasLogo(order.restaurantId)"
+                [style.background]="getRestaurantGradient(order.restaurantId)">
+                {{ getRestaurantInitials(order.restaurantId) }}
+              </span>
+            </div>
+            <div>
+              <h3>{{ getRestaurantName(order) }}</h3>
+              <p>#{{ order._id.slice(-6).toUpperCase() }}</p>
+            </div>
+          </div>
+          <span class="status-pill" [ngClass]="order.status">
+            <i class="bi" [ngClass]="getStatusIcon(order.status)"></i>
+            {{ getStatusLabel(order.status) }}
+          </span>
+        </div>
+
+        <div class="ongoing-body">
+          <div class="order-items-preview">
+            <div class="item-line" *ngFor="let item of order.items.slice(0, 3)">
+              <span>{{ item.quantity }}× {{ item.name }}</span>
+              <span class="item-price">{{ item.price * item.quantity }} Ar</span>
+            </div>
+            <p class="more-items" *ngIf="order.items.length > 3">
+              + {{ order.items.length - 3 }} autres articles
+            </p>
+          </div>
+
+          <div class="order-footer">
+            <span class="order-total">
+              Total : <strong>{{ order.total | number }} Ar</strong>
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       CATÉGORIES
+       ========================================================= -->
+  <div class="section">
+    <div class="section-header">
+      <h2>
+        <i class="bi bi-grid-3x3-gap"></i>
+        Catégories
+      </h2>
+    </div>
+
+    <div class="categories-scroll">
+      <button
+        class="category-chip"
+        *ngFor="let cat of categories"
+        [class.active]="activeCategory === cat.value"
+        (click)="setCategory(cat.value)">
+        <i class="bi" [ngClass]="cat.icon"></i>
+        <span>{{ cat.label }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       RESTAURANTS
+       ========================================================= -->
+  <div class="section">
+    <div class="section-header">
+      <h2>
+        <i class="bi bi-shop"></i>
+        Restaurants disponibles
+        <span class="count-badge">{{ filteredRestaurants.length }}</span>
+      </h2>
+      <a routerLink="/client/restaurants" class="link-see-all">
+        Voir tout <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <!-- Loader -->
+    <div class="loading-grid" *ngIf="isLoadingRestaurants">
+      <div class="skeleton-card" *ngFor="let i of [1,2,3,4]">
+        <div class="skeleton-image"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+    </div>
+
+    <!-- Liste -->
+    <div class="restaurants-grid" *ngIf="!isLoadingRestaurants">
+      <a
+        class="restaurant-card"
+  [class.has-promo]="hasPromos(r._id)"
+  *ngFor="let r of filteredRestaurants"
+  [routerLink]="['/client/restaurants', r._id]">
+
+        <div class="restaurant-cover">
+
+          <!-- Cover uploadée -->
+          <img
+            *ngIf="hasCover(r)"
+            [src]="getCoverUrl(r)"
+            [alt]="r.name">
+
+          <!-- Placeholder -->
+          <div *ngIf="!hasCover(r)" class="cover-placeholder">
+            <i class="bi bi-shop-window"></i>
+          </div>
+
+          <!-- Badge ouvert/fermé -->
+          <span class="badge-status" [class.open]="r.isOpen">
+            {{ r.isOpen ? 'Ouvert' : 'Fermé' }}
+          </span>
+
+          <!-- Badge promo -->
+<span class="promo-badge"
+      *ngIf="hasPromos(r._id)"
+      [style.background]="getPromoColor(r._id)">
+  <i class="bi bi-tag-fill"></i>
+  <ng-container *ngIf="getBestDiscount(r._id) > 0">
+    Jusqu'à -{{ getBestDiscount(r._id) }}%
+  </ng-container>
+  <ng-container *ngIf="getBestDiscount(r._id) === 0">
+    Promo
+  </ng-container>
+</span>
+
+          <!-- Logo du restaurant (par-dessus la cover) -->
+          <div class="restaurant-logo-small">
+            <img
+              *ngIf="hasLogo(r)"
+              [src]="getLogoUrl(r)"
+              [alt]="r.name">
+
+            <span
+              *ngIf="!hasLogo(r)"
+              class="logo-initials"
+              [style.background]="getRestaurantGradient(r)">
+              {{ getRestaurantInitials(r) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="restaurant-body">
+          <div class="restaurant-title">
+            <h3>{{ r.name }}</h3>
+            <span class="rating" *ngIf="r.rating > 0">
+              <i class="bi bi-star-fill"></i>
+              {{ r.rating.toFixed(1) }}
+            </span>
+          </div>
+
+          <p class="restaurant-type">
+            <i class="bi bi-tag"></i>
+            {{ r.type || 'Restaurant' }}
+            <span *ngIf="r.city"> • {{ r.city }}</span>
+          </p>
+          <!-- Bandeau promo -->
+<div class="promo-info" *ngIf="hasPromos(r._id)">
+  <i class="bi bi-megaphone-fill"></i>
+  <span>
+    {{ countPromosForRestaurant(r._id) }}
+    offre{{ countPromosForRestaurant(r._id) > 1 ? 's' : '' }} en cours
+  </span>
+</div>
+
+          <div class="restaurant-meta">
+            <span>
+              <i class="bi bi-clock"></i>
+              {{ r.avgPrepTime || 20 }} min
+            </span>
+            <span>
+              <i class="bi bi-truck"></i>
+              {{ r.deliveryFee > 0 ? r.deliveryFee + ' Ar' : 'Gratuit' }}
+            </span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- État vide -->
+    <div class="empty-state" *ngIf="!isLoadingRestaurants && filteredRestaurants.length === 0">
+      <div class="empty-icon">
+        <i class="bi bi-shop"></i>
+      </div>
+      <h3>Aucun restaurant trouvé</h3>
+      <p>Essayez une autre catégorie ou une autre recherche</p>
+      <button class="btn-secondary" (click)="searchQuery = ''; setCategory('all')">
+        Réinitialiser les filtres
+      </button>
+    </div>
+  </div>
+
+</section>

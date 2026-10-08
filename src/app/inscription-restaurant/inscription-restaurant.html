@@ -1,0 +1,234 @@
+<section class="auth-page">
+  <div class="auth-card wide">
+
+    <!-- EN-TÊTE -->
+    <div class="auth-header">
+      <div class="auth-logo restaurant">
+        <i class="bi bi-shop"></i>
+      </div>
+      <h1>Inscrire mon restaurant</h1>
+      <p>Rejoignez Komandy et vendez vos plats</p>
+    </div>
+
+    <!-- ERREUR -->
+    <div class="alert-error" *ngIf="errorMessage">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+
+      <!-- =========================================================
+           SECTION 1 : COMPTE
+           ========================================================= -->
+      <div class="section-title">
+        <i class="bi bi-person-circle"></i>
+        <span>Votre compte</span>
+      </div>
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label for="name">Nom complet</label>
+          <div class="input-wrapper">
+            <i class="bi bi-person"></i>
+            <input id="name" type="text" formControlName="name" placeholder="Rakoto Jean">
+          </div>
+          <span class="form-error" *ngIf="f['name'].touched && f['name'].errors">
+            Nom obligatoire (min. 2 caractères)
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Téléphone</label>
+          <div class="input-wrapper">
+            <i class="bi bi-telephone"></i>
+            <input id="phone" type="tel" formControlName="phone" placeholder="+261 34 12 345 67">
+          </div>
+          <span class="form-error" *ngIf="f['phone'].touched && f['phone'].errors">
+            Téléphone invalide
+          </span>
+        </div>
+
+        <div class="form-group full">
+          <label for="email">Email</label>
+          <div class="input-wrapper">
+            <i class="bi bi-envelope"></i>
+            <input id="email" type="email" formControlName="email" placeholder="contact@restaurant.mg">
+          </div>
+          <span class="form-error" *ngIf="f['email'].touched && f['email'].errors">
+            Email invalide
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <div class="input-wrapper">
+            <i class="bi bi-lock"></i>
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Min. 6 caractères">
+            <button type="button" class="btn-toggle-password" (click)="togglePassword()">
+              <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+            </button>
+          </div>
+          <span class="form-error" *ngIf="f['password'].touched && f['password'].errors">
+            Minimum 6 caractères
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirmer</label>
+          <div class="input-wrapper">
+            <i class="bi bi-lock-fill"></i>
+            <input
+              id="confirmPassword"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="confirmPassword"
+              placeholder="••••••••">
+          </div>
+          <span class="form-error"
+                *ngIf="form.errors?.['passwordMismatch'] && f['confirmPassword'].touched">
+            Les mots de passe ne correspondent pas
+          </span>
+        </div>
+
+      </div>
+
+      <!-- =========================================================
+           SECTION 2 : RESTAURANT
+           ========================================================= -->
+      <div class="section-title">
+        <i class="bi bi-shop"></i>
+        <span>Votre restaurant</span>
+      </div>
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label for="restaurantName">Nom du restaurant</label>
+          <div class="input-wrapper">
+            <i class="bi bi-shop-window"></i>
+            <input id="restaurantName" type="text" formControlName="restaurantName"
+                   placeholder="Chez Rakoto">
+          </div>
+          <span class="form-error"
+                *ngIf="f['restaurantName'].touched && f['restaurantName'].errors">
+            Nom obligatoire
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="restaurantType">Type de cuisine</label>
+          <div class="input-wrapper">
+            <i class="bi bi-tag"></i>
+            <select id="restaurantType" formControlName="restaurantType">
+              <option value="">Choisir…</option>
+              <option *ngFor="let c of cuisineOptions" [value]="c.value">
+                {{ c.label }}
+              </option>
+            </select>
+          </div>
+          <span class="form-error"
+                *ngIf="f['restaurantType'].touched && f['restaurantType'].errors">
+            Type obligatoire
+          </span>
+        </div>
+
+        <div class="form-group full">
+          <label for="description">Description</label>
+          <div class="input-wrapper textarea">
+            <i class="bi bi-card-text"></i>
+            <textarea id="description" formControlName="description" rows="3"
+                      placeholder="Décrivez votre restaurant et votre cuisine…"></textarea>
+          </div>
+          <span class="form-error"
+                *ngIf="f['description'].touched && f['description'].errors">
+            Minimum 20 caractères
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="address">Adresse</label>
+          <div class="input-wrapper">
+            <i class="bi bi-geo-alt"></i>
+            <input id="address" type="text" formControlName="address"
+                   placeholder="123 Rue de la Paix">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="city">Ville</label>
+          <div class="input-wrapper">
+            <i class="bi bi-building"></i>
+            <input id="city" type="text" formControlName="city"
+                   placeholder="Antananarivo">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- =========================================================
+           SECTION 3 : PARAMÈTRES
+           ========================================================= -->
+      <div class="section-title">
+        <i class="bi bi-sliders"></i>
+        <span>Paramètres de livraison</span>
+      </div>
+
+      <div class="form-grid three-cols">
+
+        <div class="form-group">
+          <label for="deliveryFee">Frais de livraison (Ar)</label>
+          <div class="input-wrapper">
+            <i class="bi bi-cash"></i>
+            <input id="deliveryFee" type="number" formControlName="deliveryFee">
+          </div>
+          <span class="form-hint">0 = livraison gratuite</span>
+        </div>
+
+        <div class="form-group">
+          <label for="minOrder">Commande min. (Ar)</label>
+          <div class="input-wrapper">
+            <i class="bi bi-bag"></i>
+            <input id="minOrder" type="number" formControlName="minOrder">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="avgPrepTime">Préparation (min)</label>
+          <div class="input-wrapper">
+            <i class="bi bi-clock"></i>
+            <input id="avgPrepTime" type="number" formControlName="avgPrepTime">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Conditions -->
+      <label class="checkbox-label">
+        <input type="checkbox" formControlName="acceptTerms">
+        <span>J'accepte les conditions d'utilisation et je certifie être le propriétaire du restaurant</span>
+      </label>
+
+      <!-- Bouton -->
+      <button type="submit" class="btn-primary" [disabled]="isLoading">
+        <i class="bi" [class.bi-check-lg]="!isLoading" [class.bi-hourglass-split]="isLoading"></i>
+        {{ isLoading ? 'Inscription...' : 'Créer mon restaurant' }}
+      </button>
+
+    </form>
+
+    <div class="auth-divider">
+      <span>Déjà un compte ?</span>
+    </div>
+
+    <a routerLink="/connexion" class="btn-secondary full">
+      <i class="bi bi-box-arrow-in-right"></i>
+      Se connecter
+    </a>
+
+  </div>
+</section>

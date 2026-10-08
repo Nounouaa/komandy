@@ -1,0 +1,437 @@
+/* =========================================================
+   PAGE
+   ========================================================= */
+.clients-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 40px;
+}
+
+.page-header h1 {
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0 0 4px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.page-header h1 i { color: #ff6b6b; }
+.page-header p {
+  color: rgba(255, 255, 255, .4);
+  margin: 0;
+  font-size: .9rem;
+}
+
+/* =========================================================
+   STATS
+   ========================================================= */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.stat-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  background: rgba(255, 255, 255, .03);
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 16px;
+  transition: all .3s;
+}
+.stat-box > i {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 107, 107, .1);
+  border-radius: 14px;
+  color: #ff6b6b;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+.stat-box .val {
+  display: block;
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+.stat-box .lbl {
+  display: block;
+  color: rgba(255, 255, 255, .4);
+  font-size: .78rem;
+  margin-top: 2px;
+}
+
+/* Stat "économies" (accent vert) */
+.stat-box.promo {
+  border-color: rgba(107, 203, 119, .25);
+  background: rgba(107, 203, 119, .04);
+}
+.stat-box.promo > i {
+  background: rgba(107, 203, 119, .15);
+  color: #6bcb77;
+}
+.stat-box.promo .val { color: #6bcb77; }
+
+/* =========================================================
+   FILTRES
+   ========================================================= */
+.filters-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.search-box i {
+  position: absolute;
+  left: 16px;
+  color: rgba(255, 255, 255, .3);
+  pointer-events: none;
+}
+.search-box input {
+  width: 100%;
+  padding: 13px 18px 13px 46px;
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 12px;
+  color: #fff;
+  font-size: .9rem;
+  outline: none;
+  transition: all .3s;
+}
+.search-box input:focus {
+  border-color: rgba(255, 107, 107, .4);
+  background: rgba(255, 255, 255, .06);
+}
+
+.sort-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.sort-chips button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, .03);
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 50px;
+  color: rgba(255, 255, 255, .6);
+  font-size: .82rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all .3s;
+}
+.sort-chips button i { font-size: .72rem; }
+.sort-chips button:hover {
+  background: rgba(255, 255, 255, .06);
+  color: #fff;
+}
+.sort-chips button.active {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(238, 90, 36, .3);
+}
+
+/* =========================================================
+   LISTE
+   ========================================================= */
+.clients-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.client-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 56px 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, .03);
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 14px;
+  transition: all .3s;
+}
+.client-row:hover {
+  border-color: rgba(255, 107, 107, .2);
+  background: rgba(255, 255, 255, .04);
+}
+
+/* Client avec promo → bordure légèrement dorée */
+.client-row.has-promo {
+  border-color: rgba(255, 217, 61, .25);
+  background: linear-gradient(90deg,
+    rgba(255, 217, 61, .04) 0%,
+    rgba(255, 255, 255, .03) 30%);
+}
+.client-row.has-promo:hover {
+  border-color: rgba(255, 217, 61, .5);
+}
+
+/* =========================================================
+   AVATAR
+   ========================================================= */
+.client-avatar {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, .08);
+}
+.client-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.client-avatar span {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  border-radius: 50%;
+}
+
+/* Pastille promo sur l'avatar */
+.avatar-promo-dot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ffd93d, #ee5a24);
+  border: 2px solid #0a0e1a;
+  border-radius: 50%;
+  color: #0a0e1a;
+  font-size: .62rem;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(255, 217, 61, .5);
+}
+.avatar-promo-dot i { font-weight: 900; }
+
+/* =========================================================
+   INFO CLIENT
+   ========================================================= */
+.client-info { min-width: 0; }
+
+.client-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.client-info h3 {
+  color: #fff;
+  font-size: .95rem;
+  font-weight: 700;
+  margin: 0;
+}
+.client-info p {
+  color: rgba(255, 255, 255, .4);
+  font-size: .78rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.client-info p i {
+  color: #ff6b6b;
+  font-size: .72rem;
+}
+
+/* Badge promo */
+.promo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  background: linear-gradient(135deg, rgba(255, 217, 61, .18), rgba(238, 90, 36, .15));
+  border: 1px solid rgba(255, 217, 61, .35);
+  border-radius: 50px;
+  color: #ffd93d;
+  font-size: .68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  animation: badgePulse 2.5s ease-in-out infinite;
+}
+.promo-badge i { font-size: .68rem; }
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+
+/* =========================================================
+   MÉTRIQUES
+   ========================================================= */
+.client-metrics {
+  display: flex;
+  gap: 24px;
+  padding: 0 16px;
+  border-left: 1px solid rgba(255, 255, 255, .06);
+  border-right: 1px solid rgba(255, 255, 255, .06);
+}
+.metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.metric .val {
+  color: #fff;
+  font-size: .95rem;
+  font-weight: 800;
+}
+.metric .val.spent { color: #6bcb77; }
+.metric .val.saved {
+  color: #ffd93d;
+  position: relative;
+}
+.metric .val.saved::before {
+  content: '';
+  position: absolute;
+  inset: -3px -6px;
+  background: rgba(255, 217, 61, .1);
+  border-radius: 6px;
+  z-index: -1;
+}
+.metric .val.date {
+  color: rgba(255, 255, 255, .6);
+  font-size: .82rem;
+  font-weight: 600;
+}
+.metric .lbl {
+  color: rgba(255, 255, 255, .35);
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  margin-top: 2px;
+}
+
+/* =========================================================
+   BOUTON APPEL
+   ========================================================= */
+.btn-call {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(107, 203, 119, .12);
+  border: 1px solid rgba(107, 203, 119, .25);
+  border-radius: 50%;
+  color: #6bcb77;
+  text-decoration: none;
+  transition: all .3s;
+}
+.btn-call:hover {
+  background: #6bcb77;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+.loading-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.skeleton-row {
+  height: 88px;
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, .03),
+    rgba(255, 255, 255, .06),
+    rgba(255, 255, 255, .03));
+  background-size: 200% 100%;
+  border-radius: 14px;
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* =========================================================
+   ÉTAT VIDE
+   ========================================================= */
+.empty-state {
+  padding: 80px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, .4);
+}
+.empty-state i {
+  font-size: 3.5rem;
+  color: rgba(255, 107, 107, .3);
+}
+.empty-state h3 { color: #fff; margin: 0; }
+.empty-state p { margin: 0; }
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 1200px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 991.98px) {
+  .stats-row { grid-template-columns: 1fr; }
+
+  .client-row {
+    grid-template-columns: 56px 1fr auto;
+    grid-template-areas:
+      "avatar info call"
+      "avatar metrics metrics";
+    row-gap: 12px;
+  }
+  .client-avatar { grid-area: avatar; }
+  .client-info { grid-area: info; }
+  .client-metrics {
+    grid-area: metrics;
+    border: none;
+    padding: 0;
+    justify-content: flex-start;
+    gap: 18px;
+  }
+  .btn-call { grid-area: call; }
+}

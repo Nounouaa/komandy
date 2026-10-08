@@ -1,0 +1,195 @@
+<!-- =========================================================
+     SIDEBAR RESTAURANT
+     ========================================================= -->
+<aside class="sidebar-restaurant" [class.collapsed]="isCollapsed">
+
+  <!-- =========================================================
+       EN-TÊTE
+       ========================================================= -->
+  <div class="sidebar-header">
+
+    <a class="sidebar-brand" routerLink="/restaurant/dashboard" aria-label="Accueil">
+      <span class="brand-icon">🍽️</span>
+      <span class="brand-text">Komandy</span>
+      <span class="brand-dot"></span>
+    </a>
+
+    <button
+      type="button"
+      class="btn-toggle"
+      (click)="toggleSidebar()"
+      [attr.aria-label]="isCollapsed ? 'Ouvrir la sidebar' : 'Réduire la sidebar'"
+      [attr.aria-expanded]="!isCollapsed"
+      [attr.title]="isCollapsed ? 'Ouvrir' : 'Réduire'">
+      <i class="bi"
+         [class.bi-chevron-right]="isCollapsed"
+         [class.bi-chevron-left]="!isCollapsed"></i>
+    </button>
+
+  </div>
+
+  <!-- =========================================================
+       INFO RESTAURANT (logo + nom dynamiques)
+       ========================================================= -->
+  <div class="restaurant-info">
+    <div class="restaurant-icon-wrapper">
+      <!-- Logo uploadé -->
+      <img
+        *ngIf="hasLogo()"
+        [src]="getLogoUrl()"
+        [alt]="restaurantName"
+        class="restaurant-logo-img">
+
+      <!-- Initiales colorées par défaut -->
+      <div
+        *ngIf="!hasLogo()"
+        class="restaurant-icon"
+        [style.background]="getGradient()">
+        {{ getInitials() }}
+      </div>
+    </div>
+
+    <div class="restaurant-details">
+      <h6 class="restaurant-name">{{ restaurantName || 'Mon Restaurant' }}</h6>
+      <span class="restaurant-status" [class.closed]="!isOpen">
+        <span class="status-dot" [class.closed]="!isOpen"></span>
+        {{ isOpen ? 'En ligne' : 'Fermé' }}
+      </span>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       NAVIGATION PRINCIPALE
+       ========================================================= -->
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+
+      <!-- Dashboard -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/restaurant/dashboard"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          [attr.title]="isCollapsed ? 'Dashboard' : null">
+          <i class="bi bi-grid-1x2-fill"></i>
+          <span class="nav-text">Dashboard</span>
+          <span class="nav-badge alert" *ngIf="stats.pendingOrders > 0">
+            {{ stats.pendingOrders }}
+          </span>
+        </a>
+      </li>
+
+      <!-- Produits -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/restaurant/produits"
+          routerLinkActive="active"
+          [attr.title]="isCollapsed ? 'Mes produits' : null">
+          <i class="bi bi-menu-app"></i>
+          <span class="nav-text">Mes produits</span>
+          <span class="nav-badge" *ngIf="stats.products > 0">
+            {{ stats.products }}
+          </span>
+        </a>
+      </li>
+
+      <!-- Commandes -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/restaurant/commandes"
+          routerLinkActive="active"
+          [attr.title]="isCollapsed ? 'Commandes' : null">
+          <i class="bi bi-box-seam"></i>
+          <span class="nav-text">Commandes</span>
+          <span class="nav-badge" *ngIf="stats.orders > 0">
+            {{ stats.orders }}
+          </span>
+        </a>
+      </li>
+
+      <!-- Promotions -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/restaurant/promotions"
+          routerLinkActive="active"
+          [attr.title]="isCollapsed ? 'Promotions' : null">
+          <i class="bi bi-megaphone"></i>
+          <span class="nav-text">Promotions</span>
+          <span class="nav-badge promo" *ngIf="stats.promotions > 0">
+            {{ stats.promotions }}
+          </span>
+        </a>
+      </li>
+
+      <!-- Clients -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/restaurant/clients"
+          routerLinkActive="active"
+          [attr.title]="isCollapsed ? 'Clients' : null">
+          <i class="bi bi-people"></i>
+          <span class="nav-text">Clients</span>
+          <span class="nav-badge" *ngIf="stats.clients > 0">
+            {{ stats.clients }}
+          </span>
+        </a>
+      </li>
+
+      <!-- Statistiques -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/restaurant/statistiques"
+          routerLinkActive="active"
+          [attr.title]="isCollapsed ? 'Statistiques' : null">
+          <i class="bi bi-graph-up"></i>
+          <span class="nav-text">Statistiques</span>
+        </a>
+      </li>
+
+    </ul>
+  </nav>
+
+  <!-- =========================================================
+       SÉPARATEUR
+       ========================================================= -->
+  <div class="sidebar-divider"></div>
+
+  <!-- =========================================================
+       NAVIGATION BASSE
+       ========================================================= -->
+  <nav class="sidebar-nav bottom-nav">
+    <ul class="nav-list">
+
+      <!-- Paramètres -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/restaurant/profil"
+          routerLinkActive="active"
+          [attr.title]="isCollapsed ? 'Paramètres' : null">
+          <i class="bi bi-gear"></i>
+          <span class="nav-text">Paramètres</span>
+        </a>
+      </li>
+
+      <!-- Déconnexion -->
+      <li class="nav-item">
+        <a
+          class="nav-link logout"
+          (click)="onLogout()"
+          [attr.title]="isCollapsed ? 'Déconnexion' : null">
+          <i class="bi bi-box-arrow-right"></i>
+          <span class="nav-text">Déconnexion</span>
+        </a>
+      </li>
+
+    </ul>
+  </nav>
+
+</aside>

@@ -1,0 +1,280 @@
+<section class="promo-resto-page">
+
+  <!-- EN-TÊTE -->
+  <div class="page-header">
+    <div>
+      <h1><i class="bi bi-megaphone"></i> Mes promotions</h1>
+      <p>Ajoutez des offres à vos produits pour attirer plus de clients</p>
+    </div>
+  </div>
+
+  <!-- PROMOS GLOBALES (si existantes) -->
+  <div class="global-promo-section" *ngIf="globalPromotions.length > 0">
+    <h2><i class="bi bi-shop"></i> Promotions globales</h2>
+    <div class="promo-list">
+      <div class="promo-card"
+           *ngFor="let promo of globalPromotions"
+           [class.inactive]="!promo.isActive"
+           [class.expired]="isExpired(promo)">
+
+        <div class="promo-strip" [style.background]="promo.color"></div>
+
+        <div class="promo-icon" [style.background]="promo.color + '22'" [style.color]="promo.color">
+          <i class="bi bi-shop"></i>
+        </div>
+
+        <div class="promo-body">
+          <div class="promo-header">
+            <h3>{{ promo.title }}</h3>
+            <span class="badge-discount"
+                  [style.background]="promo.color"
+                  [style.color]="'#0a0e1a'">
+              {{ getDiscountLabel(promo) }}
+            </span>
+          </div>
+          <p class="promo-desc">{{ promo.description }}</p>
+          <div class="promo-meta">
+            <span><i class="bi bi-ticket-perforated"></i> {{ promo.code }}</span>
+            <span><i class="bi bi-clock"></i> {{ getDaysLeft(promo.expiresAt) }}j restants</span>
+          </div>
+          <div class="promo-status">
+            <span class="status-pill" [class.active]="promo.isActive" [class.off]="!promo.isActive">
+              {{ promo.isActive ? 'Active' : 'Inactive' }}
+            </span>
+            <span class="status-pill expired" *ngIf="isExpired(promo)">Expirée</span>
+          </div>
+        </div>
+
+        <div class="promo-actions">
+          <button class="icon-btn" (click)="toggle(promo)"
+                  [title]="promo.isActive ? 'Désactiver' : 'Activer'">
+            <i class="bi"
+               [class.bi-pause-circle]="promo.isActive"
+               [class.bi-play-circle]="!promo.isActive"></i>
+          </button>
+          <button class="icon-btn danger" (click)="remove(promo)" title="Supprimer">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARGEMENT -->
+  <div class="loading-grid" *ngIf="isLoadingProducts">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3]"></div>
+  </div>
+
+  <!-- LISTE PAR PRODUIT -->
+  <div class="products-promo-list" *ngIf="!isLoadingProducts && products.length > 0">
+
+    <div class="product-promo-card" *ngFor="let product of products">
+
+      <!-- En-tête produit -->
+      <div class="product-header">
+        <div class="product-thumb">
+          <img *ngIf="hasProductImage(product)"
+               [src]="getProductImage(product)"
+               [alt]="product.name">
+          <i class="bi bi-bag" *ngIf="!hasProductImage(product)"></i>
+        </div>
+
+        <div class="product-info">
+          <h3>{{ product.name }}</h3>
+          <div class="product-meta">
+            <span class="price">{{ product.price | number:'1.0-0' }} Ar</span>
+            <span class="cat" *ngIf="product.category">· {{ product.category }}</span>
+          </div>
+        </div>
+
+        <button type="button"
+                class="btn-primary"
+                *ngIf="!isFormOpenFor(product._id)"
+                (click)="openCreateFor(product)">
+          <i class="bi bi-plus-lg"></i>
+          Ajouter une promo
+        </button>
+      </div>
+
+      <!-- Mini-formulaire inline -->
+      <div class="inline-form" *ngIf="isFormOpenFor(product._id)">
+        <h4>
+          <i class="bi" [class.bi-plus-circle]="!editingPromoId" [class.bi-pencil-square]="editingPromoId"></i>
+          {{ editingPromoId ? 'Modifier la promotion' : 'Nouvelle promotion' }}
+        </h4>
+
+
+        <!-- Aperçu du prix -->
+<div class="price-preview" *ngIf="currentProduct && previewPrice !== null">
+  <div class="pp-thumb">
+    <img *ngIf="hasProductImage(currentProduct)"
+         [src]="getProductImage(currentProduct)"
+         [alt]="currentProduct.name">
+    <i class="bi bi-bag" *ngIf="!hasProductImage(currentProduct)"></i>
+  </div>
+
+  <div class="pp-info">
+    <span class="pp-name">{{ currentProduct.name }}</span>
+    <span class="pp-prices">
+      <span class="pp-old">{{ currentProduct.price | number:'1.0-0' }} Ar</span>
+      <i class="bi bi-arrow-right"></i>
+      <span class="pp-new" [style.color]="pf['color'].value">
+        {{ previewPrice | number:'1.0-0' }} Ar
+      </span>
+    </span>
+  </div>
+
+  <span class="pp-savings" *ngIf="previewSavings > 0">
+    <i class="bi bi-piggy-bank"></i>
+    -{{ previewSavings | number:'1.0-0' }} Ar
+  </span>
+</div>
+
+        <form [formGroup]="promoForm" (ngSubmit)="save(product)">
+          <div class="inline-form-grid">
+
+            <div class="form-group full">
+              <label>Titre</label>
+              <input type="text" formControlName="title"
+                     placeholder="Ex: -20% sur ce produit">
+              <span class="err" *ngIf="pf['title'].touched && pf['title'].errors">
+                Titre obligatoire (min 3)
+              </span>
+            </div>
+
+            <div class="form-group full">
+              <label>Description</label>
+              <input type="text" formControlName="description"
+                     placeholder="Décrivez l'offre">
+            </div>
+
+            <div class="form-group">
+              <label>Code promo</label>
+              <input type="text" formControlName="code"
+                     placeholder="PROMO20"
+                     style="text-transform: uppercase;">
+              <span class="err" *ngIf="pf['code'].touched && pf['code'].errors">
+                Code obligatoire (min 4)
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label>Réduction (%)</label>
+              <input type="number" formControlName="discount" placeholder="10">
+              <span class="err" *ngIf="pf['discount'].touched && pf['discount'].errors">
+                Réduction obligatoire
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label>Date d'expiration</label>
+              <input type="date" formControlName="expiresAt">
+            </div>
+
+            <div class="form-group">
+              <label>Couleur</label>
+              <div class="color-picker">
+                <button type="button"
+                        *ngFor="let c of promoColors"
+                        class="color-btn"
+                        [style.background]="c"
+                        [class.active]="pf['color'].value === c"
+                        (click)="promoForm.patchValue({ color: c })"></button>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="inline-form-actions">
+            <button type="button" class="btn-secondary" (click)="cancelForm()">
+              Annuler
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="isSavingPromo">
+              <i class="bi"
+                 [class.bi-check-lg]="!isSavingPromo"
+                 [class.bi-hourglass-split]="isSavingPromo"></i>
+              {{ isSavingPromo ? 'Enregistrement…' : (editingPromoId ? 'Modifier' : 'Créer') }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Liste des promos du produit -->
+      <div class="promo-sublist" *ngIf="getPromotionsFor(product).length > 0">
+        <div class="promo-card"
+             *ngFor="let promo of getPromotionsFor(product)"
+             [class.inactive]="!promo.isActive"
+             [class.expired]="isExpired(promo)">
+
+          <div class="promo-strip" [style.background]="promo.color"></div>
+
+          <div class="promo-icon"
+               [style.background]="promo.color + '22'"
+               [style.color]="promo.color">
+            <i class="bi bi-gift-fill"></i>
+          </div>
+
+          <div class="promo-body">
+            <div class="promo-header">
+              <h3>{{ promo.title }}</h3>
+              <span class="badge-discount"
+                    [style.background]="promo.color"
+                    [style.color]="'#0a0e1a'">
+                {{ getDiscountLabel(promo) }}
+              </span>
+            </div>
+
+            <p class="promo-desc" *ngIf="promo.description">{{ promo.description }}</p>
+
+            <div class="promo-meta">
+              <span><i class="bi bi-ticket-perforated"></i> {{ promo.code }}</span>
+              <span><i class="bi bi-clock"></i> {{ getDaysLeft(promo.expiresAt) }}j restants</span>
+            </div>
+
+            <div class="promo-status">
+              <span class="status-pill" [class.active]="promo.isActive" [class.off]="!promo.isActive">
+                {{ promo.isActive ? 'Active' : 'Inactive' }}
+              </span>
+              <span class="status-pill expired" *ngIf="isExpired(promo)">Expirée</span>
+            </div>
+          </div>
+
+          <div class="promo-actions">
+            <button class="icon-btn" (click)="openEditFor(promo, product)" title="Modifier">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="icon-btn" (click)="toggle(promo)"
+                    [title]="promo.isActive ? 'Désactiver' : 'Activer'">
+              <i class="bi"
+                 [class.bi-pause-circle]="promo.isActive"
+                 [class.bi-play-circle]="!promo.isActive"></i>
+            </button>
+            <button class="icon-btn danger" (click)="remove(promo)" title="Supprimer">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- État vide sous le produit -->
+      <div class="no-promo"
+           *ngIf="getPromotionsFor(product).length === 0 && !isFormOpenFor(product._id)">
+        <i class="bi bi-megaphone"></i>
+        <span>Aucune promotion pour ce produit</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- VIDE : AUCUN PRODUIT -->
+  <div class="empty-state"
+       *ngIf="!isLoadingProducts && products.length === 0">
+    <i class="bi bi-menu-app"></i>
+    <h3>Aucun produit</h3>
+    <p>Ajoutez d'abord un produit à votre menu pour créer une promotion.</p>
+    <a href="/resto/produits" class="btn-primary">
+      <i class="bi bi-plus-lg"></i> Ajouter un produit
+    </a>
+  </div>
+
+</section>

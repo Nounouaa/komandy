@@ -1,0 +1,580 @@
+/* You can add global styles to this file, and also import other style files */
+/* ==================== DIAPORAMA HERO ==================== */
+.hero-slider-wrapper {
+  position: relative;
+  border-radius: 30px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a1f35, #0d1b2a);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.hero-slider {
+  position: relative;
+  width: 100%;
+  height: 450px;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scale(1.1);
+}
+
+.slide.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.slide-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.slide-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 8s ease-in-out;
+}
+
+.slide.active .slide-image {
+  transform: scale(1.05);
+}
+
+.slide-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 40px 30px 30px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  pointer-events: none;
+}
+
+.slide-tag {
+  display: inline-block;
+  padding: 4px 16px;
+  background: rgba(255, 107, 107, 0.2);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50px;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  animation: slide-tag-in 0.6s ease-out;
+}
+
+@keyframes slide-tag-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== DIAPORAMA ABOUT ==================== */
+.about-slider-wrapper {
+  position: relative;
+  border-radius: 30px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a1f35, #0d1b2a);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.about-slider {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+}
+
+.about-slider .slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scale(1.1) rotate(2deg);
+}
+
+.about-slider .slide.active {
+  opacity: 1;
+  transform: scale(1) rotate(0);
+}
+
+.about-slider .slide-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 10s ease-in-out;
+}
+
+.about-slider .slide.active .slide-image {
+  transform: scale(1.08);
+}
+
+.about-slider .slide-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 50px 30px 30px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+}
+
+.slide-content {
+  text-align: left;
+  animation: slide-content-in 0.6s ease-out;
+}
+
+@keyframes slide-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-title {
+  display: block;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.slide-subtitle {
+  display: block;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+}
+
+/* ==================== INDICATEURS ==================== */
+.slider-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+.about-slider-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+  position: relative;
+}
+
+.indicator.active {
+  background: #ff6b6b;
+  width: 30px;
+  border-radius: 5px;
+}
+
+.indicator:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.indicator-text {
+  display: none;
+}
+
+/* Indicateurs About avec texte */
+.about-slider-indicators .indicator {
+  width: auto;
+  padding: 6px 16px;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.about-slider-indicators .indicator.active {
+  background: rgba(255, 107, 107, 0.15);
+  border-color: rgba(255, 107, 107, 0.3);
+  color: white;
+  transform: scale(1.05);
+}
+
+.about-slider-indicators .indicator .indicator-text {
+  display: inline;
+}
+
+/* ==================== CONTROLES ==================== */
+.slider-control {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+}
+
+.hero-slider-wrapper:hover .slider-control,
+.about-slider-wrapper:hover .slider-control {
+  opacity: 1;
+}
+
+.slider-control:hover {
+  background: rgba(255, 107, 107, 0.15);
+  border-color: rgba(255, 107, 107, 0.3);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.slider-control.prev {
+  left: 16px;
+}
+
+.slider-control.next {
+  right: 16px;
+}
+
+/* ==================== COMPTEUR DE SLIDES ==================== */
+.slide-counter {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 50px;
+  padding: 6px 16px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+}
+
+.slide-counter .current {
+  color: white;
+}
+
+.slide-counter .separator {
+  margin: 0 4px;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ==================== ÉQUIPE AVATARS ==================== */
+.team-indicators {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.team-label {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.team-avatars {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  background-size: cover;
+  background-position: center;
+  margin-right: -8px;
+  transition: all 0.3s;
+  cursor: default;
+}
+
+.avatar:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 107, 107, 0.4);
+}
+
+.avatar.more {
+  background: rgba(255, 107, 107, 0.1);
+  border: 2px solid rgba(255, 107, 107, 0.15);
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes slide-tag-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 991.98px) {
+  .hero-slider {
+    height: 350px;
+  }
+  
+  .about-slider {
+    height: 320px;
+  }
+  
+  .slider-control {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+  
+  .slider-control.prev {
+    left: 10px;
+  }
+  
+  .slider-control.next {
+    right: 10px;
+  }
+  
+  .slide-title {
+    font-size: 1.2rem;
+  }
+  
+  .about-slider-indicators .indicator {
+    padding: 4px 12px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .hero-slider {
+    height: 280px;
+  }
+  
+  .about-slider {
+    height: 260px;
+  }
+  
+  .slider-control {
+    opacity: 1;
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+  
+  .slide-overlay {
+    padding: 20px 16px 16px;
+  }
+  
+  .slide-tag {
+    font-size: 0.75rem;
+    padding: 3px 12px;
+  }
+  
+  .slide-title {
+    font-size: 1rem;
+  }
+  
+  .slide-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .about-slider-indicators .indicator {
+    padding: 4px 8px;
+    font-size: 0.6rem;
+  }
+  
+  .about-slider-indicators .indicator .indicator-text {
+    display: none;
+  }
+  
+  .about-slider-indicators .indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    padding: 0;
+  }
+  
+  .slide-counter {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+  }
+  
+  .team-avatars .avatar {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .floating-badge {
+    display: none !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-slider {
+    height: 220px;
+  }
+  
+  .about-slider {
+    height: 200px;
+  }
+  
+  .slider-control {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+}
+
+/* =========================================================
+   FIX MODAL — Force l'affichage par-dessus tout
+   ========================================================= */
+
+.modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 2147483647 !important;
+  background: rgba(0, 0, 0, 0.85) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  margin: 0 !important;
+  transform: none !important;
+  filter: none !important;
+  perspective: none !important;
+  overflow-y: auto !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.modal {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 440px !important;
+  background: #1a1f35 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8) !important;
+  transform: none !important;
+  z-index: 2147483647 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
+}
+
+.modal-body {
+  padding: 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  visibility: visible !important;
+}
+
+.modal-image {
+  position: relative !important;
+  height: 200px !important;
+  background: linear-gradient(135deg, #1a1f35, #0d1b2a) !important;
+  overflow: hidden !important;
+  visibility: visible !important;
+}
+
+
+/* =========================================================
+   AVATARS DYNAMIQUES (initiales + couleur par nom)
+   ========================================================= */
+
+.avatar-initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  user-select: none;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar-initials.circle {
+  border-radius: 50%;
+}
+
+.avatar-initials.rounded {
+  border-radius: 14px;
+}
+
+/* Tailles standards */
+.avatar-initials.xs { width: 28px; height: 28px; font-size: 0.7rem; }
+.avatar-initials.sm { width: 36px; height: 36px; font-size: 0.85rem; }
+.avatar-initials.md { width: 48px; height: 48px; font-size: 1rem; }
+.avatar-initials.lg { width: 64px; height: 64px; font-size: 1.4rem; }
+.avatar-initials.xl { width: 96px; height: 96px; font-size: 2rem; }
+
+/* Image avatar */
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}

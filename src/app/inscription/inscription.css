@@ -1,0 +1,781 @@
+
+
+/* ===== SECTION D'INSCRIPTION ===== */
+.register-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0a0e1a 0%, #1a1f35 50%, #0d1b2a 100%);
+  padding: 120px 0 60px;
+}
+
+/* ===== WRAPPER PRINCIPAL ===== */
+.register-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== COLONNE GAUCHE - PRÉSENTATION ===== */
+.register-presentation {
+  padding: 20px 0;
+}
+
+.presentation-content {
+  max-width: 540px;
+}
+
+/* Badge */
+.presentation-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(107, 203, 119, 0.08);
+  border: 1px solid rgba(107, 203, 119, 0.12);
+  padding: 6px 20px 6px 12px;
+  border-radius: 50px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+.badge-icon {
+  font-size: 1.2rem;
+}
+
+/* Titre */
+.presentation-title {
+  font-size: 3.2rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #ffffff;
+  margin-bottom: 20px;
+}
+
+.brand-gradient {
+  background: linear-gradient(135deg, #6bcb77, #4ecdc4, #ffd93d);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 4s ease-in-out infinite;
+}
+
+/* Description */
+.presentation-description {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 28px;
+}
+
+/* Avantages */
+.presentation-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.benefit-item:hover {
+  background: rgba(255, 255, 255, 0.02);
+  transform: translateX(4px);
+}
+
+.benefit-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+}
+
+.benefit-icon i {
+  color: #6bcb77;
+  font-size: 1.1rem;
+}
+
+.benefit-text span {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+}
+
+/* Statistiques */
+.presentation-stats {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  margin-bottom: 28px;
+}
+
+.stat {
+  text-align: center;
+  flex: 1;
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffd93d, #6bcb77);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+
+.stat-label {
+  display: block;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Témoignage */
+.presentation-testimonial {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  border-left: 3px solid #6bcb77;
+}
+
+.testimonial-avatar {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(107, 203, 119, 0.1);
+  border: 2px solid rgba(107, 203, 119, 0.15);
+}
+
+.avatar-emoji {
+  font-size: 1.6rem;
+}
+
+.testimonial-text p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 0 4px;
+  font-style: italic;
+}
+
+.testimonial-author {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.8rem;
+}
+
+/* ===== COLONNE DROITE - FORMULAIRE ===== */
+.register-form-col {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 24px;
+  padding: 40px 35px;
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.4);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.register-card:hover {
+  border-color: rgba(107, 203, 119, 0.08);
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.5);
+}
+
+/* En-tête */
+.register-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.register-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: rgba(107, 203, 119, 0.08);
+  border-radius: 50%;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.register-icon-wrapper::before {
+  content: '';
+  position: absolute;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 1px solid rgba(107, 203, 119, 0.1);
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+.register-icon {
+  font-size: 1.6rem;
+  position: relative;
+  z-index: 1;
+}
+
+.register-title {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.register-subtitle {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.9rem;
+}
+
+/* ===== OPTIONS D'INSCRIPTION ===== */
+.register-options {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.register-option {
+  position: relative;
+  padding: 24px 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+}
+
+.register-option:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.register-option.client-option:hover {
+  border-color: rgba(78, 205, 196, 0.3);
+  background: rgba(78, 205, 196, 0.03);
+}
+
+.register-option.restaurant-option:hover {
+  border-color: rgba(255, 107, 107, 0.3);
+  background: rgba(255, 107, 107, 0.03);
+}
+
+/* Badge d'option */
+.option-badge {
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  padding: 2px 14px;
+  border-radius: 50px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(78, 205, 196, 0.1);
+  border: 1px solid rgba(78, 205, 196, 0.15);
+  color: #4ecdc4;
+}
+
+.option-badge.pro {
+  background: rgba(255, 107, 107, 0.1);
+  border-color: rgba(255, 107, 107, 0.15);
+  color: #ff6b6b;
+}
+
+.option-icon {
+  font-size: 2.4rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.option-title {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.option-description {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.option-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  text-align: left;
+  display: inline-block;
+}
+
+.option-features li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  padding: 3px 0;
+}
+
+.option-features li i {
+  color: #6bcb77;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+/* Boutons */
+.btn-client {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 28px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #4ecdc4, #44b39b);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  box-shadow: 0 4px 25px rgba(78, 205, 196, 0.2);
+}
+
+.btn-client:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 35px rgba(78, 205, 196, 0.3);
+  color: white;
+}
+
+.btn-restaurant {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 28px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  box-shadow: 0 4px 25px rgba(238, 90, 36, 0.2);
+}
+
+.btn-restaurant:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 35px rgba(238, 90, 36, 0.3);
+  color: white;
+}
+
+.btn-arrow {
+  display: inline-block;
+  transition: transform 0.3s;
+}
+
+.btn-client:hover .btn-arrow,
+.btn-restaurant:hover .btn-arrow {
+  transform: translateX(6px);
+}
+
+/* Séparateur */
+.register-divider {
+  display: flex;
+  align-items: center;
+  margin: 4px 0;
+}
+
+.register-divider::before,
+.register-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+}
+
+.divider-text {
+  padding: 0 14px;
+  color: rgba(255, 255, 255, 0.15);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Lien vers connexion */
+.register-login {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  text-align: center;
+}
+
+.login-text {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.login-link {
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.login-link:hover {
+  color: #4ecdc4;
+}
+
+.login-link i {
+  transition: transform 0.3s;
+}
+
+.login-link:hover i {
+  transform: translateX(4px);
+}
+
+/* ===== DÉCORATIONS ARRIÈRE-PLAN ===== */
+.register-bg-decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.04;
+}
+
+.bg-circle.c1 {
+  width: 600px;
+  height: 600px;
+  top: -300px;
+  right: -100px;
+  background: radial-gradient(circle, #6bcb77, transparent 70%);
+  animation: float-slow 25s ease-in-out infinite;
+}
+
+.bg-circle.c2 {
+  width: 400px;
+  height: 400px;
+  bottom: -200px;
+  left: -50px;
+  background: radial-gradient(circle, #4ecdc4, transparent 70%);
+  animation: float-slow 20s ease-in-out infinite reverse;
+}
+
+.bg-circle.c3 {
+  width: 200px;
+  height: 200px;
+  top: 40%;
+  left: 30%;
+  background: radial-gradient(circle, #ffd93d, transparent 70%);
+  animation: float-slow 18s ease-in-out infinite alternate;
+}
+
+.bg-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.05;
+}
+
+.bg-blob.b1 {
+  width: 300px;
+  height: 300px;
+  top: 10%;
+  right: 20%;
+  background: #6bcb77;
+  animation: blob-move 30s ease-in-out infinite;
+}
+
+.bg-blob.b2 {
+  width: 250px;
+  height: 250px;
+  bottom: 20%;
+  left: 10%;
+  background: #4ecdc4;
+  animation: blob-move 25s ease-in-out infinite reverse;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes float-slow {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(20px, -30px) scale(1.1); }
+  50% { transform: translate(-10px, 20px) scale(0.9); }
+  75% { transform: translate(15px, 10px) scale(1.05); }
+}
+
+@keyframes blob-move {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -20px) scale(1.2); }
+  50% { transform: translate(-20px, 30px) scale(0.8); }
+  75% { transform: translate(20px, 10px) scale(1.1); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 991.98px) {
+  .register-wrapper {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 0 20px;
+  }
+
+  .register-presentation {
+    text-align: center;
+    padding: 0;
+  }
+
+  .presentation-content {
+    max-width: 100%;
+  }
+
+  .presentation-title {
+    font-size: 2.8rem;
+  }
+
+  .presentation-badge {
+    margin: 0 auto 20px;
+  }
+
+  .presentation-description {
+    max-width: 600px;
+    margin: 0 auto 24px;
+  }
+
+  .presentation-benefits {
+    max-width: 400px;
+    margin: 0 auto 24px;
+  }
+
+  .benefit-item {
+    justify-content: center;
+  }
+
+  .presentation-stats {
+    max-width: 400px;
+    margin: 0 auto 24px;
+  }
+
+  .presentation-testimonial {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .register-form-col {
+    padding: 0;
+  }
+
+  .register-card {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .register-section {
+    padding: 100px 0 40px;
+    min-height: auto;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .presentation-title {
+    font-size: 2.2rem;
+  }
+
+  .presentation-stats {
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  .stat-number {
+    font-size: 1.3rem;
+  }
+
+  .presentation-testimonial {
+    flex-direction: column;
+    text-align: center;
+    padding: 14px 16px;
+  }
+
+  .register-card {
+    padding: 28px 20px;
+  }
+
+  .register-title {
+    font-size: 1.3rem;
+  }
+
+  .register-icon-wrapper {
+    width: 48px;
+    height: 48px;
+  }
+
+  .register-icon-wrapper::before {
+    width: 60px;
+    height: 60px;
+  }
+
+  .register-icon {
+    font-size: 1.3rem;
+  }
+
+  .register-option {
+    padding: 20px 16px;
+  }
+
+  .option-icon {
+    font-size: 2rem;
+  }
+
+  .option-features {
+    text-align: left;
+  }
+
+  .btn-client,
+  .btn-restaurant {
+    font-size: 0.85rem;
+    padding: 10px 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .register-wrapper {
+    gap: 30px;
+    padding: 0 12px;
+  }
+
+  .presentation-title {
+    font-size: 1.8rem;
+  }
+
+  .presentation-description {
+    font-size: 0.95rem;
+  }
+
+  .presentation-benefits {
+    text-align: left;
+  }
+
+  .benefit-item {
+    justify-content: flex-start;
+  }
+
+  .register-card {
+    padding: 20px 14px;
+    border-radius: 20px;
+  }
+
+  .register-option {
+    padding: 16px 12px;
+  }
+
+  .option-title {
+    font-size: 1rem;
+  }
+
+  .option-description {
+    font-size: 0.85rem;
+  }
+
+  .option-features li {
+    font-size: 0.8rem;
+  }
+
+  .option-badge {
+    font-size: 0.55rem;
+    padding: 1px 10px;
+  }
+
+  .register-section {
+    padding: 80px 0 30px;
+  }
+
+  .presentation-stats {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .stat-divider {
+    display: none;
+  }
+
+  .stat-number {
+    font-size: 1.2rem;
+  }
+
+  .btn-client,
+  .btn-restaurant {
+    font-size: 0.8rem;
+    padding: 8px 16px;
+  }
+}

@@ -1,0 +1,91 @@
+<!-- HTML - Navbar Premium avec Active State -->
+<nav class="navbar navbar-expand-lg navbar-premium fixed-top">
+  <div class="container">
+    
+    <!-- Logo -->
+    <a class="navbar-brand" routerLink="/">
+      <span class="brand-icon">🍽️</span>
+      <span class="brand-text">Komandy</span>
+      <span class="brand-dot"></span>
+    </a>
+
+    <!-- Toggle Button -->
+    <button 
+      class="navbar-toggler premium-toggler" 
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarMenu"
+      aria-controls="navbarMenu"
+      aria-expanded="false"
+      aria-label="Toggle navigation">
+      <span class="toggler-line"></span>
+      <span class="toggler-line"></span>
+      <span class="toggler-line"></span>
+    </button>
+
+    <!-- Menu -->
+    <div class="collapse navbar-collapse" id="navbarMenu">
+      <ul class="navbar-nav mx-auto gap-2">
+        <!-- Accueil -->
+        <li class="nav-item">
+          <a 
+            class="nav-link premium-link" 
+            routerLink="/"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{exact: true}">
+            <i class="bi bi-house-fill me-1"></i>
+            <span>Accueil</span>
+            <span class="nav-indicator"></span>
+          </a>
+        </li>
+
+        <!-- À propos -->
+        <li class="nav-item">
+          <a 
+            class="nav-link premium-link" 
+            routerLink="/apropos"
+            routerLinkActive="active">
+            <i class="bi bi-info-circle me-1"></i>
+            <span>À propos</span>
+            <span class="nav-indicator"></span>
+          </a>
+        </li>
+
+        <!-- Contact -->
+        <li class="nav-item">
+          <a 
+            class="nav-link premium-link" 
+            routerLink="/contact"
+            routerLinkActive="active">
+            <i class="bi bi-envelope me-1"></i>
+            <span>Contact</span>
+            <span class="nav-indicator"></span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- Boutons -->
+      <div class="nav-buttons">
+        <a 
+          routerLink="/connexion"
+          class="btn btn-outline-premium-nav me-2">
+          <i class="bi bi-box-arrow-in-right me-1"></i>
+          Connexion
+        </a>
+        <a 
+          routerLink="/inscription"
+          class="btn btn-gradient-nav">
+          <i class="bi bi-person-plus me-1"></i>
+          Inscription
+        </a>
+      </div>
+    </div>
+
+    <!-- Indicateur de statut -->
+    <div class="status-indicator d-none d-lg-flex">
+      <span class="status-dot"></span>
+      <span class="status-text">En ligne</span>
+    </div>
+
+  </div>
+</nav>

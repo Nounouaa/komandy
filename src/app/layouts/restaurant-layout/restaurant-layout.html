@@ -1,0 +1,350 @@
+<!-- =========================================================
+     LAYOUT RESTAURANT
+     ========================================================= -->
+<div class="restaurant-layout">
+
+  <!-- SIDEBAR -->
+  <app-restaurant-sidebar (toggle)="onSidebarToggle($event)"></app-restaurant-sidebar>
+
+  <!-- CONTENU PRINCIPAL -->
+  <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
+    <div class="content-wrapper">
+
+      <!-- EN-TÊTE -->
+      <div class="content-header">
+
+        <div class="header-left">
+          <button
+            type="button"
+            class="btn-toggle-sidebar"
+            (click)="toggleSidebar()"
+            aria-label="Ouvrir la sidebar">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <span class="breadcrumb-item">Restaurant</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">{{ currentPage }}</span>
+          </nav>
+        </div>
+
+        <div class="header-right">
+
+          <div class="search-wrapper">
+            <i class="bi bi-search"></i>
+            <input type="text" class="search-input" placeholder="Rechercher..."
+                   (input)="onSearch($event)">
+          </div>
+
+          <div class="header-actions">
+
+            <!-- Notifications -->
+            <button type="button" class="action-btn notifications"
+                    (click)="toggleNotifications($event)"
+                    [attr.aria-expanded]="isNotificationsOpen"
+                    aria-label="Notifications">
+              <i class="bi bi-bell"></i>
+              <span class="notification-badge" *ngIf="notificationsCount > 0">
+                {{ notificationsCount }}
+              </span>
+            </button>
+
+            <!-- Messages -->
+            <button type="button" class="action-btn messages"
+                    (click)="toggleMessages($event)"
+                    [attr.aria-expanded]="isMessagesOpen"
+                    aria-label="Messages">
+              <i class="bi bi-envelope"></i>
+              <span class="message-badge" *ngIf="messagesCount > 0">
+                {{ messagesCount }}
+              </span>
+            </button>
+
+            <!-- Profil -->
+            <button type="button" class="user-profile"
+                    (click)="toggleUserMenu($event)"
+                    [attr.aria-expanded]="isUserMenuOpen"
+                    aria-label="Menu du compte">
+
+              <div class="user-avatar-wrapper">
+                <img *ngIf="hasAvatar()" [src]="getAvatarUrl()"
+                     [alt]="restaurantName" class="user-avatar">
+
+                <div *ngIf="!hasAvatar()"
+                     class="user-avatar avatar-initials"
+                     [style.background]="getUserGradient()">
+                  {{ getUserInitials() }}
+                </div>
+
+                <span class="online-status"></span>
+              </div>
+
+              <span class="user-name">{{ restaurantName }}</span>
+              <i class="bi bi-chevron-down" [class.rotated]="isUserMenuOpen"></i>
+            </button>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENU DYNAMIQUE -->
+      <div class="content-body">
+        <router-outlet></router-outlet>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- =========================================================
+       PANEL NOTIFICATIONS (cliquable)
+       ========================================================= -->
+  <div class="side-panel notifications-panel"
+       [class.open]="isNotificationsOpen"
+       (click)="$event.stopPropagation()">
+
+    <div class="side-panel-header">
+      <h3><i class="bi bi-bell-fill"></i> Notifications</h3>
+      <button type="button" class="panel-close" (click)="closeNotifications()" aria-label="Fermer">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+
+    <div class="side-panel-body">
+
+      <!-- Liste des notifications -->
+      <div class="notification-item unread"
+           *ngFor="let notif of notifications"
+           (click)="goToNotification(notif)">
+
+        <div class="notif-icon"
+             [style.background]="notif.color + '22'"
+             [style.color]="notif.color">
+          <i class="bi" [ngClass]="notif.icon"></i>
+        </div>
+
+        <div class="notif-content">
+          <p class="notif-title">{{ notif.title }}</p>
+          <p class="notif-text">{{ notif.text }}</p>
+          <span class="notif-time">{{ notif.time }}</span>
+        </div>
+
+        <i class="bi bi-chevron-right notif-arrow"></i>
+      </div>
+
+      <!-- Vide -->
+      <div class="notification-empty" *ngIf="notifications.length === 0">
+        <i class="bi bi-bell-slash"></i>
+        <p>Aucune notification</p>
+      </div>
+    </div>
+
+    <div class="side-panel-footer">
+      <button type="button" class="btn-view-all"
+              routerLink="/restaurant/commandes"
+              (click)="closeNotifications()">
+        Voir toutes les commandes
+        <i class="bi bi-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       PANEL MESSAGES (avec réponse)
+       ========================================================= -->
+  <div class="side-panel messages-panel"
+       [class.open]="isMessagesOpen"
+       (click)="$event.stopPropagation()">
+
+    <!-- En-tête -->
+    <div class="side-panel-header">
+      <div class="chat-header-left">
+        <button *ngIf="openedConversation"
+                type="button"
+                class="btn-back-chat"
+                (click)="closeConversation()"
+                aria-label="Retour">
+          <i class="bi bi-arrow-left"></i>
+        </button>
+
+        <h3>
+          <i class="bi bi-chat-dots-fill"></i>
+          <span *ngIf="!openedConversation">Messages</span>
+          <span *ngIf="openedConversation">{{ openedConversation.name }}</span>
+        </h3>
+      </div>
+
+      <button type="button" class="panel-close" (click)="closeMessages()" aria-label="Fermer">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+
+    <!-- Corps -->
+    <div class="side-panel-body">
+
+      <!-- Liste des conversations -->
+      <ng-container *ngIf="!openedConversation">
+        <div class="message-item"
+             [class.unread]="conv.unreadCount > 0"
+             *ngFor="let conv of conversations"
+             (click)="openConversation(conv)">
+
+          <div class="msg-avatar">
+            <img *ngIf="conv.avatar"
+                 [src]="uploadService.getImageUrl(conv.avatar)"
+                 [alt]="conv.name">
+            <span *ngIf="!conv.avatar"
+                  [style.background]="avatarService.getGradient(conv.name)">
+              {{ avatarService.getInitials(conv.name) }}
+            </span>
+          </div>
+
+          <div class="msg-content">
+            <div class="msg-header">
+              <span class="msg-name">{{ conv.name }}</span>
+              <span class="msg-time">{{ conv.lastMessageAt | date:'HH:mm' }}</span>
+            </div>
+            <p class="msg-preview">{{ conv.lastMessage }}</p>
+          </div>
+
+          <span class="msg-unread-badge" *ngIf="conv.unreadCount > 0">
+            {{ conv.unreadCount }}
+          </span>
+        </div>
+
+        <div class="notification-empty" *ngIf="conversations.length === 0">
+          <i class="bi bi-envelope-slash"></i>
+          <p>Aucun message</p>
+        </div>
+      </ng-container>
+
+      <!-- Chat d'une conversation -->
+      <ng-container *ngIf="openedConversation">
+        <div class="chat-messages" *ngIf="!isLoadingMessages">
+          <div class="chat-bubble"
+               *ngFor="let msg of messages"
+               [class.mine]="isMyMessage(msg)">
+            <div class="chat-text">{{ msg.content }}</div>
+            <span class="chat-time">{{ msg.createdAt | date:'HH:mm' }}</span>
+          </div>
+        </div>
+
+        <div class="chat-loading" *ngIf="isLoadingMessages">
+          <div class="spinner small"></div>
+        </div>
+      </ng-container>
+
+    </div>
+
+    <!-- Footer : input message -->
+    <div class="side-panel-footer" *ngIf="openedConversation">
+      <div class="chat-input-wrapper">
+        <textarea class="chat-input"
+                  [(ngModel)]="newMessageText"
+                  placeholder="Écrivez votre réponse…"
+                  rows="1"
+                  maxlength="500"
+                  (keydown.enter)="$event.preventDefault(); sendMessage()"></textarea>
+
+        <button type="button"
+                class="btn-send"
+                [disabled]="!newMessageText.trim() || isSendingMessage"
+                (click)="sendMessage()"
+                aria-label="Envoyer">
+          <i class="bi"
+             [class.bi-send-fill]="!isSendingMessage"
+             [class.bi-hourglass-split]="isSendingMessage"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MENU PROFIL
+       ========================================================= -->
+  <div class="user-menu-dropdown"
+       [class.open]="isUserMenuOpen"
+       (click)="$event.stopPropagation()">
+
+    <div class="user-menu-header">
+      <div class="user-menu-avatar">
+        <img *ngIf="hasAvatar()" [src]="getAvatarUrl()" [alt]="restaurantName">
+
+        <div *ngIf="!hasAvatar()"
+             class="user-menu-avatar-initials"
+             [style.background]="getUserGradient()">
+          {{ getUserInitials() }}
+        </div>
+
+        <span class="user-status online"></span>
+      </div>
+
+      <div class="user-menu-info">
+        <h4>{{ restaurantName }}</h4>
+        <span class="user-email">{{ restaurantEmail }}</span>
+        <span class="user-role">{{ restaurantRole }}</span>
+      </div>
+    </div>
+
+    <div class="user-menu-stats">
+      <div class="stat-mini">
+        <span class="stat-mini-value">
+          {{ restaurantStats.rating > 0 ? restaurantStats.rating.toFixed(1) : '—' }}
+        </span>
+        <span class="stat-mini-label">Note</span>
+      </div>
+      <div class="stat-mini">
+        <span class="stat-mini-value">{{ restaurantStats.totalOrders }}</span>
+        <span class="stat-mini-label">Commandes</span>
+      </div>
+      <div class="stat-mini">
+        <span class="stat-mini-value">{{ restaurantStats.growth }}</span>
+        <span class="stat-mini-label">Croissance</span>
+      </div>
+    </div>
+
+    <div class="user-menu-divider"></div>
+
+    <nav class="user-menu-nav">
+      <a class="menu-item" routerLink="/restaurant/profil" (click)="closeUserMenu()">
+        <i class="bi bi-person"></i><span>Mon profil</span>
+      </a>
+      <a class="menu-item" routerLink="/restaurant/dashboard" (click)="closeUserMenu()">
+        <i class="bi bi-grid-1x2"></i><span>Tableau de bord</span>
+      </a>
+      <a class="menu-item" routerLink="/restaurant/produits" (click)="closeUserMenu()">
+        <i class="bi bi-menu-app"></i><span>Mes produits</span>
+      </a>
+      <a class="menu-item" routerLink="/restaurant/commandes" (click)="closeUserMenu()">
+        <i class="bi bi-box-seam"></i><span>Commandes</span>
+        <span class="menu-badge" *ngIf="notificationsCount > 0">
+          {{ notificationsCount }}
+        </span>
+      </a>
+      <a class="menu-item" routerLink="/restaurant/promotions" (click)="closeUserMenu()">
+        <i class="bi bi-megaphone"></i><span>Promotions</span>
+      </a>
+      <a class="menu-item" routerLink="/restaurant/statistiques" (click)="closeUserMenu()">
+        <i class="bi bi-graph-up"></i><span>Statistiques</span>
+      </a>
+    </nav>
+
+    <div class="user-menu-divider"></div>
+
+    <nav class="user-menu-nav">
+      <button class="menu-item" (click)="closeUserMenu()">
+        <i class="bi bi-question-circle"></i><span>Aide & support</span>
+      </button>
+    </nav>
+
+    <div class="user-menu-divider"></div>
+
+    <div class="user-menu-footer">
+      <button type="button" class="menu-item logout" (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i><span>Déconnexion</span>
+      </button>
+    </div>
+
+  </div>
+
+</div>

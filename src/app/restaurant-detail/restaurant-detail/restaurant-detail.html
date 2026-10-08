@@ -1,0 +1,329 @@
+<!-- =========================================================
+     DÉTAIL RESTAURANT
+     ========================================================= -->
+<section class="restaurant-detail" *ngIf="restaurant">
+
+  <!-- =========================================================
+       HERO
+       ========================================================= -->
+  <div class="hero">
+    <img
+      *ngIf="hasCover()"
+      [src]="uploadService.getImageUrl(restaurant.coverImage)"
+      [alt]="restaurant.name"
+      class="hero-cover">
+
+    <div *ngIf="!hasCover()" class="hero-cover placeholder"></div>
+    <div class="hero-overlay"></div>
+
+    <a routerLink="/client/restaurants" class="btn-back" aria-label="Retour">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+
+    <button
+      type="button"
+      class="btn-favorite"
+      [class.active]="isFavorite()"
+      (click)="toggleFavorite()"
+      [attr.aria-label]="isFavorite() ? 'Retirer des favoris' : 'Ajouter aux favoris'">
+      <i class="bi"
+         [class.bi-heart]="!isFavorite()"
+         [class.bi-heart-fill]="isFavorite()"></i>
+    </button>
+
+    <div class="hero-content">
+      <div class="hero-logo">
+        <img
+          *ngIf="hasLogo()"
+          [src]="uploadService.getImageUrl(restaurant.logo)"
+          [alt]="restaurant.name">
+
+        <span
+          *ngIf="!hasLogo()"
+          [style.background]="getGradient()"
+          class="logo-initials">
+          {{ getInitials() }}
+        </span>
+      </div>
+
+      <div class="hero-info">
+        <h1>{{ restaurant.name }}</h1>
+
+        <p class="hero-type">
+          <i class="bi bi-tag"></i>
+          {{ restaurant.type || 'Restaurant' }}
+          <span *ngIf="restaurant.city"> • {{ restaurant.city }}</span>
+        </p>
+
+        <div class="hero-badges">
+          <span class="badge" *ngIf="restaurant.rating > 0">
+            <i class="bi bi-star-fill"></i>
+            {{ restaurant.rating.toFixed(1) }}
+          </span>
+
+          <span class="badge">
+            <i class="bi bi-clock"></i>
+            {{ restaurant.avgPrepTime || 20 }} min
+          </span>
+
+          <span class="badge">
+            <i class="bi bi-truck"></i>
+            {{ restaurant.deliveryFee > 0 ? restaurant.deliveryFee + ' Ar' : 'Gratuit' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       CATÉGORIES
+       ========================================================= -->
+  <div class="categories-bar" *ngIf="categories.length > 0">
+    <button
+      [class.active]="selectedCategory === 'all'"
+      (click)="setCategory('all')">
+      Tout
+    </button>
+
+    <button
+      *ngFor="let c of categories"
+      [class.active]="selectedCategory === c"
+      (click)="setCategory(c)">
+      {{ c }}
+    </button>
+  </div>
+
+  <!-- =========================================================
+       CHARGEMENT
+       ========================================================= -->
+  <div class="products-grid" *ngIf="isLoading">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3,4]">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line short"></div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       PRODUITS
+       ========================================================= -->
+  <div class="products-grid" *ngIf="!isLoading && displayedProducts.length > 0">
+    <div class="product-card"
+         *ngFor="let p of displayedProducts"
+         (click)="openProduct(p)">
+
+      <div class="product-image">
+        <img
+          *ngIf="uploadService.hasImage(p.image)"
+          [src]="uploadService.getImageUrl(p.image)"
+          [alt]="p.name">
+
+        <div *ngIf="!uploadService.hasImage(p.image)" class="product-placeholder">
+          <i class="bi bi-egg-fried"></i>
+        </div>
+
+        <span class="product-category-badge" *ngIf="p.category">
+          {{ p.category }}
+        </span>
+
+        <!-- Badge promo -->
+        <span class="promo-badge-product"
+              *ngIf="getPromoForProduct(p._id) as promo"
+              [style.background]="getPromoColor(promo)">
+          <i class="bi bi-tag-fill"></i>
+          {{ getPromoLabel(promo) }}
+        </span>
+      </div>
+
+      <div class="product-body">
+        <div class="product-header">
+          <h3>{{ p.name }}</h3>
+
+          <!-- Prix normal ou prix promo -->
+          <div class="price-block">
+            <ng-container *ngIf="getPromoForProduct(p._id) as promo; else normalPrice">
+              <span class="price-old">{{ p.price }} Ar</span>
+              <span class="price-new" [style.color]="getPromoColor(promo)">
+                {{ getFinalPrice(p) | number:'1.0-0' }} Ar
+              </span>
+            </ng-container>
+
+            <ng-template #normalPrice>
+              <span class="product-price">{{ p.price }} Ar</span>
+            </ng-template>
+          </div>
+        </div>
+
+        <p class="product-description">
+          {{ p.description || 'Délicieux plat préparé avec soin' }}
+        </p>
+
+        <div class="product-footer">
+          <div class="prep-info">
+            <i class="bi bi-clock"></i>
+            <span>~{{ restaurant?.avgPrepTime || 20 }} min</span>
+          </div>
+
+          <button class="btn-add-product"
+                  (click)="openProduct(p); $event.stopPropagation()"
+                  aria-label="Ajouter au panier">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       AUCUN PRODUIT
+       ========================================================= -->
+  <div class="no-products" *ngIf="!isLoading && displayedProducts.length === 0">
+    <div class="no-products-icon">
+      <i class="bi bi-egg-fried"></i>
+    </div>
+
+    <h3>Aucun plat disponible</h3>
+
+    <p>
+      <ng-container *ngIf="selectedCategory !== 'all'">
+        Aucun plat dans la catégorie « {{ selectedCategory }} ».
+        <button class="link-btn" (click)="setCategory('all')">Voir tout</button>
+      </ng-container>
+
+      <ng-container *ngIf="selectedCategory === 'all'">
+        Ce restaurant n'a pas encore publié de plats.
+      </ng-container>
+    </p>
+
+    <a routerLink="/client/restaurants" class="btn-secondary">
+      <i class="bi bi-arrow-left"></i>
+      Retour aux restaurants
+    </a>
+  </div>
+
+  <!-- =========================================================
+       PANIER FLOTTANT
+       ========================================================= -->
+  <div class="floating-cart"
+       *ngIf="cartService.getCount() > 0"
+       (click)="goToCart()">
+
+    <div class="cart-badge">
+      <i class="bi bi-bag"></i>
+      <span>{{ cartService.getCount() }}</span>
+    </div>
+
+    <span class="cart-total">
+      Voir le panier • {{ cartService.getSubtotal() }} Ar
+    </span>
+
+    <i class="bi bi-arrow-right"></i>
+  </div>
+
+</section>
+
+<!-- =========================================================
+     MODAL PRODUIT
+     ========================================================= -->
+<div class="modal-overlay"
+     *ngIf="showProductModal && selectedProduct"
+     (click)="closeProductModal()">
+
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-image">
+      <img
+        *ngIf="uploadService.hasImage(selectedProduct.image)"
+        [src]="uploadService.getImageUrl(selectedProduct.image)"
+        [alt]="selectedProduct.name">
+
+      <div *ngIf="!uploadService.hasImage(selectedProduct.image)" class="product-placeholder big">
+        <i class="bi bi-egg-fried"></i>
+      </div>
+
+      <button class="modal-close" (click)="closeProductModal()" aria-label="Fermer">
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+      <span class="modal-category-badge" *ngIf="selectedProduct.category">
+        {{ selectedProduct.category }}
+      </span>
+
+      <!-- Badge promo dans le modal -->
+      <span class="promo-badge-product large"
+            *ngIf="getPromoForProduct(selectedProduct._id) as promo"
+            [style.background]="getPromoColor(promo)">
+        <i class="bi bi-tag-fill"></i>
+        {{ getPromoLabel(promo) }}
+      </span>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="modal-title-row">
+        <h2>{{ selectedProduct.name }}</h2>
+
+        <!-- Prix normal ou prix promo -->
+        <div class="modal-price-block">
+          <ng-container *ngIf="getPromoForProduct(selectedProduct._id) as promo; else normalModalPrice">
+            <span class="modal-price-old">{{ selectedProduct.price }} Ar</span>
+            <span class="modal-price-new" [style.color]="getPromoColor(promo)">
+              {{ getFinalPrice(selectedProduct) | number:'1.0-0' }} Ar
+            </span>
+          </ng-container>
+
+          <ng-template #normalModalPrice>
+            <span class="modal-price">{{ selectedProduct.price }} Ar</span>
+          </ng-template>
+        </div>
+      </div>
+
+      <p class="modal-desc">
+        {{ selectedProduct.description || 'Délicieux plat préparé avec soin' }}
+      </p>
+
+      <div class="modal-note">
+        <label>
+          <i class="bi bi-chat-left-text"></i>
+          Note pour le restaurant (optionnel)
+        </label>
+
+        <textarea
+          [(ngModel)]="productNote"
+          placeholder="Ex : sans oignons, bien cuit…"
+          rows="2"
+          maxlength="200"></textarea>
+      </div>
+
+      <div class="modal-actions">
+
+        <div class="quantity-selector">
+          <button type="button"
+                  (click)="decrementQty()"
+                  [disabled]="productQuantity <= 1">
+            <i class="bi bi-dash-lg"></i>
+          </button>
+
+          <span>{{ productQuantity }}</span>
+
+          <button type="button" (click)="incrementQty()">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </div>
+
+        <button class="btn-primary"
+                (click)="addToCart()"
+                [disabled]="!selectedProduct">
+          <i class="bi bi-bag-plus"></i>
+          <span>Ajouter</span>
+          <span class="btn-price">
+            {{ getFinalPrice(selectedProduct) * productQuantity | number:'1.0-0' }} Ar
+          </span>
+        </button>
+
+      </div>
+    </div>
+
+  </div>
+</div>

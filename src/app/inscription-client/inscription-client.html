@@ -1,0 +1,131 @@
+<section class="auth-page">
+  <div class="auth-card wide">
+
+    <!-- EN-TÊTE -->
+    <div class="auth-header">
+      <div class="auth-logo">
+        <i class="bi bi-person-plus"></i>
+      </div>
+      <h1>Créer un compte client</h1>
+      <p>Commandez vos plats préférés en quelques clics</p>
+    </div>
+
+    <!-- ERREUR -->
+    <div class="alert-error" *ngIf="errorMessage">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- FORMULAIRE -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+
+      <div class="form-grid">
+
+        <!-- Nom -->
+        <div class="form-group">
+          <label for="name">Nom complet</label>
+          <div class="input-wrapper">
+            <i class="bi bi-person"></i>
+            <input id="name" type="text" formControlName="name" placeholder="Marie Rakoto">
+          </div>
+          <span class="form-error" *ngIf="f['name'].touched && f['name'].errors">
+            <span *ngIf="f['name'].errors['required']">Nom obligatoire</span>
+            <span *ngIf="f['name'].errors['minlength']">Minimum 2 caractères</span>
+          </span>
+        </div>
+
+        <!-- Téléphone -->
+        <div class="form-group">
+          <label for="phone">Téléphone</label>
+          <div class="input-wrapper">
+            <i class="bi bi-telephone"></i>
+            <input id="phone" type="tel" formControlName="phone" placeholder="+261 34 12 345 67">
+          </div>
+          <span class="form-error" *ngIf="f['phone'].touched && f['phone'].errors">
+            <span *ngIf="f['phone'].errors['required']">Téléphone obligatoire</span>
+            <span *ngIf="f['phone'].errors['pattern']">Format invalide</span>
+          </span>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group full">
+          <label for="email">Email</label>
+          <div class="input-wrapper">
+            <i class="bi bi-envelope"></i>
+            <input id="email" type="email" formControlName="email" placeholder="marie@email.com">
+          </div>
+          <span class="form-error" *ngIf="f['email'].touched && f['email'].errors">
+            <span *ngIf="f['email'].errors['required']">Email obligatoire</span>
+            <span *ngIf="f['email'].errors['email']">Format d'email invalide</span>
+          </span>
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <div class="input-wrapper">
+            <i class="bi bi-lock"></i>
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Min. 6 caractères">
+            <button type="button" class="btn-toggle-password" (click)="togglePassword()">
+              <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+            </button>
+          </div>
+          <span class="form-error" *ngIf="f['password'].touched && f['password'].errors">
+            <span *ngIf="f['password'].errors['required']">Mot de passe obligatoire</span>
+            <span *ngIf="f['password'].errors['minlength']">Minimum 6 caractères</span>
+          </span>
+        </div>
+
+        <!-- Confirmation -->
+        <div class="form-group">
+          <label for="confirmPassword">Confirmer le mot de passe</label>
+          <div class="input-wrapper">
+            <i class="bi bi-lock-fill"></i>
+            <input
+              id="confirmPassword"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="confirmPassword"
+              placeholder="••••••••">
+          </div>
+          <span class="form-error" *ngIf="f['confirmPassword'].touched && f['confirmPassword'].errors">
+            <span *ngIf="f['confirmPassword'].errors['required']">Confirmation obligatoire</span>
+          </span>
+          <span class="form-error" *ngIf="form.errors?.['passwordMismatch'] && f['confirmPassword'].touched">
+            Les mots de passe ne correspondent pas
+          </span>
+        </div>
+
+      </div>
+
+      <!-- Conditions -->
+      <label class="checkbox-label">
+        <input type="checkbox" formControlName="acceptTerms">
+        <span>J'accepte les conditions d'utilisation et la politique de confidentialité</span>
+      </label>
+      <span class="form-error" *ngIf="f['acceptTerms'].touched && f['acceptTerms'].errors">
+        Vous devez accepter les conditions
+      </span>
+
+      <!-- Bouton -->
+      <button type="submit" class="btn-primary" [disabled]="isLoading">
+        <i class="bi" [class.bi-check-lg]="!isLoading" [class.bi-hourglass-split]="isLoading"></i>
+        {{ isLoading ? 'Création...' : 'Créer mon compte' }}
+      </button>
+
+    </form>
+
+    <div class="auth-divider">
+      <span>Déjà un compte ?</span>
+    </div>
+
+    <a routerLink="/connexion" class="btn-secondary full">
+      <i class="bi bi-box-arrow-in-right"></i>
+      Se connecter
+    </a>
+
+  </div>
+</section>

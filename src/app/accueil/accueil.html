@@ -1,0 +1,180 @@
+<!-- Section Hero avec Diaporama -->
+<section class="hero py-5">
+  <div class="container">
+    <div class="row align-items-center g-5">
+
+      <!-- Texte -->
+      <div class="col-lg-6 order-2 order-lg-1">
+        <div class="hero-content">
+          <div class="badge-wrapper mb-4">
+            <span class="hero-badge">
+              <span class="badge-icon">⚡</span>
+              Livraison en 30 min
+            </span>
+          </div>
+
+          <h1 class="hero-title mb-4">
+            Commandez vos plats préférés
+            <span class="text-gradient-premium">instantanément</span>
+          </h1>
+
+          <p class="hero-description mb-4">
+            Komandy connecte les clients avec les restaurants
+            et gargotes locales pour commander rapidement
+            et simplement en ligne.
+          </p>
+
+          <div class="d-flex flex-wrap gap-3">
+            <a
+              routerLink="/restaurants"
+              class="btn btn-primary-gradient btn-lg rounded-pill px-5 py-3 btn-glow">
+              <i class="bi bi-compass me-2"></i>
+              Explorer les restaurants
+            </a>
+            <a
+              routerLink="/inscription/restaurant"
+              class="btn btn-outline-premium btn-lg rounded-pill px-5 py-3">
+              <i class="bi bi-rocket-takeoff me-2"></i>
+              Lancer mon restaurant
+            </a>
+          </div>
+
+          <!-- Statistiques -->
+          <div class="stats-container mt-5 pt-3">
+            <div class="row g-4">
+              <div class="col-4">
+                <div class="stat-card">
+                  <span class="stat-number gradient-number">500+</span>
+                  <span class="stat-label">Restaurants</span>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="stat-card">
+                  <span class="stat-number gradient-number">10k+</span>
+                  <span class="stat-label">Commandes</span>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="stat-card">
+                  <span class="stat-number gradient-number">4.8★</span>
+                  <span class="stat-label">Note moyenne</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diaporama -->
+      <div class="col-lg-6 text-center order-1 order-lg-2">
+        <div class="hero-slider-wrapper">
+          <div class="hero-slider">
+
+            <!-- Slide 1 -->
+            <div class="slide" [class.active]="currentSlide === 0">
+              <div class="slide-image-wrapper">
+                <img
+                  src="img/hero-food-1.jpg"
+                  class="img-fluid slide-image"
+                  alt="Plats délicieux">
+                <div class="slide-overlay">
+                  <span class="slide-tag">🍕 Populaire</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="slide" [class.active]="currentSlide === 1">
+              <div class="slide-image-wrapper">
+                <img
+                  src="img/hero-food-2.jpg"
+                  class="img-fluid slide-image"
+                  alt="Cuisine locale">
+                <div class="slide-overlay">
+                  <span class="slide-tag">🌿 Frais</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="slide" [class.active]="currentSlide === 2">
+              <div class="slide-image-wrapper">
+                <img
+                  src="img/hero-food-3.jpg"
+                  class="img-fluid slide-image"
+                  alt="Restaurant ambiance">
+                <div class="slide-overlay">
+                  <span class="slide-tag">⭐ Favori</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="slide" [class.active]="currentSlide === 3">
+              <div class="slide-image-wrapper">
+                <img
+                  src="img/hero-food-4.jpg"
+                  class="img-fluid slide-image"
+                  alt="Plats exotiques">
+                <div class="slide-overlay">
+                  <span class="slide-tag">🍣 Exotique</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Indicateurs (points de navigation) -->
+          <div class="slider-indicators">
+            <span
+              class="indicator"
+              [class.active]="currentSlide === 0"
+              (click)="goToSlide(0)">
+            </span>
+            <span
+              class="indicator"
+              [class.active]="currentSlide === 1"
+              (click)="goToSlide(1)">
+            </span>
+            <span
+              class="indicator"
+              [class.active]="currentSlide === 2"
+              (click)="goToSlide(2)">
+            </span>
+            <span
+              class="indicator"
+              [class.active]="currentSlide === 3"
+              (click)="goToSlide(3)">
+            </span>
+          </div>
+
+          <!-- Badge flottant -->
+          <div class="floating-badge delivery-badge">
+            <div class="d-flex align-items-center">
+              <div class="pulse-ring">
+                <span class="badge-dot"></span>
+              </div>
+              <div class="ms-2">
+                <span class="badge-title">En direct</span>
+                <span class="badge-subtitle">12 commandes actives</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="floating-badge rating-badge">
+            <div class="d-flex align-items-center">
+              <span class="rating-stars">★★★★★</span>
+              <span class="ms-2 rating-text">4.8</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Éléments décoratifs -->
+  <div class="decorative-circle circle-1"></div>
+  <div class="decorative-circle circle-2"></div>
+  <div class="decorative-circle circle-3"></div>
+</section>

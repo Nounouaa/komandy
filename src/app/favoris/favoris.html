@@ -1,0 +1,135 @@
+<section class="favoris-page">
+
+  <!-- =========================================================
+       EN-TÊTE
+       ========================================================= -->
+  <div class="page-header">
+    <div class="header-text">
+      <h1>
+        <i class="bi bi-heart-fill"></i>
+        Mes favoris
+      </h1>
+      <p>
+        {{ favorites.length }} restaurant{{ favorites.length > 1 ? 's' : '' }} dans vos favoris
+      </p>
+    </div>
+
+    <button
+      class="btn-clear"
+      *ngIf="favorites.length > 0"
+      (click)="clearAll()">
+      <i class="bi bi-trash"></i>
+      Tout retirer
+    </button>
+  </div>
+
+  <!-- =========================================================
+       CHARGEMENT
+       ========================================================= -->
+  <div class="grid" *ngIf="isLoading">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3,4]">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line short"></div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       LISTE
+       ========================================================= -->
+  <div class="grid" *ngIf="!isLoading && favorites.length > 0">
+    <div class="restaurant-card"
+         *ngFor="let r of favorites"
+         (click)="goToRestaurant(r)">
+
+      <!-- Image (cover) -->
+      <div class="card-image">
+
+        <!-- Cover uploadée -->
+        <img
+          *ngIf="hasCover(r)"
+          [src]="getCoverUrl(r)"
+          [alt]="r.name">
+
+        <!-- Placeholder -->
+        <div *ngIf="!hasCover(r)" class="img-placeholder">
+          <i class="bi bi-shop-window"></i>
+        </div>
+
+        <!-- Badge ouvert/fermé -->
+        <span class="badge-status" [class.open]="r.isOpen">
+          {{ r.isOpen ? 'Ouvert' : 'Fermé' }}
+        </span>
+
+        <!-- Bouton retirer (coeur plein) -->
+        <button class="btn-heart-fav"
+                (click)="removeFavorite(r, $event)"
+                aria-label="Retirer des favoris">
+          <i class="bi bi-heart-fill"></i>
+        </button>
+
+        <!-- ✅ Logo du restaurant (par-dessus la cover) -->
+        <div class="restaurant-logo-small">
+          <!-- Logo uploadé -->
+          <img
+            *ngIf="hasLogo(r)"
+            [src]="getLogoUrl(r)"
+            [alt]="r.name">
+
+          <!-- Initiales colorées -->
+          <span
+            *ngIf="!hasLogo(r)"
+            class="logo-initials"
+            [style.background]="getGradient(r.name)">
+            {{ getInitials(r.name) }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Corps -->
+      <div class="card-body">
+        <div class="card-title-row">
+          <h3>{{ r.name }}</h3>
+          <span class="rating" *ngIf="r.rating > 0">
+            <i class="bi bi-star-fill"></i>
+            {{ r.rating.toFixed(1) }}
+          </span>
+        </div>
+
+        <p class="card-type">
+          <i class="bi bi-tag"></i>
+          {{ r.type || 'Restaurant' }}
+          <span *ngIf="r.city"> • {{ r.city }}</span>
+        </p>
+
+        <div class="card-meta">
+          <span>
+            <i class="bi bi-clock"></i>
+            {{ r.avgPrepTime || 20 }} min
+          </span>
+          <span>
+            <i class="bi bi-truck"></i>
+            {{ r.deliveryFee > 0 ? r.deliveryFee + ' Ar' : 'Gratuit' }}
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       VIDE
+       ========================================================= -->
+  <div class="empty-state" *ngIf="!isLoading && favorites.length === 0">
+    <div class="empty-icon">
+      <i class="bi bi-heart"></i>
+    </div>
+    <h3>Aucun favori</h3>
+    <p>Ajoutez vos restaurants préférés pour les retrouver ici</p>
+    <a routerLink="/client/restaurants" class="btn-primary">
+      <i class="bi bi-shop"></i>
+      Explorer les restaurants
+    </a>
+  </div>
+
+</section>

@@ -1,0 +1,336 @@
+<section class="panier-page">
+
+  <!-- =========================================================
+       EN-TÊTE
+       ========================================================= -->
+  <div class="page-header">
+    <div>
+      <h1><i class="bi bi-bag"></i> Mon panier</h1>
+      <p *ngIf="restaurant">
+        Commande chez <strong>{{ restaurant.name }}</strong>
+      </p>
+    </div>
+
+    <button class="btn-clear" *ngIf="items.length > 0" (click)="clearCart()">
+      <i class="bi bi-trash"></i>
+      Vider
+    </button>
+  </div>
+
+  <!-- =========================================================
+       ERREUR
+       ========================================================= -->
+  <div class="alert-error" *ngIf="errorMessage">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    {{ errorMessage }}
+  </div>
+
+  <!-- =========================================================
+       PANIER VIDE
+       ========================================================= -->
+  <div class="empty-state" *ngIf="items.length === 0">
+    <div class="empty-icon">
+      <i class="bi bi-bag-x"></i>
+    </div>
+    <h3>Votre panier est vide</h3>
+    <p>Ajoutez des plats depuis un restaurant pour commencer</p>
+    <a routerLink="/client/restaurants" class="btn-primary">
+      <i class="bi bi-shop"></i>
+      Voir les restaurants
+    </a>
+  </div>
+
+  <!-- =========================================================
+       CONTENU
+       ========================================================= -->
+  <div class="panier-layout" *ngIf="items.length > 0">
+
+    <!-- =========================================================
+         COLONNE GAUCHE
+         ========================================================= -->
+    <div class="main-col">
+
+      <!-- ---------- ARTICLES ---------- -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <i class="bi bi-bag-check"></i>
+            {{ items.length }} article{{ items.length > 1 ? 's' : '' }}
+          </h2>
+          <span class="card-count">{{ cartService.getCount() }} plat{{ cartService.getCount() > 1 ? 's' : '' }}</span>
+        </div>
+
+        <div class="items-list">
+          <div class="item-row" *ngFor="let item of items">
+
+            <!-- Image -->
+            <div class="item-image">
+              <img *ngIf="item.image" [src]="item.image" [alt]="item.name">
+              <div *ngIf="!item.image" class="placeholder">
+                <i class="bi bi-egg-fried"></i>
+              </div>
+            </div>
+
+            <!-- Info -->
+            <div class="item-info">
+              <h3>{{ item.name }}</h3>
+              <p class="item-price">{{ item.price }} Ar <span class="unit">/ unité</span></p>
+            </div>
+
+            <!-- Quantité -->
+            <div class="item-qty">
+              <button
+                (click)="decrement(item)"
+                [disabled]="item.quantity <= 1"
+                aria-label="Diminuer">
+                <i class="bi bi-dash-lg"></i>
+              </button>
+              <span>{{ item.quantity }}</span>
+              <button
+                (click)="increment(item)"
+                aria-label="Augmenter">
+                <i class="bi bi-plus-lg"></i>
+              </button>
+            </div>
+
+            <!-- Total ligne -->
+            <div class="item-total">
+              {{ item.price * item.quantity }} Ar
+            </div>
+
+            <!-- Supprimer -->
+            <button class="btn-remove" (click)="remove(item)" aria-label="Retirer">
+              <i class="bi bi-trash"></i>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Lien ajouter plus -->
+        <a routerLink="/client/restaurants/{{ restaurant?._id }}" class="btn-add-more">
+          <i class="bi bi-plus-circle"></i>
+          Ajouter d'autres plats
+        </a>
+      </div>
+
+      <!-- ---------- ADRESSES ---------- -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <i class="bi bi-geo-alt"></i>
+            Adresse de livraison
+          </h2>
+          <span class="card-count" *ngIf="addresses.length > 0">
+            {{ addresses.length }} adresse{{ addresses.length > 1 ? 's' : '' }}
+          </span>
+        </div>
+
+        <!-- Liste adresses -->
+        <div class="address-list" *ngIf="addresses.length > 0">
+          <div
+            class="address-card"
+            *ngFor="let addr of addresses; let i = index"
+            [class.selected]="selectedAddressIndex === i"
+            (click)="selectAddress(i)">
+
+            <div class="radio">
+              <div class="radio-inner" *ngIf="selectedAddressIndex === i"></div>
+            </div>
+
+            <div class="address-icon">
+              <i class="bi"
+                 [class.bi-house-door]="addr.label === 'Maison'"
+                 [class.bi-building]="addr.label === 'Bureau'"
+                 [class.bi-geo]="addr.label !== 'Maison' && addr.label !== 'Bureau'"></i>
+            </div>
+
+            <div class="address-info">
+              <span class="label">{{ addr.label || 'Adresse' }}</span>
+              <p class="line">{{ addr.address }}</p>
+              <p class="line muted">{{ addr.postalCode }} {{ addr.city }}</p>
+            </div>
+
+            <i class="bi bi-check-circle-fill check" *ngIf="selectedAddressIndex === i"></i>
+          </div>
+        </div>
+
+        <!-- Message si aucune adresse -->
+        <div class="no-address" *ngIf="addresses.length === 0 && !showNewAddressForm">
+          <i class="bi bi-exclamation-circle"></i>
+          <p>Aucune adresse enregistrée. Ajoutez-en une pour continuer.</p>
+        </div>
+
+        <!-- Bouton ajouter une adresse -->
+        <button
+          class="btn-add-address"
+          *ngIf="!showNewAddressForm"
+          (click)="showNewAddressForm = true">
+          <i class="bi bi-plus-circle"></i>
+          Ajouter une nouvelle adresse
+        </button>
+
+        <!-- Formulaire nouvelle adresse -->
+        <div class="new-address-form" *ngIf="showNewAddressForm">
+          <h3>
+            <i class="bi bi-geo-alt-fill"></i>
+            Nouvelle adresse
+          </h3>
+
+          <div class="form-grid">
+            <div class="form-group full">
+              <label>Libellé</label>
+              <input type="text" [(ngModel)]="newAddress.label" class="form-input"
+                     placeholder="Maison, Bureau…">
+            </div>
+
+            <div class="form-group full">
+              <label>Adresse</label>
+              <input type="text" [(ngModel)]="newAddress.address" class="form-input"
+                     placeholder="123 Rue de la Paix">
+            </div>
+
+            <div class="form-group">
+              <label>Ville</label>
+              <input type="text" [(ngModel)]="newAddress.city" class="form-input"
+                     placeholder="Antananarivo">
+            </div>
+
+            <div class="form-group">
+              <label>Code postal</label>
+              <input type="text" [(ngModel)]="newAddress.postalCode" class="form-input"
+                     placeholder="101">
+            </div>
+
+            <div class="form-group full">
+              <label>Téléphone</label>
+              <input type="tel" [(ngModel)]="newAddress.phone" class="form-input"
+                     placeholder="+261 34 12 345 67">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn-secondary" (click)="showNewAddressForm = false">
+              Annuler
+            </button>
+            <button class="btn-primary" (click)="addNewAddress()">
+              <i class="bi bi-check-lg"></i>
+              Enregistrer l'adresse
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =========================================================
+         COLONNE DROITE : RÉCAP
+         ========================================================= -->
+    <div class="aside-col">
+      <div class="card summary-card">
+
+        <div class="summary-header">
+          <h2 class="card-title">
+            <i class="bi bi-receipt"></i>
+            Récapitulatif
+          </h2>
+        </div>
+
+        <!-- Sous-total -->
+        <div class="summary-row">
+          <span class="row-label">Sous-total</span>
+          <span class="row-value">{{ subtotal }} Ar</span>
+        </div>
+
+        <!-- Frais livraison -->
+        <div class="summary-row">
+          <span class="row-label">Frais de livraison</span>
+          <span class="row-value">
+            <span *ngIf="deliveryFee > 0">{{ deliveryFee }} Ar</span>
+            <span *ngIf="deliveryFee === 0" class="free">Gratuit</span>
+          </span>
+        </div>
+
+        <!-- Délai préparation -->
+        <div class="summary-row" *ngIf="restaurant">
+          <span class="row-label">Préparation</span>
+          <span class="row-value">~{{ restaurant.avgPrepTime || 20 }} min</span>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <!-- Total -->
+        <div class="summary-row total">
+          <span class="row-label">Total</span>
+          <span class="row-value">{{ total }} Ar</span>
+        </div>
+
+        <!-- =========================================================
+             ALERTES INTELLIGENTES
+             ========================================================= -->
+
+        <!-- Alerte minimum -->
+        <div class="alert-box warn"
+             *ngIf="restaurant && subtotal < (restaurant.minOrder || 0)">
+          <i class="bi bi-info-circle-fill"></i>
+          <div>
+            <strong>Minimum non atteint</strong>
+            <p>Il manque <strong>{{ restaurant.minOrder - subtotal }} Ar</strong> pour commander</p>
+          </div>
+        </div>
+
+        <!-- Alerte adresse manquante -->
+        <div class="alert-box danger"
+             *ngIf="addresses.length === 0">
+          <i class="bi bi-geo-alt-fill"></i>
+          <div>
+            <strong>Adresse requise</strong>
+            <p>Ajoutez une adresse de livraison</p>
+          </div>
+        </div>
+
+        <!-- =========================================================
+             BOUTON DE VALIDATION
+             ========================================================= -->
+        <button
+          class="btn-validate"
+          [class.ready]="canOrder"
+          [disabled]="!canOrder || isSubmitting"
+          (click)="placeOrder()">
+
+          <i class="bi"
+             [class.bi-bag-check-fill]="!isSubmitting"
+             [class.bi-hourglass-split]="isSubmitting"></i>
+
+          <span class="validate-label">
+            {{ isSubmitting ? 'Envoi en cours…' : 'Valider la commande' }}
+          </span>
+
+          <span class="validate-price" *ngIf="!isSubmitting">
+            {{ total }} Ar
+          </span>
+        </button>
+
+        <!-- Info délai (après validation possible) -->
+        <div class="delivery-info" *ngIf="restaurant && canOrder">
+          <i class="bi bi-clock-history"></i>
+          <span>Livraison estimée dans <strong>~{{ (restaurant.avgPrepTime || 20) + 15 }} min</strong></span>
+        </div>
+
+        <!-- Info sécurité -->
+        <div class="secure-info" *ngIf="canOrder">
+          <i class="bi bi-shield-check"></i>
+          <span>Paiement à la livraison ou en ligne</span>
+        </div>
+
+        <!-- Aide -->
+        <div class="help-info">
+          <i class="bi bi-headset"></i>
+          <span>Un problème ? <a href="tel:+261340000000">Contactez-nous</a></span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</section>

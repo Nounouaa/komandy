@@ -1,0 +1,206 @@
+<section class="produits-page">
+
+  <!-- EN-TÊTE -->
+  <div class="page-header">
+    <div>
+      <h1><i class="bi bi-menu-app"></i> Mes produits</h1>
+      <p>{{ products.length }} produit{{ products.length > 1 ? 's' : '' }} au menu</p>
+    </div>
+
+    <button class="btn-primary" (click)="openCreate()" *ngIf="!showForm">
+      <i class="bi bi-plus-lg"></i>
+      Ajouter un produit
+    </button>
+  </div>
+
+  <!-- FORMULAIRE -->
+  <div class="form-card" *ngIf="showForm">
+    <h2>
+      <i class="bi" [class.bi-plus-circle]="!editingId" [class.bi-pencil-square]="editingId"></i>
+      {{ editingId ? 'Modifier le produit' : 'Nouveau produit' }}
+    </h2>
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <div class="form-grid">
+
+        <!-- =========================================================
+             IMAGE
+             ========================================================= -->
+        <div class="form-group full">
+          <label>Photo du produit</label>
+
+          <div class="image-upload-area"
+               [class.has-image]="previewUrl"
+               (click)="fileInput.click()">
+
+            <input
+              #fileInput
+              type="file"
+              accept="image/*"
+              hidden
+              (change)="onFileSelected($event)">
+
+            <!-- Prévisualisation -->
+            <div class="preview-wrapper" *ngIf="previewUrl">
+              <img [src]="previewUrl" alt="Aperçu">
+
+              <button type="button"
+                      class="btn-remove-image"
+                      (click)="removeImage($event)"
+                      title="Retirer l'image">
+                <i class="bi bi-trash"></i>
+              </button>
+
+              <div class="preview-overlay">
+                <i class="bi bi-camera"></i>
+                <span>Changer la photo</span>
+              </div>
+            </div>
+
+            <!-- Zone vide -->
+            <div class="upload-placeholder" *ngIf="!previewUrl">
+              <div class="upload-icon">
+                <i class="bi bi-cloud-arrow-up"></i>
+              </div>
+              <p class="upload-title">Cliquez pour ajouter une photo</p>
+              <p class="upload-hint">JPG, PNG, WEBP • Max 5 MB</p>
+            </div>
+
+            <!-- Loader -->
+            <div class="upload-loading" *ngIf="isUploading">
+              <div class="spinner"></div>
+              <span>Upload en cours…</span>
+            </div>
+          </div>
+
+          <span class="err" *ngIf="uploadError">{{ uploadError }}</span>
+        </div>
+
+        <!-- Nom -->
+        <div class="form-group full">
+          <label>Nom</label>
+          <input type="text" formControlName="name" placeholder="Ex: Burger Classique">
+          <span class="err" *ngIf="f['name'].touched && f['name'].errors">
+            Nom obligatoire (min 2 caractères)
+          </span>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group full">
+          <label>Description</label>
+          <textarea formControlName="description" rows="2" placeholder="Décrivez le plat…"></textarea>
+        </div>
+
+        <!-- Prix -->
+        <div class="form-group">
+          <label>Prix (Ar)</label>
+          <input type="number" formControlName="price" placeholder="12000">
+          <span class="err" *ngIf="f['price'].touched && f['price'].errors">
+            Prix obligatoire
+          </span>
+        </div>
+
+        <!-- Catégorie -->
+        <div class="form-group">
+          <label>Catégorie</label>
+          <select formControlName="category">
+            <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+          </select>
+        </div>
+
+        <!-- Catégorie personnalisée (uniquement si « Autres ») -->
+        <div class="form-group full" *ngIf="isCustomCategory">
+          <label>
+            Nom de la catégorie
+            <span class="hint">— votre propre catégorie</span>
+          </label>
+          <input
+            type="text"
+            formControlName="customCategory"
+            placeholder="Ex: Tacos, Sushis, Grillades…"
+            maxlength="30">
+          <span class="err" *ngIf="f['customCategory'].touched && !f['customCategory'].value">
+            Veuillez saisir un nom de catégorie
+          </span>
+        </div>
+
+        <!-- Disponibilité -->
+        <div class="form-group full">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="isAvailable">
+            <span>Disponible à la vente</span>
+          </label>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="cancelForm()">
+          Annuler
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="isUploading">
+          <i class="bi"
+             [class.bi-check-lg]="!isUploading"
+             [class.bi-hourglass-split]="isUploading"></i>
+          {{ isUploading ? 'Upload…' : (editingId ? 'Modifier' : 'Ajouter') }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- CHARGEMENT -->
+  <div class="loading-grid" *ngIf="isLoading">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3,4]"></div>
+  </div>
+
+  <!-- LISTE -->
+  <div class="products-grid" *ngIf="!isLoading && products.length > 0">
+    <div class="product-card"
+         *ngFor="let p of products"
+         [class.unavailable]="p.isAvailable === false">
+
+      <div class="product-image">
+        <img *ngIf="hasImage(p)" [src]="getImageUrl(p.image)" [alt]="p.name">
+        <div *ngIf="!p.image" class="img-placeholder">
+          <i class="bi bi-egg-fried"></i>
+        </div>
+        <span class="badge-cat" *ngIf="p.category">{{ p.category }}</span>
+        <span class="badge-off" *ngIf="p.isAvailable === false">Indisponible</span>
+      </div>
+
+      <div class="product-body">
+        <h3>{{ p.name }}</h3>
+        <p>{{ p.description || 'Aucune description' }}</p>
+
+        <div class="product-footer">
+          <span class="price">{{ p.price }} Ar</span>
+
+          <div class="actions">
+            <button class="icon-btn" (click)="toggleAvailability(p)"
+                    [title]="p.isAvailable ? 'Désactiver' : 'Activer'">
+              <i class="bi" [class.bi-eye-slash]="p.isAvailable" [class.bi-eye]="!p.isAvailable"></i>
+            </button>
+            <button class="icon-btn" (click)="openEdit(p)" title="Modifier">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="icon-btn danger" (click)="remove(p)" title="Supprimer">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIDE -->
+  <div class="empty-state" *ngIf="!isLoading && products.length === 0 && !showForm">
+    <i class="bi bi-menu-app"></i>
+    <h3>Aucun produit</h3>
+    <p>Ajoutez votre premier plat pour commencer</p>
+    <button class="btn-primary" (click)="openCreate()">
+      <i class="bi bi-plus-lg"></i>
+      Ajouter un produit
+    </button>
+  </div>
+
+</section>

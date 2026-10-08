@@ -1,0 +1,670 @@
+/* =========================================================
+   SIDEBAR RESTAURANT
+   ========================================================= */
+
+.sidebar-restaurant {
+  width: 280px;
+  min-width: 280px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  background: rgba(10, 14, 26, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 100;
+  box-shadow: 4px 0 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Scrollbar personnalisée */
+.sidebar-restaurant::-webkit-scrollbar { width: 4px; }
+.sidebar-restaurant::-webkit-scrollbar-track { background: transparent; }
+.sidebar-restaurant::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+.sidebar-restaurant::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* =========================================================
+   MODE RÉDUIT (COLLAPSED)
+   ========================================================= */
+
+.sidebar-restaurant.collapsed {
+  width: 80px;
+  min-width: 80px;
+}
+
+/* Cache tout sauf les icônes */
+.sidebar-restaurant.collapsed .brand-text,
+.sidebar-restaurant.collapsed .brand-dot,
+.sidebar-restaurant.collapsed .restaurant-details,
+.sidebar-restaurant.collapsed .nav-text,
+.sidebar-restaurant.collapsed .nav-badge,
+.sidebar-restaurant.collapsed .sidebar-divider {
+  display: none;
+}
+
+/* Header : centre le bouton toggle */
+.sidebar-restaurant.collapsed .sidebar-header {
+  justify-content: center;
+  padding: 20px 10px;
+}
+
+/* Bouton toggle : reste TOUJOURS visible et cliquable */
+.sidebar-restaurant.collapsed .btn-toggle {
+  display: flex;
+  margin: 0 auto;
+}
+
+/* Icône du restaurant centrée */
+.sidebar-restaurant.collapsed .restaurant-info {
+  justify-content: center;
+  padding: 16px 10px;
+}
+
+.sidebar-restaurant.collapsed .restaurant-icon {
+  width: 44px;
+  height: 44px;
+  font-size: 1.6rem;
+  margin: 0 auto;
+}
+
+/* Liens : centrés, icônes seules */
+.sidebar-restaurant.collapsed .nav-link {
+  justify-content: center;
+  padding: 10px;
+}
+
+.sidebar-restaurant.collapsed .nav-link i {
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+/* =========================================================
+   EN-TÊTE
+   ========================================================= */
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  min-height: 76px;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  transition: opacity 0.3s;
+}
+
+.sidebar-brand:hover { opacity: 0.8; }
+
+.brand-icon {
+  font-size: 1.8rem;
+  display: inline-block;
+  animation: icon-float 3s ease-in-out infinite;
+}
+
+.brand-text {
+  font-size: 1.4rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff 0%, #ff6b6b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+.brand-dot {
+  width: 6px;
+  height: 6px;
+  background: #6bcb77;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(107, 203, 119, 0.3);
+}
+
+/* =========================================================
+   BOUTON TOGGLE
+   ========================================================= */
+
+.btn-toggle {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.btn-toggle:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.btn-toggle:active { transform: scale(0.95); }
+
+/* =========================================================
+   INFO RESTAURANT
+   ========================================================= */
+
+.restaurant-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: all 0.3s;
+}
+
+.restaurant-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 107, 107, 0.05));
+  border: 1px solid rgba(255, 107, 107, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.restaurant-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.restaurant-name {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.restaurant-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.restaurant-status .status-dot {
+  width: 6px;
+  height: 6px;
+  background: #6bcb77;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(107, 203, 119, 0.3);
+}
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 10px;
+  overflow-y: auto;
+}
+
+.sidebar-nav.bottom-nav {
+  flex: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  padding-top: 8px;
+  margin-top: auto;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item { margin-bottom: 2px; }
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  min-height: 44px;
+}
+
+.nav-link i {
+  font-size: 1.2rem;
+  min-width: 24px;
+  text-align: center;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+.nav-text {
+  flex: 1;
+  white-space: nowrap;
+  transition: all 0.3s;
+}
+
+.nav-badge {
+  background: rgba(255, 107, 107, 0.15);
+  color: #ff6b6b;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 50px;
+  min-width: 20px;
+  text-align: center;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   ÉTATS DES LIENS
+   ========================================================= */
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.8);
+  transform: translateX(4px);
+}
+
+.nav-link:hover i { color: #ff6b6b; }
+
+.nav-link.active {
+  background: rgba(255, 107, 107, 0.08);
+  color: #ffffff;
+}
+
+.nav-link.active i { color: #ff6b6b; }
+
+.nav-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 24px;
+  background: linear-gradient(180deg, #ff6b6b, #ffd93d);
+  border-radius: 0 4px 4px 0;
+  animation: slide-in 0.3s ease-out;
+}
+
+.nav-link.active .nav-badge {
+  background: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+}
+
+/* En mode collapsed, on masque la barre active verticale */
+.sidebar-restaurant.collapsed .nav-link.active::before {
+  display: none;
+}
+
+/* =========================================================
+   DÉCONNEXION
+   ========================================================= */
+
+.nav-link.logout { color: rgba(255, 107, 107, 0.5); }
+
+.nav-link.logout:hover {
+  background: rgba(255, 107, 107, 0.08);
+  color: #ff6b6b;
+}
+
+.nav-link.logout:hover i { color: #ff6b6b; }
+
+/* =========================================================
+   SÉPARATEUR
+   ========================================================= */
+
+.sidebar-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+  margin: 4px 16px;
+}
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes icon-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-5px) rotate(-5deg); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%      { transform: scale(1.5); opacity: 0.5; }
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(-50%) scaleX(0); }
+  to   { opacity: 1; transform: translateY(-50%) scaleX(1); }
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+/* Tablette & mobile (< 992px) : sidebar en overlay */
+@media (max-width: 991.98px) {
+
+  .sidebar-restaurant {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    transform: translateX(0);
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    background: rgba(10, 14, 26, 0.98);
+  }
+
+  /* En mobile, "collapsed" = cachée complètement */
+  .sidebar-restaurant.collapsed {
+    transform: translateX(-100%);
+    width: 280px;
+    min-width: 280px;
+  }
+
+  /* En mobile, on RÉAFFICHE tout le contenu (pas de mode icônes) */
+  .sidebar-restaurant.collapsed .brand-text,
+  .sidebar-restaurant.collapsed .brand-dot,
+  .sidebar-restaurant.collapsed .restaurant-details,
+  .sidebar-restaurant.collapsed .nav-text,
+  .sidebar-restaurant.collapsed .nav-badge,
+  .sidebar-restaurant.collapsed .sidebar-divider {
+    display: flex;
+  }
+
+  .sidebar-restaurant.collapsed .sidebar-brand {
+    justify-content: flex-start;
+  }
+
+  .sidebar-restaurant.collapsed .nav-link {
+    justify-content: flex-start;
+    padding: 10px 14px;
+  }
+
+  .sidebar-restaurant.collapsed .nav-link i {
+    font-size: 1.2rem;
+  }
+
+  .sidebar-restaurant.collapsed .restaurant-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.8rem;
+  }
+
+  .sidebar-restaurant.collapsed .restaurant-info {
+    justify-content: flex-start;
+    padding: 20px 16px;
+  }
+
+  .sidebar-restaurant.collapsed .btn-toggle {
+    display: flex;
+  }
+}
+
+/* Petit mobile (< 576px) */
+@media (max-width: 576px) {
+
+  .sidebar-restaurant {
+    width: 280px;
+    min-width: 280px;
+  }
+
+  .sidebar-restaurant.collapsed {
+    transform: translateX(-100%);
+    width: 280px;
+    min-width: 280px;
+  }
+
+  .sidebar-header {
+    padding: 16px 14px;
+    min-height: 64px;
+  }
+
+  .brand-text { font-size: 1.2rem; }
+  .brand-icon { font-size: 1.5rem; }
+
+  .restaurant-info { padding: 16px 14px; }
+  .restaurant-name { font-size: 0.85rem; }
+
+  .nav-link {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    min-height: 40px;
+  }
+
+  .nav-link i {
+    font-size: 1.1rem;
+    min-width: 20px;
+  }
+
+  .nav-badge {
+    font-size: 0.65rem;
+    padding: 1px 8px;
+    min-width: 16px;
+  }
+}
+
+/* =========================================================
+   BADGES DYNAMIQUES
+   ========================================================= */
+
+/* Badge normal (produits, commandes, clients) */
+.nav-badge {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+/* Badge rouge/orange (commandes en attente — URGENT) */
+.nav-badge.alert {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(238, 90, 36, 0.45);
+  animation: alertPulse 2s ease-in-out infinite;
+}
+
+@keyframes alertPulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(238, 90, 36, 0.45);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 2px 14px rgba(238, 90, 36, 0.85);
+    transform: scale(1.1);
+  }
+}
+
+/* Badge promotions (doré) */
+.nav-badge.promo {
+  background: linear-gradient(135deg, #ffd93d, #ffb800);
+  color: #0a0e1a;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(255, 217, 61, 0.4);
+}
+
+/* Quand le lien est actif, le badge s'adapte */
+.nav-link.active .nav-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.nav-link.active .nav-badge.alert {
+  background: #ffffff;
+  color: #ee5a24;
+}
+
+.nav-link.active .nav-badge.promo {
+  background: #ffffff;
+  color: #ffb800;
+}
+
+/* Sidebar repliée → on cache les badges (sauf alerte) */
+.sidebar-restaurant.collapsed .nav-badge:not(.alert) {
+  display: none;
+}
+
+/* En mode replié, le badge alerte devient un petit point */
+.sidebar-restaurant.collapsed .nav-badge.alert {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 10px;
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  font-size: 0;
+  border: 2px solid #0f1423;
+}
+
+/* Animation icône megaphone quand actif */
+.nav-link.active .bi-megaphone {
+  animation: megaphoneShake 1.5s ease-in-out infinite;
+}
+
+@keyframes megaphoneShake {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-8deg); }
+  75%      { transform: rotate(8deg); }
+}
+
+/* =========================================================
+   LOGO RESTAURANT (dynamique)
+   ========================================================= */
+
+.restaurant-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 107, 107, 0.05));
+  border: 1px solid rgba(255, 107, 107, 0.1);
+  transition: all 0.3s;
+}
+
+.restaurant-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* Quand on a un logo, on enlève le style "gradient" du conteneur */
+.restaurant-icon-wrapper:has(img) {
+  background: none;
+  border: none;
+}
+
+/* L'icône d'initiales garde son style */
+.restaurant-icon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-radius: 12px;
+}
+
+/* =========================================================
+   STATUT RESTAURANT (ouvert/fermé)
+   ========================================================= */
+
+.restaurant-status.closed {
+  color: rgba(255, 71, 87, 0.6);
+}
+
+.restaurant-status .status-dot.closed {
+  background: #ff4757;
+  box-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
+}
+
+/* =========================================================
+   MODE RÉDUIT (COLLAPSED)
+   ========================================================= */
+
+.sidebar-restaurant.collapsed .restaurant-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+.sidebar-restaurant.collapsed .restaurant-icon {
+  font-size: 1rem;
+  border-radius: 10px;
+}
+
+/* =========================================================
+   MODE MOBILE
+   ========================================================= */
+
+@media (max-width: 991.98px) {
+  .sidebar-restaurant.collapsed .restaurant-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+  }
+
+  .sidebar-restaurant.collapsed .restaurant-icon {
+    font-size: 1.1rem;
+    border-radius: 12px;
+  }
+}
