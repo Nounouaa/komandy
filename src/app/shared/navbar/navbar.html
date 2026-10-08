@@ -1,22 +1,22 @@
-<!-- HTML - Navbar Premium avec Active State -->
-<nav class="navbar navbar-expand-lg navbar-premium fixed-top">
+<nav class="navbar navbar-expand-lg navbar-premium fixed-top"
+     [class.scrolled]="isScrolled">
+
   <div class="container">
-    
+
     <!-- Logo -->
-    <a class="navbar-brand" routerLink="/">
+    <a class="navbar-brand" routerLink="/" (click)="closeMenu()">
       <span class="brand-icon">🍽️</span>
       <span class="brand-text">Komandy</span>
       <span class="brand-dot"></span>
     </a>
 
-    <!-- Toggle Button -->
-    <button 
-      class="navbar-toggler premium-toggler" 
+    <!-- Toggle Button (hamburger) -->
+    <button
+      class="navbar-toggler premium-toggler"
       type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarMenu"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="isMenuOpen"
       aria-controls="navbarMenu"
-      aria-expanded="false"
       aria-label="Toggle navigation">
       <span class="toggler-line"></span>
       <span class="toggler-line"></span>
@@ -24,57 +24,56 @@
     </button>
 
     <!-- Menu -->
-    <div class="collapse navbar-collapse" id="navbarMenu">
+    <div class="navbar-collapse" id="navbarMenu" [class.show]="isMenuOpen">
       <ul class="navbar-nav mx-auto gap-2">
-        <!-- Accueil -->
+
         <li class="nav-item">
-          <a 
-            class="nav-link premium-link" 
-            routerLink="/"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{exact: true}">
+          <a class="nav-link premium-link"
+             routerLink="/"
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{ exact: true }"
+             (click)="closeMenu()">
             <i class="bi bi-house-fill me-1"></i>
             <span>Accueil</span>
             <span class="nav-indicator"></span>
           </a>
         </li>
 
-        <!-- À propos -->
         <li class="nav-item">
-          <a 
-            class="nav-link premium-link" 
-            routerLink="/apropos"
-            routerLinkActive="active">
+          <a class="nav-link premium-link"
+             routerLink="/apropos"
+             routerLinkActive="active"
+             (click)="closeMenu()">
             <i class="bi bi-info-circle me-1"></i>
             <span>À propos</span>
             <span class="nav-indicator"></span>
           </a>
         </li>
 
-        <!-- Contact -->
         <li class="nav-item">
-          <a 
-            class="nav-link premium-link" 
-            routerLink="/contact"
-            routerLinkActive="active">
+          <a class="nav-link premium-link"
+             routerLink="/contact"
+             routerLinkActive="active"
+             (click)="closeMenu()">
             <i class="bi bi-envelope me-1"></i>
             <span>Contact</span>
             <span class="nav-indicator"></span>
           </a>
         </li>
+
       </ul>
 
       <!-- Boutons -->
       <div class="nav-buttons">
-        <a 
-          routerLink="/connexion"
-          class="btn btn-outline-premium-nav me-2">
+        <a routerLink="/connexion"
+           class="btn btn-outline-premium-nav me-2"
+           (click)="closeMenu()">
           <i class="bi bi-box-arrow-in-right me-1"></i>
           Connexion
         </a>
-        <a 
-          routerLink="/inscription"
-          class="btn btn-gradient-nav">
+        <a routerLink="/inscription"
+           class="btn btn-gradient-nav"
+           (click)="closeMenu()">
           <i class="bi bi-person-plus me-1"></i>
           Inscription
         </a>

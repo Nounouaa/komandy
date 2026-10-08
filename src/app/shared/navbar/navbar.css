@@ -355,3 +355,44 @@
 .navbar-premium.scrolled .brand-icon {
   font-size: 1.5rem;
 }
+
+/* =========================================================
+   ÉTAT OUVERT DU MENU MOBILE
+   ========================================================= */
+
+/* État fermé par défaut sur mobile */
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    display: none;
+  }
+
+  .navbar-collapse.show {
+    display: block;
+    animation: menuSlideDown 0.3s ease-out;
+  }
+}
+
+/* Sur desktop, le menu est toujours visible */
+@media (min-width: 992px) {
+  .navbar-collapse {
+    display: flex !important;
+  }
+}
+
+@keyframes menuSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Effet scrolled : le padding change */
+.navbar-premium.scrolled {
+  padding: 8px 0;
+  background: rgba(10, 14, 26, 0.95) !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+}
