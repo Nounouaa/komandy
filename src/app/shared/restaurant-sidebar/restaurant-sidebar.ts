@@ -61,7 +61,7 @@ export class RestaurantSidebar implements OnInit, OnDestroy {
 
   private ordersSub?: Subscription;
   private refreshSub?: Subscription;
-
+isMobile = false;
   constructor(
     private router: Router,
     private auth: AuthService,
@@ -86,37 +86,92 @@ export class RestaurantSidebar implements OnInit, OnDestroy {
   // CYCLE DE VIE
   // =========================================================
   ngOnInit(): void {
-    // Charger l'état de repli
-    if (isPlatformBrowser(this.platformId)) {
+  // Détection mobile + écoute du resize
+  if (isPlatformBrowser(this.platformId)) {
+    this.checkScreenSize();
+    window.addEventListener('resize', this.onResize);
+
+    if (this.isMobile) {
+      // Sur mobile : la sidebar démarre TOUJOURS cachée
+      this.isCollapsed = true;
+    } else {
+      // Sur desktop : on restaure le state sauvegardé
       const saved = localStorage.getItem(this.STORAGE_KEY);
       if (saved !== null) {
         this.isCollapsed = saved === 'true';
       }
-
-      if (window.innerWidth < this.MOBILE_BREAKPOINT) {
-        this.isCollapsed = true;
-      }
     }
-
-    // Charger le profil restaurant (nom + logo)
-    this.loadRestaurantProfile();
-
-    // Charger les stats
-    this.loadStats();
-
-    // 🔌 Temps réel
-    this.ordersSub = this.orderService.orders$.subscribe(() => {
-      this.loadStats();
-    });
-
-    // 🔄 Refresh toutes les 30 secondes
-    this.refreshSub = interval(30000).subscribe(() => this.loadStats());
   }
+
+  // Charger le profil restaurant
+  this.loadRestaurantProfile();
+
+  // Charger les stats
+  this.loadStats();
+
+  // Temps réel
+  this.ordersSub = this.orderService.orders$.subscribe(() => {
+    this.loadStats();
+  });
+
+  // Refresh toutes les 30s
+  this.refreshSub = interval(30000).subscribe(() => this.loadStats());
+}
+
+
+
+/** Détecte si on est en mobile */
+private checkScreenSize(): void {
+  if (isPlatformBrowser(this.platformId)) {
+    this.isMobile = window.innerWidth < this.MOBILE_BREAKPOINT;
+  }
+}
+
+/** Handler resize (stocké pour pouvoir le supprimer) */
+private onResize = (): void => {
+  const wasMobile = this.isMobile;
+  this.checkScreenSize();
+
+  // Passage desktop → mobile : on ferme
+  if (!wasMobile && this.isMobile) {
+    this.zone.run(() => {
+      this.isCollapsed = true;
+      this.cdr.detectChanges();
+    });
+  }
+
+  // Passage mobile → desktop : on rouvre si sauvegardé
+  if (wasMobile && !this.isMobile) {
+    const saved = localStorage.getItem(this.STORAGE_KEY);
+    this.zone.run(() => {
+      this.isCollapsed = saved === 'true';
+      this.cdr.detectChanges();
+    });
+  }
+};
+
+/** Ferme le menu mobile (appelé par l'overlay) */
+closeMobileMenu(): void {
+  if (this.isMobile) {
+    this.isCollapsed = true;
+  }
+}
+
+/** Ferme automatiquement le menu après un clic sur un lien (mobile) */
+onNavClick(): void {
+  if (this.isMobile) {
+    this.isCollapsed = true;
+  }
+}
 
   ngOnDestroy(): void {
-    this.ordersSub?.unsubscribe();
-    this.refreshSub?.unsubscribe();
+  this.ordersSub?.unsubscribe();
+  this.refreshSub?.unsubscribe();
+
+  if (isPlatformBrowser(this.platformId)) {
+    window.removeEventListener('resize', this.onResize);
   }
+}
 
   // =========================================================
   // CHARGEMENT PROFIL (nom + logo + ouvert/fermé)
