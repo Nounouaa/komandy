@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment.prod';
 
 @Injectable({ providedIn: 'root' })
 export class PromotionService {
-  private api = 'http://localhost:3000/api/promotions';
+  private api = `${environment.apiUrl}/promotions`;
 
   constructor(private http: HttpClient) {}
 

@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { OrderService, OrderStatus } from '../../core/services/order.service';
 import { Subscription } from 'rxjs';
+import { environment } from '../../../environments/environment.prod';
 
 @Component({
   selector: 'app-commandes',
@@ -306,7 +307,7 @@ export class Commandes implements OnInit, OnDestroy {
       cancelText: 'Annuler',
       onConfirm: () => {
         this.http
-          .post(`http://localhost:3000/api/orders/${order._id}/confirm-received`, {})
+          .post(`${environment.apiUrl}/orders/${order._id}/confirm-received`,  {})
           .subscribe({
             next: (updated: any) => {
               this.zone.run(() => {
@@ -403,7 +404,7 @@ export class Commandes implements OnInit, OnDestroy {
 
     this.http
       .patch(
-        `http://localhost:3000/api/orders/${order._id}/resolve-dispute`,
+        `${environment.apiUrl}/orders/${order._id}/resolve-dispute`,
         { action, resolution }
       )
       .subscribe({

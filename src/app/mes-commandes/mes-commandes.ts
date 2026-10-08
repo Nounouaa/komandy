@@ -14,6 +14,7 @@ import { OrderService } from '../core/services/order.service';
 import { MessageService } from '../core/services/message.service';
 import { RestaurantService } from '../core/services/restaurant.service';
 import { FormsModule } from '@angular/forms';
+import { environment } from '../../environments/environment.prod';
 
 @Component({
   selector: 'app-mes-commandes',
@@ -177,7 +178,7 @@ confirmDeliveredAndPaid(order: any): void {
     cancelText: 'Pas encore',
     onConfirm: () => {
       this.http
-        .post(`http://localhost:3000/api/orders/${order._id}/confirm-received`, {})
+        .post(`${environment.apiUrl}/orders/${order._id}/confirm-received`,{})
         .subscribe({
           next: (updated: any) => {
             this.zone.run(() => {
@@ -415,7 +416,7 @@ onContactInput(event: Event): void {
     }
 
     this.http
-      .post(`http://localhost:3000/api/orders/${order._id}/confirm-received`, {})
+      .post(`${environment.apiUrl}/orders/${order._id}/confirm-received`, {})
       .subscribe({
         next: (updated: any) => {
           this.zone.run(() => {
@@ -451,7 +452,7 @@ reportNotReceived(order: any): void {
       if (reason === null) return;
 
       this.http
-        .post(`http://localhost:3000/api/orders/${order._id}/report-not-received`, {
+        .post(`${environment.apiUrl}/orders/${order._id}/report-not-received`, {
           reason: reason.trim() || 'Client déclare ne pas avoir reçu la commande',
         })
         .subscribe({

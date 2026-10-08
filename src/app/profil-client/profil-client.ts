@@ -15,6 +15,7 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../core/services/auth.service';
 import { UploadService } from '../core/services/upload';
 import { AvatarService } from '../core/services/avatar';
+import { environment } from '../../environments/environment.prod';
 
 // =========================================================
 // TYPES
@@ -224,7 +225,7 @@ submitEmailChange(): void {
   @ViewChild('avatarInput') avatarInput!: ElementRef<HTMLInputElement>;
   @ViewChild('coverInput') coverInput!: ElementRef<HTMLInputElement>;
 
-  private readonly api = 'http://localhost:3000/api/auth';
+  private readonly api = `${environment.apiUrl}/auth`;
 
   constructor(
     private auth: AuthService,

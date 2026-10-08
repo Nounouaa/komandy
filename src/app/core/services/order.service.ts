@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { io, Socket } from 'socket.io-client';
+import { environment } from '../../../environments/environment.prod';
 
 // =========================================================
 // TYPES
@@ -24,8 +25,8 @@ export type OrderStatus =
 
 @Injectable({ providedIn: 'root' })
 export class OrderService implements OnDestroy {
-  private readonly api = 'http://localhost:3000/api/orders';
-  private readonly socketUrl = 'http://localhost:3000';
+  private readonly api = `${environment.apiUrl}/orders`;
+private readonly socketUrl = environment.socketUrl;
 
   private socket?: Socket;
   private ordersSubject = new BehaviorSubject<any[]>([]);

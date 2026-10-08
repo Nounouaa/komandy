@@ -8,8 +8,9 @@ import {
 } from '@angular/forms';
 import { PromotionService } from '../../../core/services/promotion.service';
 import { UploadService } from '../../../core/services/upload';
+import { environment } from '../../../../environments/environment.prod';
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = environment.apiUrl;
 
 @Component({
   selector: 'app-promotions-resto',

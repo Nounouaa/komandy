@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment.prod';
 
 @Injectable({ providedIn: 'root' })
 export class UploadService {
-  private api = 'http://localhost:3000/api';
-  private baseUrl = 'http://localhost:3000';
+  private api = environment.apiUrl;        // → https://.../api
+private baseUrl = environment.socketUrl; // → https://...
 
   constructor(private http: HttpClient) {}
 

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
+import { environment } from '../../../environments/environment.prod';
+
 
 // =========================================================
 // TYPES
@@ -33,7 +35,7 @@ export interface Message {
 
 @Injectable({ providedIn: 'root' })
 export class MessageService {
-  private api = 'http://localhost:3000/api/messages';
+  private api = `${environment.apiUrl}/messages`;
 
 
 

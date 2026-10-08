@@ -15,6 +15,7 @@ import { RestaurantService } from '../core/services/restaurant.service';
 import { UploadService } from '../core/services/upload';
 import { AvatarService } from '../core/services/avatar';
 import { AuthService } from '../core/services/auth.service';
+import { environment } from '../../environments/environment.prod';
 
 // =========================================================
 // TYPES
@@ -140,7 +141,7 @@ export class ProfilRestaurant implements OnInit {
   // =========================================================
   // API
   // =========================================================
-  private readonly api = 'http://localhost:3000/api/auth';   // ✅ AJOUT
+  private readonly api = `${environment.apiUrl}/auth`;   // ✅ AJOUT
 
   constructor(
     private restaurantService: RestaurantService,
