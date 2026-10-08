@@ -669,3 +669,84 @@
   }
 }
 
+/* =========================================================
+   HAMBURGER MOBILE (flottant)
+   ========================================================= */
+.mobile-hamburger {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1100;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  border: none;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(238, 90, 36, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-hamburger:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 25px rgba(238, 90, 36, 0.6);
+}
+
+.mobile-hamburger:active {
+  transform: scale(0.95);
+}
+
+/* Animation au tap */
+@keyframes hamburgerPulse {
+  0%, 100% { box-shadow: 0 4px 20px rgba(238, 90, 36, 0.4); }
+  50%      { box-shadow: 0 4px 28px rgba(238, 90, 36, 0.7); }
+}
+
+.mobile-hamburger {
+  animation: hamburgerPulse 2.5s ease-in-out infinite;
+}
+
+/* =========================================================
+   OVERLAY MOBILE (fond semi-transparent)
+   ========================================================= */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 999;
+  animation: overlayFadeIn 0.25s ease-out;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* =========================================================
+   SUR MOBILE : animation de slide
+   ========================================================= */
+@media (max-width: 991.98px) {
+  .sidebar-restaurant {
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1050;   /* au-dessus de l'overlay */
+  }
+
+  /* Sécurité : cacher le hamburger dès que la sidebar s'ouvre */
+  .sidebar-restaurant:not(.collapsed) ~ .mobile-hamburger {
+    display: none;
+  }
+}
+
+/* Cacher le hamburger sur desktop (au cas où) */
+@media (min-width: 992px) {
+  .mobile-hamburger {
+    display: none !important;
+  }
+}
