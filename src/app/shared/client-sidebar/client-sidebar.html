@@ -1,6 +1,31 @@
 <!-- =========================================================
      CLIENT SIDEBAR
      ========================================================= -->
+
+     <!-- =========================================================
+     HAMBURGER MOBILE (visible quand la sidebar est cachée)
+     ========================================================= -->
+<button
+  type="button"
+  class="mobile-hamburger"
+  *ngIf="isMobile && isCollapsed"
+  (click)="toggleSidebar()"
+  aria-label="Ouvrir le menu">
+  <i class="bi bi-list"></i>
+</button>
+
+<!-- =========================================================
+     OVERLAY MOBILE (pour fermer en cliquant en dehors)
+     ========================================================= -->
+<div
+  class="sidebar-overlay"
+  *ngIf="isMobile && !isCollapsed"
+  (click)="closeMobileMenu()">
+</div>
+
+<!-- ====== TON <aside> EXISTANT (inchangé) ====== -->
+<aside class="client-sidebar" [class.collapsed]="isCollapsed" [class.mobile]="isMobile">
+  <!-- ... tout le contenu existant reste identique ... -->
 <aside class="client-sidebar" [class.collapsed]="isCollapsed">
 
   <!-- =========================================================
@@ -61,7 +86,7 @@
        NAVIGATION PRINCIPALE
        ========================================================= -->
   <nav class="sidebar-nav">
-    <ul class="nav-list">
+    <ul class="nav-list" (click)="onNavClick()">
 
       <!-- Tableau de bord -->
       <li class="nav-item">

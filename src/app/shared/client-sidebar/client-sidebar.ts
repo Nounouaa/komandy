@@ -42,6 +42,7 @@ export class ClientSidebar implements OnInit, OnDestroy {
   // ÉTAT INTERNE
   // =========================================================
   isCollapsed = false;
+  isMobile = false;
 
   // Profil client (dynamique)
   userName = '';
@@ -123,22 +124,32 @@ this.loadPromotionsCount();
     );
 
     // Restaurer l'état sidebar
-    if (isPlatformBrowser(this.platformId)) {
-      const saved = localStorage.getItem(this.STORAGE_KEY);
-      if (saved !== null) {
-        this.isCollapsed = saved === 'true';
-      }
+    // Restaurer l'état sidebar
+// Restaurer l'état sidebar (avec détection mobile)
+if (isPlatformBrowser(this.platformId)) {
+  this.checkScreenSize();
+  window.addEventListener('resize', this.onResize);
 
-      if (window.innerWidth < this.MOBILE_BREAKPOINT) {
-        this.isCollapsed = true;
-      }
+  if (this.isMobile) {
+    // Sur mobile : la sidebar démarre TOUJOURS cachée
+    this.isCollapsed = true;
+  } else {
+    // Sur desktop : on restaure le state sauvegardé
+    const saved = localStorage.getItem(this.STORAGE_KEY);
+    if (saved !== null) {
+      this.isCollapsed = saved === 'true';
     }
   }
-
-  ngOnDestroy(): void {
-    this.subs.forEach((s) => s.unsubscribe());
+}
   }
 
+ngOnDestroy(): void {
+  this.subs.forEach((s) => s.unsubscribe());
+
+  if (isPlatformBrowser(this.platformId)) {
+    window.removeEventListener('resize', this.onResize);
+  }
+}
   // =========================================================
   // PROFIL (depuis AuthService)
   // =========================================================
@@ -256,4 +267,55 @@ private loadPromotionsCount(): void {
     }
     this.logout.emit();
   }
+
+
+  /* =========================================================
+ *  MOBILE — Détection & gestion
+ * ========================================================= */
+
+/** Détecte si on est en mobile. */
+private checkScreenSize(): void {
+  if (isPlatformBrowser(this.platformId)) {
+    this.isMobile = window.innerWidth < this.MOBILE_BREAKPOINT;
+  }
+}
+
+/** Handler resize (stocké pour pouvoir le supprimer). */
+private onResize = (): void => {
+  const wasMobile = this.isMobile;
+  this.checkScreenSize();
+
+  // Passage desktop → mobile : on ferme
+  if (!wasMobile && this.isMobile) {
+    this.zone.run(() => {
+      this.isCollapsed = true;
+      this.cdr.detectChanges();
+    });
+  }
+
+  // Passage mobile → desktop : on rouvre selon le state sauvegardé
+  if (wasMobile && !this.isMobile) {
+    if (isPlatformBrowser(this.platformId)) {
+      const saved = localStorage.getItem(this.STORAGE_KEY);
+      this.zone.run(() => {
+        this.isCollapsed = saved === 'true';
+        this.cdr.detectChanges();
+      });
+    }
+  }
+};
+
+/** Ferme le menu mobile (appelé par l'overlay). */
+closeMobileMenu(): void {
+  if (this.isMobile) {
+    this.isCollapsed = true;
+  }
+}
+
+/** Ferme automatiquement le menu après un clic sur un lien (mobile). */
+onNavClick(): void {
+  if (this.isMobile) {
+    this.isCollapsed = true;
+  }
+}
 }
