@@ -6,6 +6,8 @@ import { CartService } from '../../core/services/cart.service';
 import { RestaurantService } from '../../core/services/restaurant.service';
 import { OrderService } from '../../core/services/order.service';
 import { AuthService } from '../../core/services/auth.service';
+import { UploadService } from '../../core/services/upload';
+
 
 
 @Component({
@@ -37,7 +39,8 @@ export class Panier implements OnInit {
     private auth: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private zone: NgZone
+    private zone: NgZone,
+    public uploadService: UploadService
   ) {}
 
   ngOnInit(): void {
@@ -184,4 +187,19 @@ export class Panier implements OnInit {
       },
     });
   }
+
+  /* =========================================================
+ *  HELPERS IMAGES
+ * ========================================================= */
+
+/** URL complète de l'image d'un article. */
+getItemImage(item: any): string {
+  if (!item?.image) return '';
+  return this.uploadService.getImageUrl(item.image);
+}
+
+/** Vrai si l'article a une image affichable. */
+hasItemImage(item: any): boolean {
+  return this.uploadService.hasImage(item?.image);
+}
 }
