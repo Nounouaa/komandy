@@ -1,5 +1,8 @@
 <section class="stats-page">
 
+  <!-- =========================================================
+       EN-TÊTE
+       ========================================================= -->
   <div class="page-header">
     <div>
       <h1><i class="bi bi-graph-up"></i> Statistiques</h1>
@@ -12,92 +15,124 @@
     </div>
   </div>
 
+  <!-- =========================================================
+       CHARGEMENT
+       ========================================================= -->
   <div class="loading-state" *ngIf="isLoading">
     <div class="spinner"></div>
     <p>Chargement des statistiques…</p>
   </div>
 
+  <!-- =========================================================
+       CONTENU
+       ========================================================= -->
   <ng-container *ngIf="!isLoading && stats">
 
-    <!-- Résumé -->
+    <!-- ---------- RÉSUMÉ ---------- -->
     <div class="stats-row">
+
       <div class="stat-card green">
         <i class="bi bi-cash-stack"></i>
         <div>
-          <span class="val">{{ stats.totalRevenue | number }} Ar</span>
+          <span class="val">{{ safeNumber(stats.totalRevenue) | number:'1.0-0' }} Ar</span>
           <span class="lbl">Chiffre d'affaires</span>
         </div>
       </div>
+
       <div class="stat-card red">
         <i class="bi bi-bag-check"></i>
         <div>
-          <span class="val">{{ stats.totalOrders }}</span>
+          <span class="val">{{ safeNumber(stats.totalOrders) }}</span>
           <span class="lbl">Commandes totales</span>
         </div>
       </div>
+
       <div class="stat-card blue">
         <i class="bi bi-check-circle"></i>
         <div>
-          <span class="val">{{ stats.completedOrders }}</span>
+          <span class="val">{{ safeNumber(stats.completedOrders) }}</span>
           <span class="lbl">Livrées</span>
         </div>
       </div>
+
       <div class="stat-card orange">
         <i class="bi bi-x-circle"></i>
         <div>
-          <span class="val">{{ stats.cancelledOrders }} <small>({{ stats.cancelRate }}%)</small></span>
+          <span class="val">
+            {{ safeNumber(stats.cancelledOrders) }}
+            <small>({{ safeNumber(stats.cancelRate) }}%)</small>
+          </span>
           <span class="lbl">Annulées</span>
         </div>
       </div>
+
       <div class="stat-card purple">
         <i class="bi bi-graph-up-arrow"></i>
         <div>
-          <span class="val">{{ stats.avgOrderValue | number }} Ar</span>
+          <span class="val">{{ safeNumber(stats.avgOrderValue) | number:'1.0-0' }} Ar</span>
           <span class="lbl">Panier moyen</span>
         </div>
       </div>
+
     </div>
 
-    <!-- Graphique ventes -->
+    <!-- ---------- GRAPHIQUE VENTES ---------- -->
     <div class="section-card">
-      <h2><i class="bi bi-bar-chart-line"></i> Ventes sur {{ period === '7' ? '7' : '30' }} jours</h2>
+      <h2>
+        <i class="bi bi-bar-chart-line"></i>
+        Ventes sur {{ period === '7' ? '7' : '30' }} jours
+      </h2>
 
       <div class="chart" [class.compact]="period === '30'">
         <div class="chart-bars">
+
           <div class="bar-wrap"
                *ngFor="let d of getChartData()"
-               [attr.title]="d.revenue | number: '1.0-0' + ' Ar — ' + d.orders + ' commandes'">
+               [attr.title]="(safeNumber(d.revenue) | number:'1.0-0') + ' Ar — ' + safeNumber(d.orders) + ' commandes'">
+
             <div class="bar"
                  [style.height.%]="d.height"
                  [style.background]="d.revenue > 0
                    ? 'linear-gradient(180deg, #ff6b6b, #ee5a24)'
                    : 'rgba(255,255,255,.04)'">
             </div>
+
             <span class="bar-label" *ngIf="period === '7'">{{ d.label }}</span>
+
           </div>
+
         </div>
       </div>
     </div>
 
-    <!-- Ventes par catégorie -->
+    <!-- ---------- VENTES PAR CATÉGORIE ---------- -->
     <div class="section-card" *ngIf="salesByCategory.length > 0">
-      <h2><i class="bi bi-pie-chart"></i> Ventes par catégorie</h2>
+      <h2>
+        <i class="bi bi-pie-chart"></i>
+        Ventes par catégorie
+      </h2>
 
       <div class="categories-list">
         <div class="category-row" *ngFor="let c of salesByCategory">
+
           <div class="cat-name">
             <span class="cat-label">{{ c._id || 'Autres' }}</span>
-            <span class="cat-revenue">{{ c.revenue | number }} Ar</span>
+            <span class="cat-revenue">
+              {{ safeNumber(c.revenue) | number:'1.0-0' }} Ar
+            </span>
           </div>
+
           <div class="cat-bar-wrap">
             <div class="cat-bar" [style.width.%]="getCategoryPct(c.revenue)"></div>
           </div>
+
           <span class="cat-pct">{{ getCategoryPct(c.revenue) }}%</span>
+
         </div>
       </div>
     </div>
 
-    <!-- Vide -->
+    <!-- ---------- ÉTAT VIDE ---------- -->
     <div class="empty-state" *ngIf="salesByDay.length === 0">
       <i class="bi bi-graph-up"></i>
       <h3>Aucune donnée pour cette période</h3>
