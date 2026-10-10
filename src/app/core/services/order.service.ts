@@ -1,14 +1,13 @@
 import { Injectable, OnDestroy, Inject, PLATFORM_ID, NgZone } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { io, Socket } from 'socket.io-client';
-import { environment } from '../../../environments/environment.prod';
+import { environment } from '../../../environments/environment';
 
-// =========================================================
-// TYPES
-// =========================================================
-
+/* =========================================================
+ * TYPES
+ * ========================================================= */
 export type OrderStatus =
   | 'pending'
   | 'accepted'
@@ -19,26 +18,42 @@ export type OrderStatus =
   | 'received'
   | 'cancelled';
 
-// =========================================================
-// SERVICE
-// =========================================================
-
+/* =========================================================
+ * SERVICE
+ * ========================================================= */
 @Injectable({ providedIn: 'root' })
 export class OrderService implements OnDestroy {
   private readonly api = `${environment.apiUrl}/orders`;
-private readonly socketUrl = environment.socketUrl;
+  private readonly socketUrl = environment.socketUrl;
 
   private socket?: Socket;
   private ordersSubject = new BehaviorSubject<any[]>([]);
   orders$ = this.ordersSubject.asObservable();
 
-  // =========================================================
-  // CALLBACKS (pour les composants)
-  // =========================================================
+  /* ---------------------------------------------------------
+   * 🔔 FLUX MESSAGES LUS (accusés de lecture)
+   * --------------------------------------------------------- */
+  private messagesReadSubject = new Subject<{
+    messageIds: string[];
+    readBy: string;
+    readAt: string;
+  }>();
+
+  /** Émet quand un ami a lu mes messages */
+  messagesRead$ = this.messagesReadSubject.asObservable();
+
+  /* ---------------------------------------------------------
+   * CALLBACKS (pour les composants)
+   * --------------------------------------------------------- */
   private newOrderCallback?: (order: any) => void;
   private statusChangedCallback?: (order: any) => void;
   private disputeCallback?: (order: any) => void;
   private orderCompletedCallback?: (order: any) => void;
+  private messagesReadCallback?: (payload: {
+    messageIds: string[];
+    readBy: string;
+    readAt: string;
+  }) => void;
 
   constructor(
     private http: HttpClient,
@@ -46,9 +61,9 @@ private readonly socketUrl = environment.socketUrl;
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
-  // =========================================================
-  // SOCKET.IO
-  // =========================================================
+  /* =========================================================
+   * SOCKET.IO
+   * ========================================================= */
   connectSocket(): void {
     if (!isPlatformBrowser(this.platformId)) return;
     if (this.socket?.connected) return;
@@ -66,7 +81,9 @@ private readonly socketUrl = environment.socketUrl;
 
     this.socket = io(this.socketUrl, { transports: ['websocket'] });
 
-    // --- Connexion ---
+    /* ---------------------------------------------------------
+     * Connexion
+     * --------------------------------------------------------- */
     this.socket.on('connect', () => {
       this.zone.run(() => {
         console.log('🔌 Socket connecté:', this.socket?.id);
@@ -78,70 +95,80 @@ private readonly socketUrl = environment.socketUrl;
       });
     });
 
-    // =========================================================
-    // ÉVÉNEMENT : NOUVELLE COMMANDE (côté restaurant)
-    // =========================================================
+    /* ---------------------------------------------------------
+     * NOUVELLE COMMANDE (côté restaurant)
+     * --------------------------------------------------------- */
     this.socket.on('new-order', (order: any) => {
       this.zone.run(() => {
         console.log('🔔 Nouvelle commande:', order);
-
-        // Ajouter en tête de liste
         this.ordersSubject.next([order, ...this.ordersSubject.value]);
-
-        // Déclencher le callback du composant
         this.newOrderCallback?.(order);
       });
     });
 
-    // =========================================================
-    // ÉVÉNEMENT : STATUT CHANGÉ (client OU restaurant)
-    // =========================================================
+    /* ---------------------------------------------------------
+     * STATUT CHANGÉ
+     * --------------------------------------------------------- */
     this.socket.on('status-changed', (updated: any) => {
       this.zone.run(() => {
         console.log('🔄 Statut changé:', updated._id, updated.status);
-
         const list = this.ordersSubject.value.map((o) =>
           o._id === updated._id ? updated : o
         );
         this.ordersSubject.next(list);
-
         this.statusChangedCallback?.(updated);
       });
     });
 
-    // =========================================================
-    // ÉVÉNEMENT : LITIGE SIGNALÉ (côté restaurant)
-    // =========================================================
+    /* ---------------------------------------------------------
+     * LITIGE
+     * --------------------------------------------------------- */
     this.socket.on('order-dispute', (order: any) => {
       this.zone.run(() => {
         console.log('⚠️ Litige signalé:', order._id);
-
         const list = this.ordersSubject.value.map((o) =>
           o._id === order._id ? order : o
         );
         this.ordersSubject.next(list);
-
         this.disputeCallback?.(order);
       });
     });
 
-    // =========================================================
-    // ÉVÉNEMENT : COMMANDE TERMINÉE / VENDUE (côté restaurant)
-    // =========================================================
+    /* ---------------------------------------------------------
+     * COMMANDE VENDUE
+     * --------------------------------------------------------- */
     this.socket.on('order-completed', (order: any) => {
       this.zone.run(() => {
         console.log('✅ Commande vendue:', order._id);
-
         const list = this.ordersSubject.value.map((o) =>
           o._id === order._id ? order : o
         );
         this.ordersSubject.next(list);
-
         this.orderCompletedCallback?.(order);
       });
     });
 
-    // --- Déconnexion ---
+    /* ---------------------------------------------------------
+     * 🔔 MESSAGES LUS (accusés de lecture)
+     * --------------------------------------------------------- */
+    this.socket.on(
+      'messages-read',
+      (payload: { messageIds: string[]; readBy: string; readAt: string }) => {
+        this.zone.run(() => {
+          console.log('✓✓ Messages lus par:', payload.readBy, payload.messageIds);
+
+          // Émet dans le flux observable
+          this.messagesReadSubject.next(payload);
+
+          // Déclenche le callback (si enregistré)
+          this.messagesReadCallback?.(payload);
+        });
+      }
+    );
+
+    /* ---------------------------------------------------------
+     * Déconnexion
+     * --------------------------------------------------------- */
     this.socket.on('disconnect', () => {
       this.zone.run(() => {
         console.log('🔌 Socket déconnecté');
@@ -160,33 +187,35 @@ private readonly socketUrl = environment.socketUrl;
     this.disconnectSocket();
   }
 
-  // =========================================================
-  // CALLBACKS — Enregistrement
-  // =========================================================
-
-  /** Callback appelé quand une nouvelle commande arrive */
+  /* =========================================================
+   * CALLBACKS — Enregistrement
+   * ========================================================= */
   onNewOrder(callback: (order: any) => void): void {
     this.newOrderCallback = callback;
   }
 
-  /** Callback appelé quand un statut change */
   onStatusChanged(callback: (order: any) => void): void {
     this.statusChangedCallback = callback;
   }
 
-  /** Callback appelé quand un client signale un litige */
   onDispute(callback: (order: any) => void): void {
     this.disputeCallback = callback;
   }
 
-  /** Callback appelé quand une commande est confirmée vendue */
   onOrderCompleted(callback: (order: any) => void): void {
     this.orderCompletedCallback = callback;
   }
 
-  // =========================================================
-  // CLIENT
-  // =========================================================
+  /** Callback appelé quand un ami lit mes messages */
+  onMessagesRead(
+    callback: (payload: { messageIds: string[]; readBy: string; readAt: string }) => void
+  ): void {
+    this.messagesReadCallback = callback;
+  }
+
+  /* =========================================================
+   * CLIENT
+   * ========================================================= */
   createOrder(payload: any) {
     return this.http.post<any>(this.api, payload);
   }
@@ -199,21 +228,19 @@ private readonly socketUrl = environment.socketUrl;
     return this.http.post(`${this.api}/${orderId}/review`, { rating, review });
   }
 
-  /** Client confirme avoir reçu + payé */
   confirmReceived(orderId: string) {
     return this.http.post<any>(`${this.api}/${orderId}/confirm-received`, {});
   }
 
-  /** Client signale ne pas avoir reçu */
   reportNotReceived(orderId: string, reason: string) {
     return this.http.post<any>(`${this.api}/${orderId}/report-not-received`, {
       reason,
     });
   }
 
-  // =========================================================
-  // RESTAURANT
-  // =========================================================
+  /* =========================================================
+   * RESTAURANT
+   * ========================================================= */
   getReceivedOrders() {
     return this.http.get<any[]>(`${this.api}/received`);
   }
@@ -229,7 +256,6 @@ private readonly socketUrl = environment.socketUrl;
     });
   }
 
-  /** Restaurant résout un litige */
   resolveDispute(
     orderId: string,
     action: 'resolve' | 'confirm',
@@ -241,9 +267,9 @@ private readonly socketUrl = environment.socketUrl;
     });
   }
 
-  // =========================================================
-  // HELPERS
-  // =========================================================
+  /* =========================================================
+   * HELPERS
+   * ========================================================= */
   getStatusLabel(status: OrderStatus | string): string {
     const labels: Record<string, string> = {
       pending: 'En attente',

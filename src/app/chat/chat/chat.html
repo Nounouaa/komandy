@@ -1,5 +1,8 @@
 <section class="chat-page">
 
+  <!-- =========================================================
+       EN-TÊTE
+       ========================================================= -->
   <div class="chat-header">
     <a routerLink="/client/amis" class="btn-back">
       <i class="bi bi-arrow-left"></i>
@@ -18,6 +21,9 @@
     </div>
   </div>
 
+  <!-- =========================================================
+       MESSAGES
+       ========================================================= -->
   <div class="chat-body" *ngIf="!isLoading">
 
     <div class="empty-chat" *ngIf="messages.length === 0">
@@ -32,7 +38,26 @@
 
         <div class="bubble">
           <p>{{ m.content }}</p>
-          <span class="time">{{ formatTime(m.createdAt) }}</span>
+
+          <div class="bubble-footer">
+            <span class="time">{{ formatTime(m.createdAt) }}</span>
+
+            <!-- Coches uniquement sur MES messages -->
+            <span class="check" *ngIf="isMine(m)">
+
+              <!-- En cours d'envoi -->
+              <i class="bi bi-clock sending" *ngIf="isSendingMsg(m)"></i>
+
+              <!-- Lu : double coche -->
+              <i class="bi bi-check2-all read"
+                 *ngIf="!isSendingMsg(m) && isRead(m)"></i>
+
+              <!-- Envoyé, non lu : coche simple -->
+              <i class="bi bi-check2"
+                 *ngIf="!isSendingMsg(m) && !isRead(m)"></i>
+
+            </span>
+          </div>
         </div>
 
       </div>
@@ -42,6 +67,9 @@
 
   </div>
 
+  <!-- =========================================================
+       SAISIE
+       ========================================================= -->
   <div class="chat-input">
     <input
       type="text"
