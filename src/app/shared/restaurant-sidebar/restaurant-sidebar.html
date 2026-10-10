@@ -1,9 +1,5 @@
 <!-- =========================================================
-     SIDEBAR RESTAURANT
-     ========================================================= -->
-
-     <!-- =========================================================
-     HAMBURGER MOBILE (visible quand la sidebar est cachée)
+     HAMBURGER MOBILE
      ========================================================= -->
 <button
   type="button"
@@ -15,7 +11,7 @@
 </button>
 
 <!-- =========================================================
-     OVERLAY MOBILE (pour fermer en cliquant en dehors)
+     OVERLAY MOBILE
      ========================================================= -->
 <div
   class="sidebar-overlay"
@@ -23,12 +19,12 @@
   (click)="closeMobileMenu()">
 </div>
 
-<!-- ====== TON <aside> EXISTANT ====== -->
+<!-- =========================================================
+     SIDEBAR
+     ========================================================= -->
 <aside class="sidebar-restaurant"
        [class.collapsed]="isCollapsed"
        [class.mobile]="isMobile">
-  <!-- ... tout le contenu existant reste identique ... -->
-<aside class="sidebar-restaurant" [class.collapsed]="isCollapsed">
 
   <!-- =========================================================
        EN-TÊTE
@@ -56,18 +52,16 @@
   </div>
 
   <!-- =========================================================
-       INFO RESTAURANT (logo + nom dynamiques)
+       INFO RESTAURANT
        ========================================================= -->
   <div class="restaurant-info">
     <div class="restaurant-icon-wrapper">
-      <!-- Logo uploadé -->
       <img
         *ngIf="hasLogo()"
         [src]="getLogoUrl()"
         [alt]="restaurantName"
         class="restaurant-logo-img">
 
-      <!-- Initiales colorées par défaut -->
       <div
         *ngIf="!hasLogo()"
         class="restaurant-icon"
@@ -93,12 +87,11 @@
 
       <!-- Dashboard -->
       <li class="nav-item">
-        <a
-          class="nav-link"
-          routerLink="/restaurant/dashboard"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-          [attr.title]="isCollapsed ? 'Dashboard' : null">
+        <a class="nav-link"
+           routerLink="/restaurant/dashboard"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{ exact: true }"
+           [attr.title]="isCollapsed ? 'Dashboard' : null">
           <i class="bi bi-grid-1x2-fill"></i>
           <span class="nav-text">Dashboard</span>
           <span class="nav-badge alert" *ngIf="stats.pendingOrders > 0">
@@ -109,71 +102,69 @@
 
       <!-- Produits -->
       <li class="nav-item">
-        <a
-          class="nav-link"
-          routerLink="/restaurant/produits"
-          routerLinkActive="active"
-          [attr.title]="isCollapsed ? 'Mes produits' : null">
+        <a class="nav-link"
+           routerLink="/restaurant/produits"
+           routerLinkActive="active"
+           [attr.title]="isCollapsed ? 'Mes produits' : null">
           <i class="bi bi-menu-app"></i>
           <span class="nav-text">Mes produits</span>
-          <span class="nav-badge" *ngIf="stats.products > 0">
-            {{ stats.products }}
-          </span>
+          <span class="nav-badge" *ngIf="stats.products > 0">{{ stats.products }}</span>
         </a>
       </li>
 
       <!-- Commandes -->
       <li class="nav-item">
-        <a
-          class="nav-link"
-          routerLink="/restaurant/commandes"
-          routerLinkActive="active"
-          [attr.title]="isCollapsed ? 'Commandes' : null">
+        <a class="nav-link"
+           routerLink="/restaurant/commandes"
+           routerLinkActive="active"
+           [attr.title]="isCollapsed ? 'Commandes' : null">
           <i class="bi bi-box-seam"></i>
           <span class="nav-text">Commandes</span>
-          <span class="nav-badge" *ngIf="stats.orders > 0">
-            {{ stats.orders }}
-          </span>
+          <span class="nav-badge" *ngIf="stats.orders > 0">{{ stats.orders }}</span>
         </a>
       </li>
 
       <!-- Promotions -->
       <li class="nav-item">
-        <a
-          class="nav-link"
-          routerLink="/restaurant/promotions"
-          routerLinkActive="active"
-          [attr.title]="isCollapsed ? 'Promotions' : null">
+        <a class="nav-link"
+           routerLink="/restaurant/promotions"
+           routerLinkActive="active"
+           [attr.title]="isCollapsed ? 'Promotions' : null">
           <i class="bi bi-megaphone"></i>
           <span class="nav-text">Promotions</span>
-          <span class="nav-badge promo" *ngIf="stats.promotions > 0">
-            {{ stats.promotions }}
-          </span>
+          <span class="nav-badge promo" *ngIf="stats.promotions > 0">{{ stats.promotions }}</span>
         </a>
       </li>
 
       <!-- Clients -->
       <li class="nav-item">
-        <a
-          class="nav-link"
-          routerLink="/restaurant/clients"
-          routerLinkActive="active"
-          [attr.title]="isCollapsed ? 'Clients' : null">
+        <a class="nav-link"
+           routerLink="/restaurant/clients"
+           routerLinkActive="active"
+           [attr.title]="isCollapsed ? 'Clients' : null">
           <i class="bi bi-people"></i>
           <span class="nav-text">Clients</span>
-          <span class="nav-badge" *ngIf="stats.clients > 0">
-            {{ stats.clients }}
-          </span>
+          <span class="nav-badge" *ngIf="stats.clients > 0">{{ stats.clients }}</span>
+        </a>
+      </li>
+
+      <!-- Messages -->
+      <li class="nav-item">
+        <a class="nav-link"
+           routerLink="/restaurant/messages"
+           routerLinkActive="active"
+           [attr.title]="isCollapsed ? 'Messages' : null">
+          <i class="bi bi-chat-dots"></i>
+          <span class="nav-text">Messages</span>
         </a>
       </li>
 
       <!-- Statistiques -->
       <li class="nav-item">
-        <a
-          class="nav-link"
-          routerLink="/restaurant/statistiques"
-          routerLinkActive="active"
-          [attr.title]="isCollapsed ? 'Statistiques' : null">
+        <a class="nav-link"
+           routerLink="/restaurant/statistiques"
+           routerLinkActive="active"
+           [attr.title]="isCollapsed ? 'Statistiques' : null">
           <i class="bi bi-graph-up"></i>
           <span class="nav-text">Statistiques</span>
         </a>
@@ -191,15 +182,14 @@
        NAVIGATION BASSE
        ========================================================= -->
   <nav class="sidebar-nav bottom-nav">
-    <ul class="nav-list">
+    <ul class="nav-list" (click)="onNavClick()">
 
       <!-- Paramètres -->
       <li class="nav-item">
-        <a
-          class="nav-link"
-          routerLink="/restaurant/profil"
-          routerLinkActive="active"
-          [attr.title]="isCollapsed ? 'Paramètres' : null">
+        <a class="nav-link"
+           routerLink="/restaurant/profil"
+           routerLinkActive="active"
+           [attr.title]="isCollapsed ? 'Paramètres' : null">
           <i class="bi bi-gear"></i>
           <span class="nav-text">Paramètres</span>
         </a>
@@ -207,10 +197,9 @@
 
       <!-- Déconnexion -->
       <li class="nav-item">
-        <a
-          class="nav-link logout"
-          (click)="onLogout()"
-          [attr.title]="isCollapsed ? 'Déconnexion' : null">
+        <a class="nav-link logout"
+           (click)="onLogout()"
+           [attr.title]="isCollapsed ? 'Déconnexion' : null">
           <i class="bi bi-box-arrow-right"></i>
           <span class="nav-text">Déconnexion</span>
         </a>

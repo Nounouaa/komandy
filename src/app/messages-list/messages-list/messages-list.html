@@ -1,0 +1,188 @@
+<section class="messages-page">
+
+  <!-- =========================================================
+       EN-TÊTE
+       ========================================================= -->
+  <div class="page-header">
+    <div>
+      <h1>
+        <i class="bi bi-chat-dots-fill"></i>
+        Messages
+      </h1>
+      <p>
+        {{ conversations.length }} conversation{{ conversations.length > 1 ? 's' : '' }}
+        <span *ngIf="unreadTotal > 0"> · {{ unreadTotal }} non lu{{ unreadTotal > 1 ? 's' : '' }}</span>
+      </p>
+    </div>
+
+    <!-- Bouton retour -->
+    <a [routerLink]="context === 'client' ? '/client/dashboard' : '/restaurant/dashboard'"
+       class="btn-back">
+      <i class="bi bi-arrow-left"></i>
+      Retour
+    </a>
+  </div>
+
+  <!-- =========================================================
+       ONGLETS
+       ========================================================= -->
+  <div class="tabs">
+    <button [class.active]="activeTab === 'conversations'"
+            (click)="setTab('conversations')">
+      <i class="bi bi-chat-dots"></i>
+      Conversations
+      <span class="badge" *ngIf="unreadTotal > 0">{{ unreadTotal }}</span>
+    </button>
+
+    <button [class.active]="activeTab === 'search'"
+            (click)="setTab('search')">
+      <i class="bi bi-search"></i>
+      Rechercher un ami
+    </button>
+  </div>
+
+  <!-- =========================================================
+       ONGLET 1 : CONVERSATIONS
+       ========================================================= -->
+  <div class="tab-content" *ngIf="activeTab === 'conversations'">
+
+    <!-- Barre de recherche locale -->
+    <div class="search-bar">
+      <i class="bi bi-search"></i>
+      <input
+        type="text"
+        placeholder="Filtrer mes conversations…"
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput()">
+      <button *ngIf="searchQuery" (click)="clearSearch()" class="btn-clear-search">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Chargement -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Chargement…</p>
+    </div>
+
+    <!-- Vide -->
+    <div class="empty-state" *ngIf="!isLoading && filteredConversations.length === 0">
+      <i class="bi bi-chat-dots"></i>
+      <h3>
+        {{ conversations.length === 0 ? 'Aucune conversation' : 'Aucun résultat' }}
+      </h3>
+      <p>
+        {{ conversations.length === 0
+            ? 'Cherchez un ami pour commencer une discussion'
+            : 'Essayez un autre mot-clé' }}
+      </p>
+      <button class="btn-primary" (click)="setTab('search')">
+        <i class="bi bi-search"></i>
+        Rechercher un ami
+      </button>
+    </div>
+
+    <!-- Liste des conversations -->
+    <div class="conversations-list" *ngIf="!isLoading && filteredConversations.length > 0">
+      <div class="conv-item"
+           *ngFor="let c of filteredConversations"
+           [class.unread]="c.unreadCount > 0"
+           (click)="openChat(c.userId)">
+
+        <div class="conv-avatar">
+          <img *ngIf="hasAvatar(c)" [src]="getAvatarUrl(c)" [alt]="c.name">
+          <span *ngIf="!hasAvatar(c)" [style.background]="getGradient(c.name)">
+            {{ getInitials(c.name) }}
+          </span>
+        </div>
+
+        <div class="conv-info">
+          <div class="conv-row">
+            <h3>{{ c.name }}</h3>
+            <span class="conv-time">{{ formatDate(c.lastMessageAt) }}</span>
+          </div>
+          <p class="conv-last">{{ c.lastMessage }}</p>
+        </div>
+
+        <span class="conv-badge" *ngIf="c.unreadCount > 0">
+          {{ c.unreadCount }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       ONGLET 2 : RECHERCHE D'AMIS
+       ========================================================= -->
+  <div class="tab-content" *ngIf="activeTab === 'search'">
+
+    <div class="search-bar">
+      <i class="bi bi-search"></i>
+      <input
+        type="text"
+        placeholder="Rechercher un ami par nom…"
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput()"
+        autofocus>
+      <button *ngIf="searchQuery" (click)="clearSearch()" class="btn-clear-search">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Aide quand rien tapé -->
+    <div class="empty-state" *ngIf="!searchQuery">
+      <i class="bi bi-people"></i>
+      <h3>Rechercher un ami</h3>
+      <p>Tapez au moins 2 caractères pour trouver un utilisateur</p>
+    </div>
+
+    <!-- Chargement -->
+    <div class="loading-state" *ngIf="isSearching">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Aucun résultat -->
+    <div class="empty-state"
+         *ngIf="!isSearching && searchQuery.length >= 2 && searchResults.length === 0">
+      <i class="bi bi-search"></i>
+      <h3>Aucun utilisateur trouvé</h3>
+      <p>Essayez un autre nom</p>
+    </div>
+
+    <!-- Résultats -->
+    <div class="search-results"
+         *ngIf="!isSearching && searchResults.length > 0">
+
+      <div class="result-item"
+           *ngFor="let u of searchResults"
+           (click)="openChat(u._id)">
+
+        <div class="conv-avatar">
+          <img *ngIf="hasAvatar(u)" [src]="getAvatarUrl(u)" [alt]="u.name">
+          <span *ngIf="!hasAvatar(u)" [style.background]="getGradient(u.name)">
+            {{ getInitials(u.name) }}
+          </span>
+        </div>
+
+        <div class="conv-info">
+          <h3>{{ u.name }}</h3>
+          <p class="conv-last">
+            <span class="status-badge"
+                  [class.friend]="u.status === 'friend'"
+                  [class.pending]="u.status === 'pending-sent' || u.status === 'pending-received'">
+              {{
+                u.status === 'friend'           ? 'Ami' :
+                u.status === 'pending-sent'     ? 'Demande envoyée' :
+                u.status === 'pending-received' ? 'Vous a ajouté' :
+                'Client'
+              }}
+            </span>
+          </p>
+        </div>
+
+        <i class="bi bi-chat-dots-fill action-icon"></i>
+      </div>
+    </div>
+  </div>
+
+</section>

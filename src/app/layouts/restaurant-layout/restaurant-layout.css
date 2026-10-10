@@ -1174,3 +1174,45 @@
 .btn-expand-chat i {
   font-size: 0.9rem;
 }
+
+/* =========================================================
+   HEADER BOUTONS (Voir tous + Fermer)
+   ========================================================= */
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-see-all {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 107, 107, .1);
+  border: 1px solid rgba(255, 107, 107, .25);
+  border-radius: 10px;
+  color: #ff6b6b;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all .3s;
+}
+.btn-see-all:hover {
+  background: rgba(255, 107, 107, .2);
+  border-color: rgba(255, 107, 107, .5);
+  transform: scale(1.05);
+}
+
+.chat-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.chat-header-left h3 {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -144,7 +144,6 @@
     </div>
 
     <div class="side-panel-body">
-
       <div class="notification-item unread"
            *ngFor="let notif of notifications"
            (click)="goToNotification(notif)">
@@ -181,7 +180,7 @@
   </div>
 
   <!-- =========================================================
-       PANEL MESSAGES (avec réponse + coches)
+       PANEL MESSAGES
        ========================================================= -->
   <div class="side-panel messages-panel"
        [class.open]="isMessagesOpen"
@@ -205,9 +204,19 @@
         </h3>
       </div>
 
-      <button type="button" class="panel-close" (click)="closeMessages()" aria-label="Fermer">
-        <i class="bi bi-x"></i>
-      </button>
+      <div class="header-buttons">
+        <!-- Voir toutes les conversations -->
+        <a class="btn-see-all"
+           routerLink="/client/messages"
+           (click)="closeMessages()"
+           title="Voir toutes les conversations">
+          <i class="bi bi-arrows-angle-expand"></i>
+        </a>
+
+        <button type="button" class="panel-close" (click)="closeMessages()" aria-label="Fermer">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
     </div>
 
     <!-- CORPS -->
@@ -261,16 +270,10 @@
             <div class="chat-footer-row">
               <span class="chat-time">{{ msg.createdAt | date:'HH:mm' }}</span>
 
-              <!-- Coches uniquement sur MES messages -->
               <span class="chat-check" *ngIf="isMyMessage(msg)">
-                <!-- En cours d'envoi -->
                 <i class="bi bi-clock sending" *ngIf="isSendingMsg(msg)"></i>
-
-                <!-- Lu : double coche -->
                 <i class="bi bi-check2-all read"
                    *ngIf="!isSendingMsg(msg) && isRead(msg)"></i>
-
-                <!-- Envoyé : coche simple -->
                 <i class="bi bi-check2"
                    *ngIf="!isSendingMsg(msg) && !isRead(msg)"></i>
               </span>
@@ -326,15 +329,11 @@
 
     <div class="user-menu-header">
       <div class="user-menu-avatar">
-        <img
-          *ngIf="hasAvatar()"
-          [src]="getAvatarUrl()"
-          [alt]="userName">
+        <img *ngIf="hasAvatar()" [src]="getAvatarUrl()" [alt]="userName">
 
-        <div
-          *ngIf="!hasAvatar()"
-          class="user-menu-avatar-initials"
-          [style.background]="getUserGradient()">
+        <div *ngIf="!hasAvatar()"
+             class="user-menu-avatar-initials"
+             [style.background]="getUserGradient()">
           {{ getUserInitials() }}
         </div>
 
@@ -384,6 +383,9 @@
       </a>
       <a class="menu-item" routerLink="/client/amis" (click)="closeUserMenu()">
         <i class="bi bi-people"></i><span>Amis</span>
+      </a>
+      <a class="menu-item" routerLink="/client/messages" (click)="closeUserMenu()">
+        <i class="bi bi-chat-dots"></i><span>Messages</span>
       </a>
     </nav>
 

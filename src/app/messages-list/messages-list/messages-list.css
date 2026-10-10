@@ -1,0 +1,394 @@
+/* =========================================================
+   PAGE
+   ========================================================= */
+.messages-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 40px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* =========================================================
+   EN-TÊTE
+   ========================================================= */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.page-header h1 {
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0 0 4px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.page-header h1 i { color: #ff6b6b; }
+
+.page-header p {
+  color: rgba(255, 255, 255, .4);
+  margin: 0;
+  font-size: .9rem;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, .7);
+  font-size: .85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all .3s;
+}
+.btn-back:hover {
+  background: rgba(255, 107, 107, .15);
+  border-color: rgba(255, 107, 107, .3);
+  color: #fff;
+}
+
+/* =========================================================
+   ONGLETS
+   ========================================================= */
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: rgba(255, 255, 255, .03);
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 12px;
+  width: fit-content;
+}
+.tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, .5);
+  font-size: .85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all .3s;
+}
+.tabs button.active {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  color: #fff;
+}
+.tabs button .badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ff4757;
+  color: #fff;
+  border-radius: 50px;
+  font-size: .7rem;
+  font-weight: 800;
+}
+
+/* =========================================================
+   CONTENU ONGLET
+   ========================================================= */
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* =========================================================
+   BARRE DE RECHERCHE
+   ========================================================= */
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.search-bar > i {
+  position: absolute;
+  left: 18px;
+  color: rgba(255, 255, 255, .3);
+  font-size: 1rem;
+  pointer-events: none;
+}
+.search-bar input {
+  width: 100%;
+  padding: 13px 46px 13px 48px;
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 12px;
+  color: #fff;
+  font-size: .9rem;
+  font-family: inherit;
+  outline: none;
+  transition: all .3s;
+}
+.search-bar input:focus {
+  border-color: rgba(255, 107, 107, .4);
+  background: rgba(255, 255, 255, .06);
+  box-shadow: 0 0 0 4px rgba(255, 107, 107, .08);
+}
+.search-bar input::placeholder { color: rgba(255, 255, 255, .25); }
+
+.btn-clear-search {
+  position: absolute;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, .06);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, .6);
+  cursor: pointer;
+  transition: all .3s;
+}
+.btn-clear-search:hover {
+  background: rgba(255, 255, 255, .12);
+  color: #fff;
+}
+
+/* =========================================================
+   CONVERSATIONS
+   ========================================================= */
+.conversations-list,
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.conv-item,
+.result-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, .03);
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all .3s;
+}
+.conv-item:hover,
+.result-item:hover {
+  background: rgba(255, 255, 255, .05);
+  border-color: rgba(255, 107, 107, .25);
+  transform: translateY(-2px);
+}
+
+.conv-item.unread {
+  background: rgba(255, 107, 107, .05);
+  border-color: rgba(255, 107, 107, .2);
+}
+
+.conv-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, .08);
+}
+.conv-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.conv-avatar span {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+}
+
+.conv-info { flex: 1; min-width: 0; }
+
+.conv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.conv-info h3 {
+  color: #fff;
+  font-size: .95rem;
+  font-weight: 700;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.conv-time {
+  color: rgba(255, 255, 255, .35);
+  font-size: .72rem;
+  flex-shrink: 0;
+}
+.conv-last {
+  color: rgba(255, 255, 255, .5);
+  font-size: .82rem;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conv-badge {
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  border-radius: 50px;
+  color: #fff;
+  font-size: .72rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   RECHERCHE — STATUT
+   ========================================================= */
+.status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 50px;
+  font-size: .7rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, .06);
+  color: rgba(255, 255, 255, .6);
+  text-transform: uppercase;
+}
+.status-badge.friend {
+  background: rgba(107, 203, 119, .15);
+  color: #6bcb77;
+}
+.status-badge.pending {
+  background: rgba(255, 217, 61, .15);
+  color: #ffd93d;
+}
+
+.action-icon {
+  color: #ff6b6b;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   ÉTATS
+   ========================================================= */
+.loading-state {
+  padding: 60px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, .4);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, .06);
+  border-top-color: #ff6b6b;
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state {
+  padding: 60px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, .4);
+}
+.empty-state i {
+  font-size: 3rem;
+  color: rgba(255, 107, 107, .3);
+}
+.empty-state h3 {
+  color: #fff;
+  margin: 0;
+  font-size: 1.1rem;
+}
+.empty-state p {
+  color: rgba(255, 255, 255, .4);
+  margin: 0;
+  font-size: .9rem;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: .88rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all .3s;
+  box-shadow: 0 4px 15px rgba(238, 90, 36, .3);
+  margin-top: 8px;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(238, 90, 36, .5);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 767.98px) {
+  .page-header h1 { font-size: 1.4rem; }
+
+  .tabs {
+    width: 100%;
+  }
+  .tabs button {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .conv-avatar {
+    width: 46px;
+    height: 46px;
+  }
+
+  .conv-item,
+  .result-item {
+    padding: 12px 14px;
+  }
+}

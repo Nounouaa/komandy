@@ -148,7 +148,7 @@
   </div>
 
   <!-- =========================================================
-       PANEL MESSAGES (avec réponse + coches)
+       PANEL MESSAGES
        ========================================================= -->
   <div class="side-panel messages-panel"
        [class.open]="isMessagesOpen"
@@ -172,9 +172,19 @@
         </h3>
       </div>
 
-      <button type="button" class="panel-close" (click)="closeMessages()" aria-label="Fermer">
-        <i class="bi bi-x"></i>
-      </button>
+      <div class="header-buttons">
+        <!-- Voir toutes les conversations -->
+        <a class="btn-see-all"
+           routerLink="/restaurant/messages"
+           (click)="closeMessages()"
+           title="Voir toutes les conversations">
+          <i class="bi bi-arrows-angle-expand"></i>
+        </a>
+
+        <button type="button" class="panel-close" (click)="closeMessages()" aria-label="Fermer">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
     </div>
 
     <!-- CORPS -->
@@ -345,6 +355,9 @@
       </a>
       <a class="menu-item" routerLink="/restaurant/statistiques" (click)="closeUserMenu()">
         <i class="bi bi-graph-up"></i><span>Statistiques</span>
+      </a>
+      <a class="menu-item" routerLink="/restaurant/messages" (click)="closeUserMenu()">
+        <i class="bi bi-chat-dots"></i><span>Messages</span>
       </a>
     </nav>
 
