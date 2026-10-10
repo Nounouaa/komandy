@@ -33,12 +33,6 @@
       Conversations
       <span class="badge" *ngIf="unreadTotal > 0">{{ unreadTotal }}</span>
     </button>
-
-    <button [class.active]="activeTab === 'search'"
-            (click)="setTab('search')">
-      <i class="bi bi-search"></i>
-      Rechercher un ami
-    </button>
   </div>
 
   <!-- =========================================================

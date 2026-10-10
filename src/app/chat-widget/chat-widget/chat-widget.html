@@ -38,7 +38,17 @@
   <div class="chat-view" *ngIf="activeView === 'list'">
 
     <!-- Recherche -->
-    
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input
+        type="text"
+        placeholder="Rechercher un ami…"
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()">
+      <button *ngIf="searchQuery" (click)="clearSearch()" class="btn-clear">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
 
     <!-- Loading -->
     <div class="chat-loading" *ngIf="isLoadingConversations">
