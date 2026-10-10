@@ -1,0 +1,211 @@
+<!-- =========================================================
+     BOUTON FLOTTANT
+     ========================================================= -->
+<button
+  class="chat-fab"
+  [class.hidden]="isOpen"
+  (click)="toggleWidget()"
+  [attr.aria-label]="'Ouvrir la messagerie'">
+
+  <i class="bi bi-chat-dots-fill"></i>
+
+  <span class="chat-fab-badge" *ngIf="unreadCount > 0">
+    {{ unreadCount > 99 ? '99+' : unreadCount }}
+  </span>
+</button>
+
+<!-- =========================================================
+     PANNEAU CHAT
+     ========================================================= -->
+<div class="chat-panel" *ngIf="isOpen">
+
+  <!-- =========================================================
+       EN-TÊTE
+       ========================================================= -->
+  <div class="chat-panel-header">
+    <h3>
+      <i class="bi bi-chat-dots-fill"></i>
+      Messages
+    </h3>
+    <button class="btn-close" (click)="closeWidget()" aria-label="Fermer">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <!-- =========================================================
+       VUE 1 : LISTE DES CONVERSATIONS
+       ========================================================= -->
+  <div class="chat-view" *ngIf="activeView === 'list'">
+
+    <!-- Recherche -->
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input
+        type="text"
+        placeholder="Rechercher un ami…"
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()">
+      <button *ngIf="searchQuery" (click)="clearSearch()" class="btn-clear">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div class="chat-loading" *ngIf="isLoadingConversations">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Vide -->
+    <div class="chat-empty" *ngIf="!isLoadingConversations && conversations.length === 0">
+      <i class="bi bi-chat-dots"></i>
+      <p>Aucune conversation</p>
+      <small>Cherchez un ami pour commencer</small>
+    </div>
+
+    <!-- Liste -->
+    <div class="conversations-list" *ngIf="!isLoadingConversations && conversations.length > 0">
+      <div class="conv-item"
+           *ngFor="let c of conversations"
+           [class.unread]="c.unreadCount > 0"
+           (click)="openChat(c)">
+
+        <div class="conv-avatar">
+          <img *ngIf="hasAvatar(c)" [src]="getAvatarUrl(c)" [alt]="c.name">
+          <span *ngIf="!hasAvatar(c)" [style.background]="getGradient(c.name)">
+            {{ getInitials(c.name) }}
+          </span>
+        </div>
+
+        <div class="conv-info">
+          <div class="conv-row">
+            <h4>{{ c.name }}</h4>
+            <span class="conv-time">{{ formatDate(c.lastMessageAt) }}</span>
+          </div>
+          <p class="conv-last">{{ c.lastMessage }}</p>
+        </div>
+
+        <span class="conv-badge" *ngIf="c.unreadCount > 0">
+          {{ c.unreadCount }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       VUE 2 : CHAT OUVERT
+       ========================================================= -->
+  <div class="chat-view" *ngIf="activeView === 'chat' && activeChat">
+
+    <!-- En-tête de la conversation -->
+    <div class="conv-header">
+      <button class="btn-back" (click)="backToList()" aria-label="Retour">
+        <i class="bi bi-arrow-left"></i>
+      </button>
+
+      <div class="conv-header-avatar">
+        <img *ngIf="hasAvatar(activeChat)" [src]="getAvatarUrl(activeChat)" [alt]="activeChat.name">
+        <span *ngIf="!hasAvatar(activeChat)" [style.background]="getGradient(activeChat.name)">
+          {{ getInitials(activeChat.name) }}
+        </span>
+      </div>
+
+      <div class="conv-header-info">
+        <h4>{{ activeChat.name }}</h4>
+        <span class="status">Ami</span>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages-area" *ngIf="!isLoadingMessages">
+      <div class="empty-messages" *ngIf="messages.length === 0">
+        <i class="bi bi-chat-dots"></i>
+        <p>Envoyez votre premier message</p>
+      </div>
+
+      <div class="message-row"
+           *ngFor="let m of messages"
+           [class.mine]="isMine(m)">
+
+        <div class="bubble">
+          <p>{{ m.content }}</p>
+
+          <div class="bubble-footer">
+            <span class="time">{{ formatTime(m.createdAt) }}</span>
+
+            <span class="check" *ngIf="isMine(m)">
+              <i class="bi bi-clock sending" *ngIf="isSendingMsg(m)"></i>
+              <i class="bi bi-check2-all read" *ngIf="!isSendingMsg(m) && isRead(m)"></i>
+              <i class="bi bi-check2" *ngIf="!isSendingMsg(m) && !isRead(m)"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div #messagesEnd></div>
+    </div>
+
+    <!-- Loading messages -->
+    <div class="chat-loading" *ngIf="isLoadingMessages">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Saisie -->
+    <div class="chat-input">
+      <input
+        type="text"
+        [(ngModel)]="newMessage"
+        (keyup.enter)="send()"
+        placeholder="Écrire un message…"
+        maxlength="1000"
+        [disabled]="isSending">
+
+      <button (click)="send()" [disabled]="!newMessage.trim() || isSending">
+        <i class="bi bi-send-fill"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       VUE 3 : RECHERCHE
+       ========================================================= -->
+  <div class="chat-view" *ngIf="activeView === 'search'">
+
+    <div class="search-header">
+      <button class="btn-back" (click)="clearSearch()" aria-label="Retour">
+        <i class="bi bi-arrow-left"></i>
+      </button>
+      <span>Résultats pour « {{ searchQuery }} »</span>
+    </div>
+
+    <div class="chat-loading" *ngIf="isSearching">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="chat-empty" *ngIf="!isSearching && searchResults.length === 0">
+      <i class="bi bi-search"></i>
+      <p>Aucun résultat</p>
+    </div>
+
+    <div class="search-results" *ngIf="!isSearching && searchResults.length > 0">
+      <div class="search-item"
+           *ngFor="let u of searchResults"
+           (click)="startChatWith(u)">
+
+        <div class="conv-avatar">
+          <img *ngIf="hasAvatar(u)" [src]="getAvatarUrl(u)" [alt]="u.name">
+          <span *ngIf="!hasAvatar(u)" [style.background]="getGradient(u.name)">
+            {{ getInitials(u.name) }}
+          </span>
+        </div>
+
+        <div class="conv-info">
+          <h4>{{ u.name }}</h4>
+          <p>{{ u.status === 'friend' ? 'Ami' : 'Client' }}</p>
+        </div>
+
+        <i class="bi bi-chat-dots-fill action-icon"></i>
+      </div>
+    </div>
+  </div>
+
+</div>

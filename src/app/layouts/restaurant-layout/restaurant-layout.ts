@@ -39,24 +39,24 @@ import { RestaurantSidebar } from '../../shared/restaurant-sidebar/restaurant-si
 })
 export class RestaurantLayout implements OnInit, OnDestroy {
 
-  // =========================================================
-  // ÉTAT UI
-  // =========================================================
+  /* =========================================================
+   *  ÉTAT UI
+   * ========================================================= */
   isSidebarCollapsed = false;
   isUserMenuOpen = false;
   isNotificationsOpen = false;
   isMessagesOpen = false;
   currentPage = 'Tableau de bord';
 
-  // =========================================================
-  // COMPTEURS
-  // =========================================================
+  /* =========================================================
+   *  COMPTEURS
+   * ========================================================= */
   notificationsCount = 0;
   messagesCount = 0;
 
-  // =========================================================
-  // PROFIL RESTAURANT
-  // =========================================================
+  /* =========================================================
+   *  PROFIL RESTAURANT
+   * ========================================================= */
   restaurantName = '';
   restaurantEmail = '';
   restaurantRole = 'Restaurant';
@@ -68,14 +68,14 @@ export class RestaurantLayout implements OnInit, OnDestroy {
     growth: '+0%',
   };
 
-  // =========================================================
-  // NOTIFICATIONS
-  // =========================================================
+  /* =========================================================
+   *  NOTIFICATIONS
+   * ========================================================= */
   notifications: any[] = [];
 
-  // =========================================================
-  // MESSAGERIE
-  // =========================================================
+  /* =========================================================
+   *  MESSAGERIE
+   * ========================================================= */
   conversations: Conversation[] = [];
   openedConversation: Conversation | null = null;
   messages: Message[] = [];
@@ -83,10 +83,14 @@ export class RestaurantLayout implements OnInit, OnDestroy {
   isSendingMessage = false;
   isLoadingMessages = false;
 
-  // =========================================================
-  // PRIVÉ
-  // =========================================================
+  /** IDs des messages marqués lus en temps réel. */
+  readMessageIds = new Set<string>();
+
+  /* =========================================================
+   *  PRIVÉ
+   * ========================================================= */
   private destroy$ = new Subject<void>();
+  private subs: Subscription[] = [];
   private ordersSub?: Subscription;
   private refreshSub?: Subscription;
   private storageListener?: () => void;
@@ -105,34 +109,58 @@ export class RestaurantLayout implements OnInit, OnDestroy {
     private zone: NgZone
   ) {}
 
-  // =========================================================
-  // CYCLE DE VIE
-  // =========================================================
+  /* =========================================================
+   *  CYCLE DE VIE
+   * ========================================================= */
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.restoreSidebarState();
 
-      // ✅ Recharger le profil si avatar modifié ailleurs
+      /* --- Recharger le profil si avatar modifié ailleurs --- */
       this.storageListener = () => {
         this.zone.run(() => this.loadProfile());
       };
       window.addEventListener('storage', this.storageListener);
     }
 
-    // Charge tout au démarrage
+    /* --- Chargements initiaux --- */
     this.loadProfile();
     this.loadNotifications();
     this.loadConversations();
     this.loadCounters();
     this.listenToRouteChanges();
 
-    // 🔌 Recharger les compteurs sur nouvelle commande
+    /* --- Socket --- */
+    this.orderService.connectSocket();
+
     this.ordersSub = this.orderService.orders$.subscribe(() => {
       this.loadCounters();
       this.loadNotifications();
     });
 
-    // 🔄 Rafraîchir toutes les 30 secondes
+    /* --- 🔔 Accusés de lecture --- */
+    this.subs.push(
+      this.orderService.messagesRead$.subscribe((payload) => {
+        this.zone.run(() => {
+          for (const id of payload.messageIds) {
+            this.readMessageIds.add(id);
+          }
+          this.messages = this.messages.map((m) =>
+            payload.messageIds.includes(m._id) ? { ...m, read: true } : m
+          );
+          this.cdr.detectChanges();
+        });
+      })
+    );
+
+    /* --- ✅ Ouverture conversation depuis l'extérieur --- */
+    this.subs.push(
+      this.messageService.openConversation$.subscribe((recipient) => {
+        this.zone.run(() => this.openMessagesWith(recipient));
+      })
+    );
+
+    /* --- 🔄 Refresh périodique --- */
     this.refreshSub = interval(30000).subscribe(() => {
       this.loadCounters();
       this.loadNotifications();
@@ -143,6 +171,7 @@ export class RestaurantLayout implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.subs.forEach((s) => s.unsubscribe());
     this.ordersSub?.unsubscribe();
     this.refreshSub?.unsubscribe();
 
@@ -155,9 +184,9 @@ export class RestaurantLayout implements OnInit, OnDestroy {
     }
   }
 
-  // =========================================================
-  // PROFIL
-  // =========================================================
+  /* =========================================================
+   *  PROFIL
+   * ========================================================= */
   private loadProfile(): void {
     this.restaurantService.getMyProfile().subscribe({
       next: (r) => {
@@ -175,9 +204,9 @@ export class RestaurantLayout implements OnInit, OnDestroy {
     });
   }
 
-  // =========================================================
-  // COMPTEURS (sidebar, badge)
-  // =========================================================
+  /* =========================================================
+   *  COMPTEURS
+   * ========================================================= */
   private loadCounters(): void {
     this.restaurantService.getMyDashboard().subscribe({
       next: (data) => {
@@ -203,9 +232,9 @@ export class RestaurantLayout implements OnInit, OnDestroy {
     });
   }
 
-  // =========================================================
-  // NAVIGATION
-  // =========================================================
+  /* =========================================================
+   *  NAVIGATION
+   * ========================================================= */
   private listenToRouteChanges(): void {
     this.router.events
       .pipe(
@@ -234,12 +263,18 @@ export class RestaurantLayout implements OnInit, OnDestroy {
     };
 
     const cleanUrl = url.split('?')[0].split('#')[0];
+
+    if (cleanUrl.startsWith('/restaurant/messages')) {
+      this.currentPage = 'Messages';
+      return;
+    }
+
     this.currentPage = routes[cleanUrl] ?? 'Tableau de bord';
   }
 
-  // =========================================================
-  // SIDEBAR
-  // =========================================================
+  /* =========================================================
+   *  SIDEBAR
+   * ========================================================= */
   private restoreSidebarState(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
@@ -273,9 +308,9 @@ export class RestaurantLayout implements OnInit, OnDestroy {
     }
   }
 
-  // =========================================================
-  // MENU UTILISATEUR
-  // =========================================================
+  /* =========================================================
+   *  MENU UTILISATEUR
+   * ========================================================= */
   toggleUserMenu(event?: MouseEvent): void {
     event?.stopPropagation();
     this.isUserMenuOpen = !this.isUserMenuOpen;
@@ -290,18 +325,16 @@ export class RestaurantLayout implements OnInit, OnDestroy {
     this.toggleBodyScroll(false);
   }
 
-  // =========================================================
-  // NOTIFICATIONS
-  // =========================================================
+  /* =========================================================
+   *  NOTIFICATIONS
+   * ========================================================= */
   toggleNotifications(event?: MouseEvent): void {
     event?.stopPropagation();
     this.isNotificationsOpen = !this.isNotificationsOpen;
     this.isUserMenuOpen = false;
     this.isMessagesOpen = false;
 
-    if (this.isNotificationsOpen) {
-      this.loadNotifications();
-    }
+    if (this.isNotificationsOpen) this.loadNotifications();
   }
 
   closeNotifications(): void {
@@ -351,9 +384,9 @@ export class RestaurantLayout implements OnInit, OnDestroy {
     if (notif.link) this.router.navigate([notif.link]);
   }
 
-  // =========================================================
-  // MESSAGERIE
-  // =========================================================
+  /* =========================================================
+   *  MESSAGERIE
+   * ========================================================= */
   toggleMessages(event?: MouseEvent): void {
     event?.stopPropagation();
     this.isMessagesOpen = !this.isMessagesOpen;
@@ -428,21 +461,38 @@ export class RestaurantLayout implements OnInit, OnDestroy {
 
     this.isSendingMessage = true;
     const content = this.newMessageText.trim();
+    const recipientId = this.openedConversation.userId;
 
-    this.messageService.send(this.openedConversation.userId, content).subscribe({
+    const tempId = `temp-${Date.now()}`;
+    const tempMsg: any = {
+      _id: tempId,
+      senderId: this.auth.getUser()?._id,
+      recipientId,
+      content,
+      read: false,
+      _temp: true,
+      createdAt: new Date().toISOString(),
+    };
+    this.messages.push(tempMsg);
+    this.newMessageText = '';
+    this.cdr.detectChanges();
+    setTimeout(() => this.scrollChatToBottom(), 50);
+
+    this.messageService.send(recipientId, content).subscribe({
       next: (msg) => {
         this.zone.run(() => {
-          this.messages.push(msg);
-          this.newMessageText = '';
+          const idx = this.messages.findIndex((m) => m._id === tempId);
+          if (idx !== -1) this.messages[idx] = msg;
           this.isSendingMessage = false;
           this.cdr.detectChanges();
-
           setTimeout(() => this.scrollChatToBottom(), 50);
         });
       },
       error: (err) => {
         this.zone.run(() => {
+          this.messages = this.messages.filter((m) => m._id !== tempId);
           this.isSendingMessage = false;
+          this.cdr.detectChanges();
           alert(err.error?.message || 'Erreur envoi');
         });
       },
@@ -468,9 +518,75 @@ export class RestaurantLayout implements OnInit, OnDestroy {
     return String(senderId) === String(me._id);
   }
 
-  // =========================================================
-  // HELPERS GÉNÉRAUX
-  // =========================================================
+  /* =========================================================
+   *  COCHES DE LECTURE
+   * ========================================================= */
+  isRead(msg: any): boolean {
+    if (!this.isMyMessage(msg)) return false;
+    return msg.read === true || this.readMessageIds.has(msg._id);
+  }
+
+  isSendingMsg(msg: any): boolean {
+    return msg._temp === true;
+  }
+
+  /* =========================================================
+   *  AGRANDIR — Ouvrir le chat en plein écran
+   * ========================================================= */
+  expandChat(): void {
+    if (!this.openedConversation) return;
+    const id = this.openedConversation.userId;
+    this.closeMessages();
+    this.router.navigate(['/restaurant/messages', id]);
+  }
+
+  /* =========================================================
+   *  OUVRIR UNE CONVERSATION DEPUIS L'EXTÉRIEUR
+   * ========================================================= */
+  private openMessagesWith(recipient: {
+    userId: string;
+    name: string;
+    avatar?: string;
+    role: string;
+    pendingMessage?: string;
+  }): void {
+    this.isMessagesOpen = true;
+    this.isUserMenuOpen = false;
+    this.isNotificationsOpen = false;
+
+    this.loadConversations();
+
+    setTimeout(() => {
+      const existing = this.conversations.find(
+        (c) => String(c.userId) === String(recipient.userId)
+      );
+
+      if (existing) {
+        this.openConversation(existing);
+      } else {
+        const fake: Conversation = {
+          userId: recipient.userId,
+          name: recipient.name,
+          avatar: recipient.avatar || '',
+          role: recipient.role,
+          lastMessage: '',
+          lastMessageAt: new Date().toISOString(),
+          unreadCount: 0,
+        };
+        this.openConversation(fake);
+      }
+
+      if (recipient.pendingMessage) {
+        this.newMessageText = recipient.pendingMessage;
+      }
+
+      this.cdr.detectChanges();
+    }, 400);
+  }
+
+  /* =========================================================
+   *  HELPERS
+   * ========================================================= */
   private closeAllMenus(): void {
     this.isUserMenuOpen = false;
     this.isNotificationsOpen = false;
@@ -515,9 +631,9 @@ export class RestaurantLayout implements OnInit, OnDestroy {
     }
   }
 
-  // =========================================================
-  // DIVERS
-  // =========================================================
+  /* =========================================================
+   *  DIVERS
+   * ========================================================= */
   onSearch(event: Event): void {
     console.log('Recherche:', (event.target as HTMLInputElement).value);
   }
@@ -534,9 +650,9 @@ export class RestaurantLayout implements OnInit, OnDestroy {
     this.router.navigate(['/connexion']);
   }
 
-  // =========================================================
-  // HELPERS TEMPLATE
-  // =========================================================
+  /* =========================================================
+   *  HELPERS TEMPLATE
+   * ========================================================= */
   getUserInitials(): string {
     return this.avatarService.getInitials(this.restaurantName);
   }

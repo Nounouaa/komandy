@@ -97,7 +97,7 @@
   </main>
 
   <!-- =========================================================
-       PANEL NOTIFICATIONS (cliquable)
+       PANEL NOTIFICATIONS
        ========================================================= -->
   <div class="side-panel notifications-panel"
        [class.open]="isNotificationsOpen"
@@ -112,7 +112,6 @@
 
     <div class="side-panel-body">
 
-      <!-- Liste des notifications -->
       <div class="notification-item unread"
            *ngFor="let notif of notifications"
            (click)="goToNotification(notif)">
@@ -132,7 +131,6 @@
         <i class="bi bi-chevron-right notif-arrow"></i>
       </div>
 
-      <!-- Vide -->
       <div class="notification-empty" *ngIf="notifications.length === 0">
         <i class="bi bi-bell-slash"></i>
         <p>Aucune notification</p>
@@ -150,13 +148,13 @@
   </div>
 
   <!-- =========================================================
-       PANEL MESSAGES (avec réponse)
+       PANEL MESSAGES (avec réponse + coches)
        ========================================================= -->
   <div class="side-panel messages-panel"
        [class.open]="isMessagesOpen"
        (click)="$event.stopPropagation()">
 
-    <!-- En-tête -->
+    <!-- EN-TÊTE -->
     <div class="side-panel-header">
       <div class="chat-header-left">
         <button *ngIf="openedConversation"
@@ -179,10 +177,10 @@
       </button>
     </div>
 
-    <!-- Corps -->
+    <!-- CORPS -->
     <div class="side-panel-body">
 
-      <!-- Liste des conversations -->
+      <!-- VUE 1 : LISTE DES CONVERSATIONS -->
       <ng-container *ngIf="!openedConversation">
         <div class="message-item"
              [class.unread]="conv.unreadCount > 0"
@@ -218,14 +216,26 @@
         </div>
       </ng-container>
 
-      <!-- Chat d'une conversation -->
+      <!-- VUE 2 : CHAT D'UNE CONVERSATION -->
       <ng-container *ngIf="openedConversation">
         <div class="chat-messages" *ngIf="!isLoadingMessages">
           <div class="chat-bubble"
                *ngFor="let msg of messages"
                [class.mine]="isMyMessage(msg)">
+
             <div class="chat-text">{{ msg.content }}</div>
-            <span class="chat-time">{{ msg.createdAt | date:'HH:mm' }}</span>
+
+            <div class="chat-footer-row">
+              <span class="chat-time">{{ msg.createdAt | date:'HH:mm' }}</span>
+
+              <span class="chat-check" *ngIf="isMyMessage(msg)">
+                <i class="bi bi-clock sending" *ngIf="isSendingMsg(msg)"></i>
+                <i class="bi bi-check2-all read"
+                   *ngIf="!isSendingMsg(msg) && isRead(msg)"></i>
+                <i class="bi bi-check2"
+                   *ngIf="!isSendingMsg(msg) && !isRead(msg)"></i>
+              </span>
+            </div>
           </div>
         </div>
 
@@ -236,8 +246,17 @@
 
     </div>
 
-    <!-- Footer : input message -->
-    <div class="side-panel-footer" *ngIf="openedConversation">
+    <!-- FOOTER : bouton agrandir + saisie -->
+    <div class="side-panel-footer chat-footer" *ngIf="openedConversation">
+
+      <button type="button"
+              class="btn-expand-chat"
+              (click)="expandChat()"
+              title="Ouvrir en plein écran">
+        <i class="bi bi-arrows-angle-expand"></i>
+        <span>Ouvrir en grand</span>
+      </button>
+
       <div class="chat-input-wrapper">
         <textarea class="chat-input"
                   [(ngModel)]="newMessageText"

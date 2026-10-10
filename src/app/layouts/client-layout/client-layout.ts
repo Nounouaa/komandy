@@ -40,24 +40,24 @@ import {
 })
 export class ClientLayout implements OnInit, OnDestroy {
 
-  // =========================================================
-  // ÉTAT UI
-  // =========================================================
+  /* =========================================================
+   *  ÉTAT UI
+   * ========================================================= */
   isSidebarCollapsed = false;
   isUserMenuOpen = false;
   isNotificationsOpen = false;
   isMessagesOpen = false;
   currentPage = 'Tableau de bord';
 
-  // =========================================================
-  // COMPTEURS
-  // =========================================================
+  /* =========================================================
+   *  COMPTEURS
+   * ========================================================= */
   notificationsCount = 0;
   messagesCount = 0;
 
-  // =========================================================
-  // PROFIL CLIENT
-  // =========================================================
+  /* =========================================================
+   *  PROFIL
+   * ========================================================= */
   userName = '';
   userEmail = '';
   userAvatar = '';
@@ -68,14 +68,14 @@ export class ClientLayout implements OnInit, OnDestroy {
     rating: 0,
   };
 
-  // =========================================================
-  // NOTIFICATIONS
-  // =========================================================
+  /* =========================================================
+   *  NOTIFICATIONS
+   * ========================================================= */
   notifications: any[] = [];
 
-  // =========================================================
-  // MESSAGERIE
-  // =========================================================
+  /* =========================================================
+   *  MESSAGERIE
+   * ========================================================= */
   conversations: Conversation[] = [];
   openedConversation: Conversation | null = null;
   messages: Message[] = [];
@@ -83,11 +83,15 @@ export class ClientLayout implements OnInit, OnDestroy {
   isSendingMessage = false;
   isLoadingMessages = false;
 
-  // =========================================================
-  // PRIVÉ
-  // =========================================================
+  /** IDs des messages marqués lus en temps réel. */
+  readMessageIds = new Set<string>();
+
+  /* =========================================================
+   *  PRIVÉ
+   * ========================================================= */
   private readonly MOBILE_BREAKPOINT = 991.98;
   private destroy$ = new Subject<void>();
+  private subs: Subscription[] = [];
   private ordersSub?: Subscription;
   private refreshSub?: Subscription;
 
@@ -105,41 +109,68 @@ export class ClientLayout implements OnInit, OnDestroy {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
-  // =========================================================
-  // CYCLE DE VIE
-  // =========================================================
+  /* =========================================================
+   *  CYCLE DE VIE
+   * ========================================================= */
   ngOnInit(): void {
-    // Panier
-    this.cartService.items$.subscribe(() => {
-      this.zone.run(() => this.cdr.detectChanges());
-    });
+    /* --- Panier --- */
+    this.subs.push(
+      this.cartService.items$.subscribe(() => {
+        this.zone.run(() => this.cdr.detectChanges());
+      })
+    );
 
-    // Favoris
-    this.favoriteService.favorites$.subscribe(() => {
-      this.zone.run(() => {
-        this.userStats.favorites = this.favoriteService.getCount();
-        this.cdr.detectChanges();
-      });
-    });
+    /* --- Favoris --- */
+    this.subs.push(
+      this.favoriteService.favorites$.subscribe(() => {
+        this.zone.run(() => {
+          this.userStats.favorites = this.favoriteService.getCount();
+          this.cdr.detectChanges();
+        });
+      })
+    );
 
     if (isPlatformBrowser(this.platformId)) {
       this.loadUserFromStorage();
       this.restoreSidebarState();
     }
 
-    // Charge notifications + conversations
+    /* --- Chargements initiaux --- */
     this.loadNotifications();
     this.loadConversations();
 
     this.listenToRouteChanges();
 
-    // 🔌 Temps réel
+    /* --- Socket --- */
     this.orderService.connectSocket();
+
     this.ordersSub = this.orderService.orders$.subscribe(() => {
       this.loadNotifications();
     });
 
-    // 🔄 Refresh toutes les 30 secondes
+    /* --- 🔔 Accusés de lecture --- */
+    this.subs.push(
+      this.orderService.messagesRead$.subscribe((payload) => {
+        this.zone.run(() => {
+          for (const id of payload.messageIds) {
+            this.readMessageIds.add(id);
+          }
+          this.messages = this.messages.map((m) =>
+            payload.messageIds.includes(m._id) ? { ...m, read: true } : m
+          );
+          this.cdr.detectChanges();
+        });
+      })
+    );
+
+    /* --- ✅ Ouverture conversation depuis l'extérieur --- */
+    this.subs.push(
+      this.messageService.openConversation$.subscribe((recipient) => {
+        this.zone.run(() => this.openMessagesWith(recipient));
+      })
+    );
+
+    /* --- 🔄 Refresh périodique --- */
     this.refreshSub = interval(30000).subscribe(() => {
       this.loadNotifications();
       this.loadConversations();
@@ -149,6 +180,7 @@ export class ClientLayout implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.subs.forEach((s) => s.unsubscribe());
     this.ordersSub?.unsubscribe();
     this.refreshSub?.unsubscribe();
 
@@ -157,12 +189,11 @@ export class ClientLayout implements OnInit, OnDestroy {
     }
   }
 
-  // =========================================================
-  // PROFIL
-  // =========================================================
+  /* =========================================================
+   *  PROFIL
+   * ========================================================= */
   private loadUserFromStorage(): void {
     const user = this.auth.getUser();
-
     if (user) {
       this.userName = user.name || 'Client';
       this.userEmail = user.email || '';
@@ -171,9 +202,9 @@ export class ClientLayout implements OnInit, OnDestroy {
     }
   }
 
-  // =========================================================
-  // NOTIFICATIONS (basées sur les commandes)
-  // =========================================================
+  /* =========================================================
+   *  NOTIFICATIONS
+   * ========================================================= */
   loadNotifications(): void {
     this.orderService.getMyOrders().subscribe({
       next: (orders) => {
@@ -181,17 +212,12 @@ export class ClientLayout implements OnInit, OnDestroy {
           const list = orders || [];
           this.userStats.orders = list.length;
 
-          // Filtrer les commandes en cours
           const ongoing = list.filter((o) =>
             ['pending', 'accepted', 'preparing', 'ready', 'delivering'].includes(o.status)
           );
-
-          // Commandes livrées en attente de confirmation
           const toConfirm = list.filter((o) => o.status === 'delivered');
 
           this.notificationsCount = ongoing.length + toConfirm.length;
-
-          // Construire la liste
           this.notifications = [];
 
           if (ongoing.length > 0) {
@@ -231,9 +257,7 @@ export class ClientLayout implements OnInit, OnDestroy {
     this.isUserMenuOpen = false;
     this.isMessagesOpen = false;
 
-    if (this.isNotificationsOpen) {
-      this.loadNotifications();
-    }
+    if (this.isNotificationsOpen) this.loadNotifications();
   }
 
   closeNotifications(): void {
@@ -245,9 +269,9 @@ export class ClientLayout implements OnInit, OnDestroy {
     if (notif.link) this.router.navigate([notif.link]);
   }
 
-  // =========================================================
-  // MESSAGERIE
-  // =========================================================
+  /* =========================================================
+   *  MESSAGERIE
+   * ========================================================= */
   toggleMessages(event?: MouseEvent): void {
     event?.stopPropagation();
     this.isMessagesOpen = !this.isMessagesOpen;
@@ -322,21 +346,39 @@ export class ClientLayout implements OnInit, OnDestroy {
 
     this.isSendingMessage = true;
     const content = this.newMessageText.trim();
+    const recipientId = this.openedConversation.userId;
 
-    this.messageService.send(this.openedConversation.userId, content).subscribe({
+    /* --- Message optimiste --- */
+    const tempId = `temp-${Date.now()}`;
+    const tempMsg: any = {
+      _id: tempId,
+      senderId: this.auth.getUser()?._id,
+      recipientId,
+      content,
+      read: false,
+      _temp: true,
+      createdAt: new Date().toISOString(),
+    };
+    this.messages.push(tempMsg);
+    this.newMessageText = '';
+    this.cdr.detectChanges();
+    setTimeout(() => this.scrollChatToBottom(), 50);
+
+    this.messageService.send(recipientId, content).subscribe({
       next: (msg) => {
         this.zone.run(() => {
-          this.messages.push(msg);
-          this.newMessageText = '';
+          const idx = this.messages.findIndex((m) => m._id === tempId);
+          if (idx !== -1) this.messages[idx] = msg;
           this.isSendingMessage = false;
           this.cdr.detectChanges();
-
           setTimeout(() => this.scrollChatToBottom(), 50);
         });
       },
       error: (err) => {
         this.zone.run(() => {
+          this.messages = this.messages.filter((m) => m._id !== tempId);
           this.isSendingMessage = false;
+          this.cdr.detectChanges();
           alert(err.error?.message || 'Erreur envoi');
         });
       },
@@ -362,9 +404,75 @@ export class ClientLayout implements OnInit, OnDestroy {
     return String(senderId) === String(me._id);
   }
 
-  // =========================================================
-  // NAVIGATION
-  // =========================================================
+  /* =========================================================
+   *  COCHES DE LECTURE
+   * ========================================================= */
+  isRead(msg: any): boolean {
+    if (!this.isMyMessage(msg)) return false;
+    return msg.read === true || this.readMessageIds.has(msg._id);
+  }
+
+  isSendingMsg(msg: any): boolean {
+    return msg._temp === true;
+  }
+
+  /* =========================================================
+   *  AGRANDIR — Ouvrir le chat en plein écran
+   * ========================================================= */
+  expandChat(): void {
+    if (!this.openedConversation) return;
+    const id = this.openedConversation.userId;
+    this.closeMessages();
+    this.router.navigate(['/client/messages', id]);
+  }
+
+  /* =========================================================
+   *  OUVRIR UNE CONVERSATION DEPUIS L'EXTÉRIEUR
+   * ========================================================= */
+  private openMessagesWith(recipient: {
+    userId: string;
+    name: string;
+    avatar?: string;
+    role: string;
+    pendingMessage?: string;
+  }): void {
+    this.isMessagesOpen = true;
+    this.isUserMenuOpen = false;
+    this.isNotificationsOpen = false;
+
+    this.loadConversations();
+
+    setTimeout(() => {
+      const existing = this.conversations.find(
+        (c) => String(c.userId) === String(recipient.userId)
+      );
+
+      if (existing) {
+        this.openConversation(existing);
+      } else {
+        const fake: Conversation = {
+          userId: recipient.userId,
+          name: recipient.name,
+          avatar: recipient.avatar || '',
+          role: recipient.role,
+          lastMessage: '',
+          lastMessageAt: new Date().toISOString(),
+          unreadCount: 0,
+        };
+        this.openConversation(fake);
+      }
+
+      if (recipient.pendingMessage) {
+        this.newMessageText = recipient.pendingMessage;
+      }
+
+      this.cdr.detectChanges();
+    }, 400);
+  }
+
+  /* =========================================================
+   *  NAVIGATION
+   * ========================================================= */
   private listenToRouteChanges(): void {
     this.router.events
       .pipe(
@@ -390,15 +498,23 @@ export class ClientLayout implements OnInit, OnDestroy {
       '/client/promotions':  'Promotions',
       '/client/profil':      'Mon profil',
       '/client/parametres':  'Paramètres',
+      '/client/amis':        'Amis',
     };
 
     const cleanUrl = url.split('?')[0].split('#')[0];
+
+    // Cas spéciaux : /client/messages/:id → "Messages"
+    if (cleanUrl.startsWith('/client/messages')) {
+      this.currentPage = 'Messages';
+      return;
+    }
+
     this.currentPage = routes[cleanUrl] ?? 'Tableau de bord';
   }
 
-  // =========================================================
-  // SIDEBAR
-  // =========================================================
+  /* =========================================================
+   *  SIDEBAR
+   * ========================================================= */
   private restoreSidebarState(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
@@ -429,9 +545,9 @@ export class ClientLayout implements OnInit, OnDestroy {
     }
   }
 
-  // =========================================================
-  // MENU UTILISATEUR
-  // =========================================================
+  /* =========================================================
+   *  MENU UTILISATEUR
+   * ========================================================= */
   toggleUserMenu(event?: MouseEvent): void {
     event?.stopPropagation();
     this.isUserMenuOpen = !this.isUserMenuOpen;
@@ -446,16 +562,16 @@ export class ClientLayout implements OnInit, OnDestroy {
     this.toggleBodyScroll(false);
   }
 
-  // =========================================================
-  // PANIER
-  // =========================================================
+  /* =========================================================
+   *  PANIER
+   * ========================================================= */
   goToCart(): void {
     this.router.navigate(['/client/panier']);
   }
 
-  // =========================================================
-  // HELPERS
-  // =========================================================
+  /* =========================================================
+   *  HELPERS
+   * ========================================================= */
   private closeAllMenus(): void {
     this.isUserMenuOpen = false;
     this.isNotificationsOpen = false;
@@ -500,71 +616,16 @@ export class ClientLayout implements OnInit, OnDestroy {
     }
   }
 
-  // =========================================================
-  // RECHERCHE
-  // =========================================================
+  /* =========================================================
+   *  RECHERCHE
+   * ========================================================= */
   onSearch(event: Event): void {
     console.log('Recherche:', (event.target as HTMLInputElement).value);
   }
 
-
-
-
-  // =========================================================
-// OUVRIR UNE CONVERSATION DEPUIS L'EXTÉRIEUR
-// =========================================================
-// private openMessagesWith(recipient: {
-//   userId: string;
-//   name: string;
-//   avatar?: string;
-//   role: string;
-//   pendingMessage?: string;
-// }): void {
-//   // 1. Ouvrir le panel
-//   this.isMessagesOpen = true;
-//   this.isUserMenuOpen = false;
-//   this.isNotificationsOpen = false;
-
-//   // 2. Charger les conversations
-//   this.loadConversations();
-
-//   // 3. Après un petit délai, ouvrir la conversation
-//   setTimeout(() => {
-//     // Chercher dans les conversations existantes
-//     const existing = this.conversations.find((c) => c.userId === recipient.userId);
-
-//     if (existing) {
-//       this.openConversation(existing);
-
-//       // Pré-remplir si un message est passé
-//       if (recipient.pendingMessage) {
-//         this.newMessageText = recipient.pendingMessage;
-//       }
-//     } else {
-//       // Créer une conversation "virtuelle" pour l'ouvrir
-//       const fake: Conversation = {
-//         userId: recipient.userId,
-//         name: recipient.name,
-//         avatar: recipient.avatar || '',
-//         role: recipient.role,
-//         lastMessage: '',
-//         lastMessageAt: new Date().toISOString(),
-//         unreadCount: 0,
-//       };
-
-//       this.openConversation(fake);
-
-//       if (recipient.pendingMessage) {
-//         this.newMessageText = recipient.pendingMessage;
-//       }
-//     }
-
-//     this.cdr.detectChanges();
-//   }, 300);
-// }
-//   // =========================================================
-  // DÉCONNEXION
-  // =========================================================
+  /* =========================================================
+   *  DÉCONNEXION
+   * ========================================================= */
   logout(): void {
     if (!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) return;
 
@@ -573,19 +634,14 @@ export class ClientLayout implements OnInit, OnDestroy {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem('sidebarCollapsed');
     }
-    // ✅ Écouter la demande d'ouverture de conversation
-this.messageService.openConversation$.subscribe((recipient) => {
-  this.zone.run(() => {
-    this.openMessagesWith(recipient);
-  });
-});
+
     this.closeAllMenus();
     this.router.navigate(['/connexion']);
   }
 
-  // =========================================================
-  // HELPERS TEMPLATE
-  // =========================================================
+  /* =========================================================
+   *  HELPERS TEMPLATE
+   * ========================================================= */
   getUserInitials(): string {
     return this.avatarService.getInitials(this.userName);
   }
@@ -601,51 +657,4 @@ this.messageService.openConversation$.subscribe((recipient) => {
   getAvatarUrl(): string {
     return this.uploadService.getImageUrl(this.userAvatar);
   }
-
-
-
-  private openMessagesWith(recipient: {
-  userId: string;
-  name: string;
-  avatar?: string;
-  role: string;
-  pendingMessage?: string;
-}): void {
-  // 1. Ouvrir le panel
-  this.isMessagesOpen = true;
-  this.isUserMenuOpen = false;
-  this.isNotificationsOpen = false;
-
-  // 2. Charger les conversations
-  this.loadConversations();
-
-  // 3. Attendre que les conversations soient chargées puis ouvrir la bonne
-  setTimeout(() => {
-    const existing = this.conversations.find(
-      (c) => String(c.userId) === String(recipient.userId)
-    );
-
-    if (existing) {
-      this.openConversation(existing);
-    } else {
-      // Créer une conversation virtuelle
-      const fake: Conversation = {
-        userId: recipient.userId,
-        name: recipient.name,
-        avatar: recipient.avatar || '',
-        role: recipient.role,
-        lastMessage: '',
-        lastMessageAt: new Date().toISOString(),
-        unreadCount: 0,
-      };
-      this.openConversation(fake);
-    }
-
-    if (recipient.pendingMessage) {
-      this.newMessageText = recipient.pendingMessage;
-    }
-
-    this.cdr.detectChanges();
-  }, 400);
-}
 }

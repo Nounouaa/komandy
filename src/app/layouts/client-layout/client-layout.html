@@ -145,7 +145,6 @@
 
     <div class="side-panel-body">
 
-      <!-- Liste notifications cliquables -->
       <div class="notification-item unread"
            *ngFor="let notif of notifications"
            (click)="goToNotification(notif)">
@@ -165,7 +164,6 @@
         <i class="bi bi-chevron-right notif-arrow"></i>
       </div>
 
-      <!-- Vide -->
       <div class="notification-empty" *ngIf="notifications.length === 0">
         <i class="bi bi-bell-slash"></i>
         <p>Aucune notification</p>
@@ -183,12 +181,13 @@
   </div>
 
   <!-- =========================================================
-       PANEL MESSAGES (avec réponse)
+       PANEL MESSAGES (avec réponse + coches)
        ========================================================= -->
   <div class="side-panel messages-panel"
        [class.open]="isMessagesOpen"
        (click)="$event.stopPropagation()">
 
+    <!-- EN-TÊTE -->
     <div class="side-panel-header">
       <div class="chat-header-left">
         <button *ngIf="openedConversation"
@@ -211,9 +210,10 @@
       </button>
     </div>
 
+    <!-- CORPS -->
     <div class="side-panel-body">
 
-      <!-- Liste conversations -->
+      <!-- VUE 1 : LISTE DES CONVERSATIONS -->
       <ng-container *ngIf="!openedConversation">
         <div class="message-item"
              [class.unread]="conv.unreadCount > 0"
@@ -249,14 +249,32 @@
         </div>
       </ng-container>
 
-      <!-- Chat d'une conversation -->
+      <!-- VUE 2 : CHAT D'UNE CONVERSATION -->
       <ng-container *ngIf="openedConversation">
         <div class="chat-messages" *ngIf="!isLoadingMessages">
           <div class="chat-bubble"
                *ngFor="let msg of messages"
                [class.mine]="isMyMessage(msg)">
+
             <div class="chat-text">{{ msg.content }}</div>
-            <span class="chat-time">{{ msg.createdAt | date:'HH:mm' }}</span>
+
+            <div class="chat-footer-row">
+              <span class="chat-time">{{ msg.createdAt | date:'HH:mm' }}</span>
+
+              <!-- Coches uniquement sur MES messages -->
+              <span class="chat-check" *ngIf="isMyMessage(msg)">
+                <!-- En cours d'envoi -->
+                <i class="bi bi-clock sending" *ngIf="isSendingMsg(msg)"></i>
+
+                <!-- Lu : double coche -->
+                <i class="bi bi-check2-all read"
+                   *ngIf="!isSendingMsg(msg) && isRead(msg)"></i>
+
+                <!-- Envoyé : coche simple -->
+                <i class="bi bi-check2"
+                   *ngIf="!isSendingMsg(msg) && !isRead(msg)"></i>
+              </span>
+            </div>
           </div>
         </div>
 
@@ -267,8 +285,17 @@
 
     </div>
 
-    <!-- Input message -->
-    <div class="side-panel-footer" *ngIf="openedConversation">
+    <!-- FOOTER : bouton agrandir + saisie -->
+    <div class="side-panel-footer chat-footer" *ngIf="openedConversation">
+
+      <button type="button"
+              class="btn-expand-chat"
+              (click)="expandChat()"
+              title="Ouvrir en plein écran">
+        <i class="bi bi-arrows-angle-expand"></i>
+        <span>Ouvrir en grand</span>
+      </button>
+
       <div class="chat-input-wrapper">
         <textarea class="chat-input"
                   [(ngModel)]="newMessageText"
@@ -354,6 +381,9 @@
       <a class="menu-item" routerLink="/client/favoris" (click)="closeUserMenu()">
         <i class="bi bi-heart"></i><span>Mes favoris</span>
         <span class="menu-badge" *ngIf="userStats.favorites > 0">{{ userStats.favorites }}</span>
+      </a>
+      <a class="menu-item" routerLink="/client/amis" (click)="closeUserMenu()">
+        <i class="bi bi-people"></i><span>Amis</span>
       </a>
     </nav>
 
