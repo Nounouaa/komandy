@@ -22,6 +22,7 @@ import { FavoriteService } from '../../core/services/favorite.service';
 import { OrderService } from '../../core/services/order.service';
 import { RestaurantService } from '../../core/services/restaurant.service';
 import { PromotionService } from '../../core/services/promotion.service';
+import { FriendsService } from '../../core/services/friends.service';
 
 @Component({
   selector: 'app-client-sidebar',
@@ -32,6 +33,9 @@ import { PromotionService } from '../../core/services/promotion.service';
 })
 export class ClientSidebar implements OnInit, OnDestroy {
 
+
+
+  
   // =========================================================
   // ÉVÉNEMENTS VERS LE PARENT
   // =========================================================
@@ -61,6 +65,7 @@ export class ClientSidebar implements OnInit, OnDestroy {
   private subs: Subscription[] = [];
 
   constructor(
+    private friendsService: FriendsService,
     private router: Router,
     private auth: AuthService,
     public avatarService: AvatarService,
@@ -73,6 +78,20 @@ export class ClientSidebar implements OnInit, OnDestroy {
   private promoService: PromotionService, 
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
+
+requestsCount = 0;
+private loadRequestsCount(): void {
+  this.friendsService.getRequests().subscribe({
+    next: (res) => {
+      this.zone.run(() => {
+        this.requestsCount = Array.isArray(res) ? res.length : 0;
+        this.cdr.detectChanges();
+      });
+    },
+    error: () => { this.requestsCount = 0; },
+  });
+}
+  
 
   // =========================================================
   // INPUT : état reçu du parent

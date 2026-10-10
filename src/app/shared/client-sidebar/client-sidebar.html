@@ -140,6 +140,18 @@
         </a>
       </li>
 
+
+      <li class="nav-item">
+  <a class="nav-link"
+     routerLink="/client/amis"
+     routerLinkActive="active"
+     [attr.title]="isCollapsed ? 'Amis' : null">
+    <i class="bi bi-people"></i>
+    <span class="nav-text">Amis</span>
+    <span class="nav-badge alert" *ngIf="requestsCount > 0">{{ requestsCount }}</span>
+  </a>
+</li>
+
       <!-- Promotions -->
       <li class="nav-item">
         <a

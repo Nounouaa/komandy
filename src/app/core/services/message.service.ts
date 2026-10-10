@@ -1,13 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
-import { environment } from '../../../environments/environment.prod';
+import { environment } from '../../../environments/environment';
 
-
-// =========================================================
-// TYPES
-// =========================================================
-
+/* =========================================================
+ * TYPES
+ * ========================================================= */
 export interface Conversation {
   userId: string;
   name: string;
@@ -29,28 +27,29 @@ export interface Message {
   createdAt: string;
 }
 
-// =========================================================
-// SERVICE
-// =========================================================
-
+/* =========================================================
+ * SERVICE
+ * ========================================================= */
 @Injectable({ providedIn: 'root' })
 export class MessageService {
   private api = `${environment.apiUrl}/messages`;
 
-
-
-   // ✅ NOUVEAU : demande d'ouverture d'une conversation
+  /* --- Flux d'ouverture de conversation (widget) --- */
   private openConversationSubject = new Subject<{
     userId: string;
     name: string;
     avatar?: string;
     role: string;
-    pendingMessage?: string;   // message pré-rempli optionnel
+    pendingMessage?: string;
   }>();
 
   openConversation$ = this.openConversationSubject.asObservable();
 
-  // ✅ Méthode publique pour demander l'ouverture
+  constructor(private http: HttpClient) {}
+
+  /* ---------------------------------------------------------
+   *  WIDGET — Ouvrir une conversation programmatiquement
+   * --------------------------------------------------------- */
   requestOpenConversation(recipient: {
     userId: string;
     name: string;
@@ -61,19 +60,20 @@ export class MessageService {
     this.openConversationSubject.next(recipient);
   }
 
-  constructor(private http: HttpClient) {}
-
-  /** Liste des conversations */
+  /* ---------------------------------------------------------
+   *  CONVERSATIONS
+   * --------------------------------------------------------- */
   getConversations() {
     return this.http.get<Conversation[]>(`${this.api}/conversations`);
   }
 
-  /** Messages d'une conversation avec un utilisateur */
   getMessagesWith(userId: string) {
     return this.http.get<Message[]>(`${this.api}/with/${userId}`);
   }
 
-  /** Envoyer un message */
+  /* ---------------------------------------------------------
+   *  ENVOI / LECTURE / SUPPRESSION
+   * --------------------------------------------------------- */
   send(recipientId: string, content: string, orderId?: string) {
     return this.http.post<Message>(this.api, {
       recipientId,
@@ -82,12 +82,10 @@ export class MessageService {
     });
   }
 
-  /** Marquer un message comme lu */
   markAsRead(messageId: string) {
     return this.http.patch<Message>(`${this.api}/${messageId}/read`, {});
   }
 
-  /** Supprimer un message */
   delete(messageId: string) {
     return this.http.delete(`${this.api}/${messageId}`);
   }

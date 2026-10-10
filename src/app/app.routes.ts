@@ -169,4 +169,14 @@ export const routes: Routes = [
   // 404 — Redirection par défaut
   // =========================================================
   { path: '**', redirectTo: '' },
+
+
+  {
+  path: 'client/amis',
+  loadComponent: () => import('./amis/amis/amis').then((m) => m.Amis),
+},
+{
+  path: 'client/messages/:id',
+  loadComponent: () => import('./chat/chat/chat').then((m) => m.Chat),
+},
 ];

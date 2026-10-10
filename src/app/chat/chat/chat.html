@@ -1,0 +1,59 @@
+<section class="chat-page">
+
+  <div class="chat-header">
+    <a routerLink="/client/amis" class="btn-back">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+
+    <div class="friend-thumb" *ngIf="friend">
+      <img *ngIf="hasAvatar(friend)" [src]="getAvatarUrl(friend)" [alt]="friend.name">
+      <span *ngIf="!hasAvatar(friend)" [style.background]="getGradient(friend.name)">
+        {{ getInitials(friend.name) }}
+      </span>
+    </div>
+
+    <div class="friend-name">
+      <h2>{{ friend?.name || 'Discussion' }}</h2>
+      <span class="status">Ami</span>
+    </div>
+  </div>
+
+  <div class="chat-body" *ngIf="!isLoading">
+
+    <div class="empty-chat" *ngIf="messages.length === 0">
+      <i class="bi bi-chat-dots"></i>
+      <p>Envoyez votre premier message</p>
+    </div>
+
+    <div class="messages" *ngIf="messages.length > 0">
+      <div class="message-row"
+           *ngFor="let m of messages"
+           [class.mine]="isMine(m)">
+
+        <div class="bubble">
+          <p>{{ m.content }}</p>
+          <span class="time">{{ formatTime(m.createdAt) }}</span>
+        </div>
+
+      </div>
+
+      <div #messagesEnd></div>
+    </div>
+
+  </div>
+
+  <div class="chat-input">
+    <input
+      type="text"
+      [(ngModel)]="newMessage"
+      (keyup.enter)="send()"
+      placeholder="Écrire un message…"
+      maxlength="1000"
+      [disabled]="isSending">
+
+    <button (click)="send()" [disabled]="!newMessage.trim() || isSending">
+      <i class="bi" [class.bi-send-fill]="!isSending" [class.bi-hourglass-split]="isSending"></i>
+    </button>
+  </div>
+
+</section>

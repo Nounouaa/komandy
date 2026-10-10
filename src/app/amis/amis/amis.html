@@ -1,0 +1,167 @@
+<section class="amis-page">
+
+  <!-- EN-TÊTE -->
+  <div class="page-header">
+    <div>
+      <h1><i class="bi bi-people-fill"></i> Amis</h1>
+      <p>Trouvez et ajoutez d'autres clients</p>
+    </div>
+  </div>
+
+  <!-- BARRE DE RECHERCHE -->
+  <div class="search-bar">
+    <i class="bi bi-search"></i>
+    <input
+      type="text"
+      placeholder="Rechercher un client par nom…"
+      [(ngModel)]="searchQuery"
+      (input)="onSearch()">
+    <button *ngIf="searchQuery" (click)="clearSearch()" class="btn-clear-search">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <!-- RÉSULTATS RECHERCHE -->
+  <div class="results-section" *ngIf="searchQuery.length >= 2">
+
+    <div class="loading-state" *ngIf="isSearching">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="empty-search" *ngIf="!isSearching && searchResults.length === 0">
+      <i class="bi bi-search"></i>
+      <p>Aucun client trouvé pour « {{ searchQuery }} »</p>
+    </div>
+
+    <div class="search-results" *ngIf="!isSearching && searchResults.length > 0">
+      <div class="user-card" *ngFor="let u of searchResults">
+
+        <div class="user-avatar">
+          <img *ngIf="hasAvatar(u)" [src]="getAvatarUrl(u)" [alt]="u.name">
+          <span *ngIf="!hasAvatar(u)" [style.background]="getGradient(u.name)">
+            {{ getInitials(u.name) }}
+          </span>
+        </div>
+
+        <div class="user-info">
+          <h3>{{ u.name }}</h3>
+          <p><i class="bi bi-envelope"></i> {{ u.email }}</p>
+        </div>
+
+        <div class="user-action">
+          <button *ngIf="u.status === 'none'"
+                  class="btn-add"
+                  (click)="addFriend(u._id)">
+            <i class="bi bi-person-plus"></i> Ajouter
+          </button>
+
+          <span *ngIf="u.status === 'pending-sent'" class="badge-pending">
+            <i class="bi bi-hourglass-split"></i> En attente
+          </span>
+
+          <span *ngIf="u.status === 'pending-received'" class="badge-pending">
+            <i class="bi bi-envelope-paper"></i> Vous a ajouté
+          </span>
+
+          <span *ngIf="u.status === 'friend'" class="badge-friend">
+            <i class="bi bi-check-circle-fill"></i> Ami
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ONGLETS -->
+  <div class="tabs" *ngIf="searchQuery.length < 2">
+    <button [class.active]="activeTab === 'friends'" (click)="activeTab = 'friends'">
+      <i class="bi bi-people"></i> Mes amis
+      <span class="tab-badge" *ngIf="friends.length > 0">{{ friends.length }}</span>
+    </button>
+
+    <button [class.active]="activeTab === 'requests'" (click)="activeTab = 'requests'">
+      <i class="bi bi-envelope"></i> Demandes
+      <span class="tab-badge alert" *ngIf="requests.length > 0">{{ requests.length }}</span>
+    </button>
+  </div>
+
+  <!-- ONGLET AMIS -->
+  <div *ngIf="searchQuery.length < 2 && activeTab === 'friends'">
+
+    <div class="loading-state" *ngIf="isLoadingFriends">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoadingFriends && friends.length === 0">
+      <i class="bi bi-people"></i>
+      <h3>Aucun ami pour l'instant</h3>
+      <p>Recherchez quelqu'un par son nom pour commencer</p>
+    </div>
+
+    <div class="friends-grid" *ngIf="!isLoadingFriends && friends.length > 0">
+      <div class="friend-card" *ngFor="let f of friends">
+
+        <div class="friend-avatar">
+          <img *ngIf="hasAvatar(f)" [src]="getAvatarUrl(f)" [alt]="f.name">
+          <span *ngIf="!hasAvatar(f)" [style.background]="getGradient(f.name)">
+            {{ getInitials(f.name) }}
+          </span>
+        </div>
+
+        <h3>{{ f.name }}</h3>
+        <p *ngIf="f.city"><i class="bi bi-geo-alt"></i> {{ f.city }}</p>
+
+        <div class="friend-actions">
+          <button class="btn-chat" (click)="openChat(f._id)">
+            <i class="bi bi-chat-dots-fill"></i> Discuter
+          </button>
+          <button class="btn-remove" (click)="removeFriend(f._id, f.name)" title="Retirer">
+            <i class="bi bi-person-dash"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ONGLET DEMANDES -->
+  <div *ngIf="searchQuery.length < 2 && activeTab === 'requests'">
+
+    <div class="loading-state" *ngIf="isLoadingRequests">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoadingRequests && requests.length === 0">
+      <i class="bi bi-envelope-open"></i>
+      <h3>Aucune demande en attente</h3>
+    </div>
+
+    <div class="requests-list" *ngIf="!isLoadingRequests && requests.length > 0">
+      <div class="request-card" *ngFor="let r of requests">
+
+        <div class="user-avatar">
+          <img *ngIf="hasAvatar(r.user)" [src]="getAvatarUrl(r.user)" [alt]="r.user.name">
+          <span *ngIf="!hasAvatar(r.user)" [style.background]="getGradient(r.user.name)">
+            {{ getInitials(r.user.name) }}
+          </span>
+        </div>
+
+        <div class="user-info">
+          <h3>{{ r.user.name }}</h3>
+          <p>{{ r.user.email }}</p>
+        </div>
+
+        <div class="request-actions">
+          <button class="btn-accept" (click)="acceptRequest(r._id)">
+            <i class="bi bi-check-lg"></i> Accepter
+          </button>
+          <button class="btn-reject" (click)="rejectRequest(r._id)">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</section>
