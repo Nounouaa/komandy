@@ -111,6 +111,15 @@ export const routes: Routes = [
           import('./profil-client/profil-client').then(m => m.ProfilClient),
         title: 'Mon profil',
       },
+
+      {
+  path: 'amis',
+  loadComponent: () => import('./amis/amis/amis').then((m) => m.Amis),
+},
+{
+  path: 'messages/:id',
+  loadComponent: () => import('./chat/chat/chat').then((m) => m.Chat),
+},
     ],
   },
 
@@ -171,12 +180,5 @@ export const routes: Routes = [
   { path: '**', redirectTo: '' },
 
 
-  {
-  path: 'client/amis',
-  loadComponent: () => import('./amis/amis/amis').then((m) => m.Amis),
-},
-{
-  path: 'client/messages/:id',
-  loadComponent: () => import('./chat/chat/chat').then((m) => m.Chat),
-},
+  
 ];
