@@ -10,7 +10,9 @@
   <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
     <div class="content-wrapper">
 
-      <!-- EN-TÊTE -->
+      <!-- =========================================================
+           EN-TÊTE
+           ========================================================= -->
       <div class="content-header">
 
         <div class="header-left">
@@ -88,7 +90,9 @@
         </div>
       </div>
 
-      <!-- CONTENU DYNAMIQUE -->
+      <!-- =========================================================
+           CONTENU DYNAMIQUE
+           ========================================================= -->
       <div class="content-body">
         <router-outlet></router-outlet>
       </div>
@@ -173,7 +177,7 @@
       </div>
 
       <div class="header-buttons">
-        <!-- Voir toutes les conversations -->
+        <!-- Voir toutes les conversations (agrandir) -->
         <a class="btn-see-all"
            routerLink="/restaurant/messages"
            (click)="closeMessages()"
@@ -256,16 +260,8 @@
 
     </div>
 
-    <!-- FOOTER : bouton agrandir + saisie -->
+    <!-- FOOTER : saisie uniquement (bouton agrandir supprimé) -->
     <div class="side-panel-footer chat-footer" *ngIf="openedConversation">
-
-      <button type="button"
-              class="btn-expand-chat"
-              (click)="expandChat()"
-              title="Ouvrir en plein écran">
-        <i class="bi bi-arrows-angle-expand"></i>
-        <span>Ouvrir en grand</span>
-      </button>
 
       <div class="chat-input-wrapper">
         <textarea class="chat-input"
