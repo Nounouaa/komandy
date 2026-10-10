@@ -166,6 +166,12 @@ export const routes: Routes = [
       },
 
       {
+  path: 'messages/:id',
+  loadComponent: () =>
+    import('./chat/chat/chat').then((m) => m.Chat),
+},
+
+      {
   path: 'promotions',
   loadComponent: () =>
     import('./dashboard-restaurant/promotions/promotions/promotions')
