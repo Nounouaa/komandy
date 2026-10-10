@@ -177,18 +177,22 @@
       </div>
 
       <div class="header-buttons">
-        <!-- Voir toutes les conversations (agrandir) -->
-        <a class="btn-see-all"
-           routerLink="/restaurant/messages"
-           (click)="closeMessages()"
-           title="Voir toutes les conversations">
-          <i class="bi bi-arrows-angle-expand"></i>
-        </a>
+  <!-- Agrandir : chat en cours OU liste des conversations -->
+  <a class="btn-see-all"
+     [routerLink]="openedConversation
+       ? ['/restaurant/messages', openedConversation.userId]
+       : ['/restaurant/messages']"
+     (click)="closeMessages()"
+     [title]="openedConversation
+       ? 'Ouvrir cette conversation en plein écran'
+       : 'Voir toutes les conversations'">
+    <i class="bi bi-arrows-angle-expand"></i>
+  </a>
 
-        <button type="button" class="panel-close" (click)="closeMessages()" aria-label="Fermer">
-          <i class="bi bi-x"></i>
-        </button>
-      </div>
+  <button type="button" class="panel-close" (click)="closeMessages()" aria-label="Fermer">
+    <i class="bi bi-x"></i>
+  </button>
+</div>
     </div>
 
     <!-- CORPS -->
