@@ -3,8 +3,11 @@
      ========================================================= -->
 <div class="restaurant-layout">
 
-  <!-- SIDEBAR -->
-  <app-restaurant-sidebar (toggle)="onSidebarToggle($event)"></app-restaurant-sidebar>
+  <!-- SIDEBAR (connecté au layout via [collapsed]) -->
+  <app-restaurant-sidebar
+    [collapsed]="isSidebarCollapsed"
+    (toggle)="onSidebarToggle($event)">
+  </app-restaurant-sidebar>
 
   <!-- CONTENU PRINCIPAL -->
   <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
@@ -33,6 +36,7 @@
 
         <div class="header-right">
 
+          <!-- Recherche -->
           <div class="search-wrapper">
             <i class="bi bi-search"></i>
             <input type="text" class="search-input" placeholder="Rechercher..."
@@ -177,22 +181,21 @@
       </div>
 
       <div class="header-buttons">
-  <!-- Agrandir : chat en cours OU liste des conversations -->
-  <a class="btn-see-all"
-     [routerLink]="openedConversation
-       ? ['/restaurant/messages', openedConversation.userId]
-       : ['/restaurant/messages']"
-     (click)="closeMessages()"
-     [title]="openedConversation
-       ? 'Ouvrir cette conversation en plein écran'
-       : 'Voir toutes les conversations'">
-    <i class="bi bi-arrows-angle-expand"></i>
-  </a>
+        <a class="btn-see-all"
+           [routerLink]="openedConversation
+             ? ['/restaurant/messages', openedConversation.userId]
+             : ['/restaurant/messages']"
+           (click)="closeMessages()"
+           [title]="openedConversation
+             ? 'Ouvrir cette conversation en plein écran'
+             : 'Voir toutes les conversations'">
+          <i class="bi bi-arrows-angle-expand"></i>
+        </a>
 
-  <button type="button" class="panel-close" (click)="closeMessages()" aria-label="Fermer">
-    <i class="bi bi-x"></i>
-  </button>
-</div>
+        <button type="button" class="panel-close" (click)="closeMessages()" aria-label="Fermer">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
     </div>
 
     <!-- CORPS -->
@@ -264,7 +267,7 @@
 
     </div>
 
-    <!-- FOOTER : saisie uniquement (bouton agrandir supprimé) -->
+    <!-- FOOTER : saisie uniquement -->
     <div class="side-panel-footer chat-footer" *ngIf="openedConversation">
 
       <div class="chat-input-wrapper">
