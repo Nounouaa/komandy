@@ -1,1 +1,5 @@
+<!-- Navbar publique : UNIQUEMENT sur les pages publiques -->
+<app-navbar *ngIf="!isDashboardRoute()"></app-navbar>
+
+<!-- Contenu -->
 <router-outlet></router-outlet>
